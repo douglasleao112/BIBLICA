@@ -4,15 +4,20 @@
   <meta charset="utf-8">
 
   <script>
-    const destino = "https://descobreabiblia.netlify.app/biblica";
+    const pagina01 = "https://descobreabiblia.netlify.app/biblica01";
+    const pagina02 = "https://descobreabiblia.netlify.app/biblica02";
 
-    // Pega todos os parâmetros da URL atual
+    // Split aleatório 50% / 50%
+    const destino = Math.random() < 0.5 ? pagina01 : pagina02;
+
+    // Mantém UTMs e demais parâmetros
     const parametros = window.location.search;
 
-    // Redireciona mantendo UTMs e demais parâmetros
+    // Redireciona imediatamente
     window.location.replace(destino + parametros);
   </script>
 </head>
+
 <body>
 </body>
 </html>
