@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#463026">
+  <meta name="description" content="Autocolantes bíblicos digitais para imprimir, recortar e explorar os livros da Bíblia.">
+  <title>Bíblia em Autocolantes | Coleção digital para imprimir</title>
+  <!-- Meta Pixel: mesmo identificador da página Crianças da Bíblia -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+    (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init','28332699173082170');
+    fbq('track','PageView');
+  </script>
+  <!-- Microsoft Clarity: mesmo identificador da página Crianças da Bíblia -->
+  <script>
+    (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src='https://www.clarity.ms/tag/'+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window,document,'clarity','script','yd7oxudycw');
+  </script>
+  <style>
+    :root{--oliva:#374001;--laranja:#e97f05;--castanho:#5b1a04;--terracota:#e86433;--creme:#fff9ed;--papel:#fffdf8;--areia:#f6ebd5;--texto:#392719;--sombra:0 18px 55px rgba(91,26,4,.12)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-width:320px;overflow-x:hidden;background:var(--creme);color:var(--texto);font-family:Arial,Helvetica,sans-serif;line-height:1.55}
+    a{color:inherit}
+    button,a{ -webkit-tap-highlight-color:transparent }
+    .wrap{width:min(1120px,calc(100% - 40px));margin:auto}
+    .eyebrow{font-size:.8125rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--terracota)}
+    h1,h2,h3{font-family:Georgia,serif;line-height:1.08;letter-spacing:-.035em;color:var(--castanho)}
+    h1{font-size:clamp(2.7rem,6.7vw,5.6rem);margin:.2em 0}
+    h2{font-size:clamp(2rem,4vw,3.55rem);margin:.2em 0 .4em}
+    h3{font-size:1.35rem;margin:.2em 0 .5em}
+    p{margin:.3em 0 1em}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.7rem;padding:1rem 1.55rem;border-radius:999px;text-decoration:none;font-weight:800;text-align:center;transition:transform .2s,box-shadow .2s}
+    .btn:hover{transform:translateY(-3px)}
+    .btn-primary{background:var(--laranja);color:#fff;box-shadow:0 8px 0 #bd5c00,0 18px 28px rgba(233,127,5,.26)}
+    .btn-primary:hover{box-shadow:0 5px 0 #bd5c00,0 13px 24px rgba(233,127,5,.3)}
+    .btn-secondary{border:2px solid var(--oliva);color:var(--oliva);background:#fff}
+    .purchase-notice{position:fixed;top:56px;right:18px;z-index:29;width:min(245px,calc(100% - 28px));display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid #d7e3ef;border-radius:14px;background:rgba(255,255,255,.97);box-shadow:0 14px 38px rgba(9,26,54,.2);opacity:0;transform:translate3d(calc(100% + 30px),0,0);transition:opacity .42s ease,transform .42s cubic-bezier(.16,1,.3,1);pointer-events:none}
+    .purchase-notice.show{opacity:1;transform:translate3d(0,0,0)}
+    .purchase-notice-icon{flex:0 0 28px;width:28px;height:28px;display:grid;place-items:center;border:1px solid #c9dff1;border-radius:50%;background:#eaf4fb;color:#17457b;font-weight:900}
+    .purchase-notice-copy{display:block;flex:1;min-width:0}
+    .purchase-notice-head{display:flex!important;width:100%;align-items:center;justify-content:space-between;gap:8px}
+    .purchase-notice-head b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.68rem;color:#10284f}
+    .purchase-notice-head em{flex:0 0 auto;color:#17457b;font-size:.58rem;font-style:normal;font-weight:800;white-space:nowrap}
+    .purchase-notice-detail{display:block;margin-top:2px;color:#627087;font-size:.58rem;font-weight:800;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ticker{overflow:hidden;background:#463026;color:#eac07c;border-bottom:1px solid #a5673e}
+    .ticker-track{display:flex;width:max-content;animation:ticker-scroll 32s linear infinite}
+    .ticker-group{display:flex;flex:none;white-space:nowrap}
+    .ticker-item{display:flex;align-items:center;gap:.5rem;padding:.55rem 1.6rem;border-right:1px solid #795043;font-size:.875rem;font-weight:800}
+    .ticker-item b{color:#ffd18b}
+    .ticker:hover .ticker-track{animation-play-state:paused}
+    @keyframes ticker-scroll{to{transform:translateX(-50%)}}
+    .hero{position:relative;isolation:isolate;padding:76px 0 90px;background:radial-gradient(circle at 80% 22%,#a2633730,transparent 34%),linear-gradient(125deg,#573122,#75432c 60%,#593525);color:#f6e9d6;overflow:hidden}
+    .hero-grid{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:clamp(30px,5vw,80px)}
+    .hero .eyebrow{display:inline-block;padding:.55rem 1.15rem;border:1px solid #d5a658;border-radius:999px;background:#eeb55e18;color:#eac07c;letter-spacing:.2em}
+    .hero h1{color:#fff8eb;font-size:clamp(3.4rem,6vw,6rem);max-width:660px;margin:.32em 0 .2em}
+    .hero-strap{display:block;max-width:600px;color:#eac07c;font:italic 700 clamp(1.7rem,3vw,2.75rem)/1.28 Georgia,serif;margin-bottom:1.2rem}
+    .hero-copy>p{font-size:1.12rem;max-width:590px;color:#ead7c3}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:1rem;margin:1.8rem 0 1rem}
+    .hero .btn-primary{background:linear-gradient(100deg,#26c76d,#189b7e);color:#fff;border:1px solid #5bda99;box-shadow:0 14px 30px #135c443d;padding:1.15rem 2rem}
+    .hero .btn-primary:hover{box-shadow:0 18px 36px #135c4459}
+    .trust{display:flex;flex-wrap:wrap;gap:1.15rem;margin-top:1.5rem}
+    .trust span{color:#d9b78b;font-size:.82rem;font-weight:700}
+    .trust span:before{content:"✓";margin-right:.4rem;color:#eeb55e}
+    .visual{position:relative;isolation:isolate;min-width:0;display:grid;place-items:center;padding:16px}
+    .visual:before{content:"";position:absolute;inset:12% 2% 7%;border:1px solid #d9ad793b;border-radius:28px;background:#e6a4660e;z-index:-1}
+    .visual img{display:block;width:min(100%,520px);max-height:640px;height:auto;object-fit:contain;filter:drop-shadow(0 22px 27px #2f190d6b)}
+    .preview-label{position:absolute;bottom:4%;right:4%;z-index:3;background:#fffaf2;border-radius:13px;padding:.65rem .85rem;font-size:.78rem;font-weight:800;color:#69412c;box-shadow:0 8px 22px #341a0c4d}
+    .examples{background:#fcf1dc}
+    .examples .section-intro{max-width:720px}
+    .example-list{display:grid;gap:1.2rem;max-width:780px;margin:auto}
+    .example-card{display:grid;grid-template-columns:180px 1fr;align-items:center;gap:1.5rem;background:#fffdf9;border:2px solid #7b422c;border-radius:18px;padding:1.2rem;box-shadow:0 10px 28px #5b1a0412}
+    .example-card img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:contain;border-radius:12px;background:#f6ebd9}
+    .example-tag{display:inline-block;background:#eec06b;color:#4c2d1f;border-radius:999px;padding:.35rem .7rem;font-size:.8rem;font-weight:800;margin-bottom:.6rem}
+    .example-card h3{font-size:1.45rem}
+    .example-card p{font-size:1rem;color:#684a38;margin:0}
+    .example-note{font-size:.8rem;color:#836b56;text-align:center;margin:1.25rem auto 0}
+    .ribbon{background:var(--terracota);color:white;text-align:center;padding:1rem; font-weight:800}
+    section{padding:92px 0}
+    .section-intro{text-align:center;max-width:720px;margin:0 auto 2.8rem}
+    .section-intro p{font-size:1.04rem;color:#765c46}
+    .benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+    .card{background:#fff;border:1px solid #eadbc3;border-radius:24px;padding:1.8rem;box-shadow:0 8px 26px rgba(91,26,4,.05)}
+    .benefits .card{display:flex;flex-direction:column;overflow:hidden;padding:0;background:#fffdf8}
+    .benefit-image{display:block;width:100%;height:auto}
+    .benefit-copy{position:relative;z-index:1;flex:1;margin-top:-3.25rem;padding:4.1rem 1.8rem 1.8rem;background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(255,255,255,.96) 3.25rem,#fff 4.1rem)}
+    .section-offer-action{text-align:center;margin-top:2.2rem}
+    .section-offer-action .btn-primary{background:linear-gradient(100deg,#26c76d,#189b7e);color:#fff;box-shadow:0 10px 24px #135c4433}
+    .section-offer-action .btn-primary:hover{box-shadow:0 12px 28px #135c4459}
+    .card p{color:#765c46;font-size:.92rem}
+    .how{background:#f5ecd9}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+    .step{position:relative;background:#fffdf8;border-radius:24px;padding:2rem 1.5rem;border-bottom:5px solid var(--laranja)}
+    .step:nth-child(2){border-color:var(--terracota)}
+    .step:nth-child(3){border-color:var(--oliva)}
+    .num{display:grid;place-items:center;width:43px;height:43px;border-radius:50%;background:var(--castanho);color:#fff;font-weight:900;margin-bottom:1rem}
+    .step p{color:#765c46}
+    .offer{background:linear-gradient(145deg,#5b2d1f,#75422d);color:white;text-align:center}
+    .offer-grid{display:grid;grid-template-columns:1fr;align-items:center;gap:2rem;max-width:760px}
+    .offer .eyebrow{color:#efc581}
+    .offer h2,.offer h3{color:#fff7e8}
+    .offer p{color:#eedac8}
+    .offer-box{width:min(100%,600px);margin:auto;background:#7e4c33;color:#fff7e8;border:1px solid #d4a05d;border-radius:28px;padding:2.4rem;box-shadow:0 22px 36px #381b124d}
+    .offer-product{display:block;width:min(100%,370px);height:auto;max-height:470px;object-fit:contain;margin:0 auto 1.2rem;filter:drop-shadow(0 20px 24px #35190f70)}
+    .offer-box h3{font-size:2rem}
+    .offer-price{margin:.8rem 0 1.2rem;color:#fff9ed}
+    .offer-price strong{display:block;font:700 clamp(3.5rem,9vw,5rem)/1 Georgia,serif}
+    .offer-price span{display:block;margin-top:.3rem;font-size:.9rem;color:#f1d4b4}
+    .offer-box ul{list-style:none;padding:0;margin:1.4rem 0}
+    .offer-box li{padding:.58rem 0;border-bottom:1px solid #cda07966;text-align:left}
+    .offer-box li:before{content:"✓";color:#f6cb83;font-weight:900;margin-right:.7rem}
+    .offer-box .btn{width:100%}
+    .offer-box .btn-primary{background:linear-gradient(100deg,#26c76d,#189b7e);color:#fff;box-shadow:0 12px 28px #16573d70}
+    .checkout-visual{position:relative;isolation:isolate}
+    .checkout-visual .btn{position:relative;z-index:2}
+    .payment-methods{position:relative;z-index:0;display:block;width:min(300px,82%);height:auto;margin:-14px auto 0;opacity:.85}
+    .offer-basic{background:#fff;color:#5b2d1f;border-color:#e9c48a;padding:2rem 2.4rem}
+    .offer-basic .eyebrow{color:#ae5733}
+    .offer-basic h3,.offer-basic .offer-price{color:#5b2d1f}
+    .offer-basic .offer-price strong{font-size:clamp(3rem,7vw,4.2rem)}
+    .offer-basic .offer-price span{color:#765c46}
+    .offer-basic li{border-color:#e4d3bd}
+    .offer-basic li:before{color:#199b69}
+    .offer-basic .offer-product{margin-bottom:.45rem;filter:drop-shadow(0 16px 18px #5b2d1f33)}
+    .offer-basic .mockup-note{margin:0 0 1.2rem;color:#765c46;font-size:.78rem}
+    .offer-complete{background:#fff;color:#5b2d1f;border-color:#e9c48a}
+    .offer-complete .eyebrow{color:#ae5733}
+    .offer-complete h3,.offer-complete .offer-price{color:#5b2d1f}
+    .offer-complete .offer-price span{color:#765c46}
+    .offer-complete li{border-color:#e4d3bd}
+    .offer-complete li:before{color:#199b69}
+    .offer-complete .offer-product{filter:drop-shadow(0 16px 18px #5b2d1f33)}
+    .upgrade-dialog{width:min(100% - 30px,480px);max-height:calc(100vh - 30px);overflow:auto;border:1px solid #e9c48a;border-radius:24px;padding:2rem;background:#fff9ed;color:var(--texto);box-shadow:0 24px 70px #26170fc4}
+    .upgrade-dialog::backdrop{background:#1d120bbd}
+    .upgrade-dialog h2{font-size:clamp(1.9rem,6vw,2.6rem);margin:.35em 0}
+    .upgrade-dialog p{color:#765c46}
+    .upgrade-dialog .eyebrow{color:#ae5733}
+    .upgrade-actions{display:grid;gap:.8rem;margin-top:1.5rem}
+    .upgrade-actions .btn{width:100%}
+    .upgrade-actions .btn-primary{background:linear-gradient(100deg,#26c76d,#189b7e);box-shadow:0 12px 28px #16573d4d}
+    .upgrade-actions .btn-secondary{border-color:#d8c7ad;color:#5b2d1f}
+    .upgrade-close{position:absolute;top:1rem;right:1rem;display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:50%;background:#f1e5d2;color:#5b2d1f;font-size:1.4rem;cursor:pointer}
+    .faq{max-width:780px;margin:auto}
+    details{background:#fff;border:1px solid #eadbc3;border-radius:16px;padding:1.1rem 1.3rem;margin:.7rem 0}
+    summary{cursor:pointer;font-weight:800;color:var(--castanho)}
+    details p{color:#765c46;margin:1rem 0 0}
+    footer{background:var(--castanho);color:#fff;padding:2.5rem 0;font-size:.78rem}
+    footer .wrap{display:flex;justify-content:space-between;gap:2rem;flex-wrap:wrap}
+    footer p{max-width:600px;margin:0;color:#f7dfcd}
+    .facts{background:var(--castanho);color:#fff;padding:1.3rem 0}
+    .facts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;text-align:center}
+    .facts-grid strong{display:block;font:700 clamp(1.7rem,4vw,3rem)/1 Georgia,serif;color:#ffd7a4}
+    .facts-grid span{font-size:.86rem}
+    .chapter{background:#fff7e8}
+    .chapter.dark{background:var(--castanho);color:#fff}
+    .chapter.dark h2,.chapter.dark h3{color:#fff}
+    .chapter.dark .eyebrow{color:#ffcf8f}
+    .chapter.dark .section-intro p{color:#f4dfcb}
+    .book-grid{display:grid;grid-template-columns:1fr;gap:1.25rem}
+    .book-panel{min-width:0;background:#fff;border:1px solid #e8d3b6;border-radius:24px;padding:1.7rem}
+    .book-panel h3{display:flex;justify-content:space-between;align-items:baseline;gap:1rem}
+    .book-panel h3 span{font:800 .82rem Arial,Helvetica,sans-serif;color:var(--terracota)}
+    .book-panel p{font-size:.87rem;color:#765c46}
+    .book-scroll{max-width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;margin-top:1rem;mask-image:linear-gradient(90deg,transparent,#000 2%,#000 98%,transparent)}
+    .book-scroll::-webkit-scrollbar{display:none}
+    .book-scroll:focus-visible{outline:3px solid var(--laranja);outline-offset:4px}
+    .book-track{display:flex;width:max-content}
+    .book-track.is-animated{animation:book-marquee 48s linear infinite}
+    .book-panel:nth-child(2) .book-track.is-animated{animation-duration:37s}
+    .book-scroll:is(:hover,:focus,:focus-within,:active) .book-track{animation-play-state:paused}
+    .books{display:flex;flex:0 0 auto;flex-wrap:nowrap;width:max-content;gap:.5rem;list-style:none;padding:0;margin:0 .5rem 0 0}
+    .books li{flex:none;white-space:nowrap;background:#f7efe0;border:1px solid #e8d3b6;border-radius:99px;padding:.35rem .7rem;font-size:.875rem;font-weight:700}
+    .books li.rare{background:#fff0d8;border-color:var(--laranja);color:var(--castanho)}
+    @keyframes book-marquee{to{transform:translateX(-50%)}}
+    .book-note{font-size:.8rem;color:#765c46;max-width:740px;margin:1.2rem auto 0;text-align:center}
+    .sheet-showcase{background:#fffaf1;overflow:hidden}
+    .sheet-showcase .section-intro{margin-bottom:1.4rem}
+    .sheet-set{position:relative;z-index:1;width:100%;margin:0 auto 4rem}
+    .sheet-set:last-of-type{margin-bottom:1.2rem}
+    .sheet-viewport{position:relative;z-index:2;overflow:visible;width:100%}
+    .sheet-viewport:focus-visible{outline:3px solid var(--laranja);outline-offset:4px}
+    .sheet-strip{display:flex;width:max-content;min-width:100%}
+    .sheet-strip.is-animated{animation:sheet-marquee-left var(--sheet-duration,47s) linear infinite}
+    .sheet-set.antigo .sheet-strip.is-animated{animation-name:sheet-marquee-right}
+    .sheet-set:is(:hover,:focus-within) .sheet-strip{animation-play-state:paused}
+    .sheet-group{display:flex;flex:none;gap:1rem;padding-right:1rem}
+    .sheet-slide{flex:none;width:clamp(180px,22vw,270px);height:clamp(265px,28vw,360px);margin:0;display:grid;place-items:center;background:transparent;border:0;box-shadow:none;padding:0}
+    .sheet-slide img{display:block;width:100%;height:100%;object-fit:contain}
+    @keyframes sheet-marquee-left{to{transform:translateX(-50%)}}
+    @keyframes sheet-marquee-right{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+    .sheet-note{text-align:center;color:#765c46;font-size:.85rem;max-width:680px;margin:0 auto}
+    .sticker-break{padding:30px 0;background:#fffaf1;overflow:hidden}
+    .sticker-break .sheet-set{margin:0}
+    .sticker-break .sheet-slide{width:clamp(150px,18vw,210px);height:clamp(170px,20vw,240px)}
+    .advantage-section{background:#fffaf1}
+    .advantage-section .section-intro{text-align:left;max-width:730px;margin:0 0 2.2rem}
+    .advantage-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:2.5rem}
+    .advantage-item{display:grid;grid-template-columns:30px minmax(0,1fr);align-items:start;gap:1rem;padding:1.3rem 0;border-bottom:1px solid #dfcdb9;min-width:0}
+    .advantage-item h3{font-size:1.14rem;margin:0 0 .28rem}
+    .advantage-item p{font-size:1rem;color:#765c46;margin:0}
+    .advantage-icon{width:25px;height:25px;color:#c2633d;margin-top:.1rem;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+    .icon-sprite{position:absolute;width:0;height:0;overflow:hidden}
+    .advantage-item.will-reveal{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s cubic-bezier(.22,1,.36,1)}
+    .advantage-item.will-reveal.is-visible{opacity:1;transform:none}
+    .uses{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+    .use-card{border-radius:20px;padding:1.45rem;background:#fff;border-top:5px solid var(--laranja)}
+    .use-card:nth-child(2){border-color:var(--terracota)}
+    .use-card:nth-child(3){border-color:var(--oliva)}
+    .use-card:nth-child(4){border-color:var(--castanho)}
+    .use-card span{display:block;font-size:1.6rem;margin-bottom:.5rem}
+    .use-card p{font-size:.86rem;color:#765c46}
+    .sample-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+    .sample{background:#fff;border:1px solid #e7d0ae;border-radius:20px;padding:1rem}
+    .sample img{display:block;width:100%;height:300px;object-fit:contain;background:#fff7e8;border-radius:12px}
+    .sample h3{font-size:1.07rem;margin:.8rem 0 .2rem}
+    .sample p{font-size:.78rem;color:#765c46}
+    .bonus-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+    .bonus{background:#fffdf8;border-radius:24px;overflow:hidden;border:1px solid #dcb48b}
+    .bonus .bonus-media{background:#f7ead8}
+    .bonus img{display:block;width:100%;height:300px;object-fit:contain}
+    .bonus-copy{padding:1.4rem}
+    .bonus-copy strong{color:var(--terracota);font-size:.75rem;text-transform:uppercase;letter-spacing:.1em}
+    .bonus-copy p{color:#765c46;font-size:.85rem}
+    .guarantee{display:flex;align-items:center;gap:1.5rem;border:2px solid #e9c48a;border-radius:22px;background:#fffdf8;padding:1.5rem 2rem;max-width:780px;margin:2rem auto 0}
+    .guarantee-badge{flex:none;width:110px;height:110px;object-fit:contain}
+    .guarantee p{font-size:.87rem;color:#765c46}
+    .help{background:#f6ecd9;text-align:center;padding:55px 0}
+    .help h2{font-size:clamp(1.7rem,3.2vw,2.5rem)}
+    .help .btn{background:#1eaf63;color:#fff;box-shadow:0 12px 25px #1eaf6333}
+    @media(max-width:850px){.hero-grid,.offer-grid{grid-template-columns:1fr}.hero-copy{text-align:left}.hero-copy>p{margin-left:0;margin-right:0}.hero-actions,.trust{justify-content:flex-start}.benefits,.steps{grid-template-columns:1fr}.offer-grid{gap:2.8rem}}
+    @media(max-width:850px){.uses,.sample-grid,.bonus-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:700px){.advantage-grid{grid-template-columns:1fr}.advantage-section .section-intro{text-align:center;margin:0 auto 1.5rem}}
+    @media(max-width:520px){.wrap{width:min(100% - 30px,1120px)}.hero{padding:52px 0 62px}.hero h1{font-size:clamp(2.9rem,13vw,4rem)}.hero-actions{flex-direction:column}.hero-actions .btn{width:100%}.visual{padding:6px}.preview-label{position:static;display:block;width:max-content;max-width:100%;margin:.6rem auto 0;text-align:center}section{padding:65px 0}.offer-box{padding:1.5rem}.ribbon{font-size:.8rem}}
+    @media(max-width:520px){.book-grid,.uses,.sample-grid,.bonus-grid,.example-card{grid-template-columns:1fr}.example-card img{max-width:280px;margin:auto}.facts-grid{gap:.5rem}.facts-grid strong{font-size:1.45rem}.facts-grid span{font-size:.68rem}.guarantee{padding:1rem;gap:.9rem}.guarantee-badge{width:76px;height:76px}.sample img{height:240px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn,.purchase-notice{transition:none}.book-track.is-animated,.ticker-track,.sheet-strip.is-animated{animation:none}.ticker,.sheet-viewport{overflow-x:auto}.sheet-viewport{scrollbar-width:none}.advantage-item.will-reveal{opacity:1;transform:none;transition:none}}
+  </style>
+</head>
+<body>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=28332699173082170&amp;ev=PageView&amp;noscript=1" alt=""></noscript>
+  <div class="ticker" aria-label="Características da coleção"><div class="ticker-track">
+    <div class="ticker-group"><span class="ticker-item">✦ <b>66 livros</b> em autocolantes</span><span class="ticker-item">▦ <b>150+ páginas</b> prontas para imprimir</span><span class="ticker-item">✧ <b>90 autocolantes extra</b></span><span class="ticker-item">↓ <b>PDF digital</b> para descarregar e imprimir</span></div>
+    <div class="ticker-group" aria-hidden="true"><span class="ticker-item">✦ <b>66 livros</b> em autocolantes</span><span class="ticker-item">▦ <b>150+ páginas</b> prontas para imprimir</span><span class="ticker-item">✧ <b>90 autocolantes extra</b></span><span class="ticker-item">↓ <b>PDF digital</b> para descarregar e imprimir</span></div>
+  </div></div>
+  <main>
+    <section class="hero" id="inicio">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">Bíblia em Autocolantes</span>
+          <h1>+300 autocolantes prontos a imprimir</h1>
+          <span class="hero-strap">Autocolantes para explorar os livros da Bíblia</span>
+          <p>Decore a sua Bíblia ou o seu devocional, partilhe as histórias com os seus filhos ou prepare a próxima aula. Um conjunto digital para descarregar, imprimir e recortar ao seu ritmo.</p>
+          <div class="hero-actions"><a class="btn btn-primary" href="#colecao">Quero a Bíblia em Autocolantes <span aria-hidden="true">→</span></a></div>
+          <div class="trust" aria-label="Características"><span>Descarregue o PDF</span><span>Imprima em casa</span><span>Use nas suas atividades</span></div>
+        </div>
+        <div class="visual"><img src="hero-autocolantes.png" width="1122" height="1402" alt="Imagem do Livro de Autocolantes Bíblicos com folhas ilustradas de histórias da Bíblia"><span class="preview-label">Imagem do produto · entrega digital em PDF</span></div>
+      </div>
+    </section>
+    <section class="examples" id="exemplos">
+      <div class="wrap">
+        <div class="section-intro"><span class="eyebrow">Exemplos visuais</span><h2>Da impressão aos momentos de descoberta.</h2><p>Veja estas duas folhas ilustradas e imagine as atividades que pode preparar com as crianças.</p></div>
+        <div class="example-list">
+          <article class="example-card"><img src="exemplo-autocolantes-1.png" alt="Folha impressa de autocolantes bíblicos ilustrados, segurada à frente de uma mesa" loading="lazy"><div><span class="example-tag">Histórias para partilhar</span><h3>Uma folha, muitas conversas.</h3><p>Personagens, cenas e mensagens para apresentar as histórias da Bíblia de forma visual e criar uma atividade em família.</p></div></article>
+          <article class="example-card"><img src="exemplo-autocolantes-2.png" alt="Folha impressa com autocolantes da história de Daniel e outros símbolos bíblicos" loading="lazy"><div><span class="example-tag">Leitura e devocional</span><h3>Descubra os detalhes de cada relato.</h3><p>Escolha uma imagem, leia a passagem correspondente e deixe que os pequenos contem o que observaram.</p></div></article>
+        </div>
+        <p class="example-note">Imagens ilustrativas de folhas impressas. O produto é entregue em formato digital.</p>
+      </div>
+    </section>
+    <div class="ribbon">Um momento longe dos ecrãs, cheio de imaginação e conversa</div>
+    <div class="facts" aria-label="Dados apresentados no material de referência"><div class="wrap facts-grid"><div><strong>66</strong><span>livros da Bíblia</span></div><div><strong>150+</strong><span>páginas para imprimir</span></div><div><strong>90</strong><span>autocolantes extra</span></div></div></div>
+    <section id="beneficios">
+      <div class="wrap"><div class="section-intro"><span class="eyebrow">Mais do que uma atividade</span><h2>Aprender, brincar e estar juntos.</h2><p>Os autocolantes ajudam a transformar uma história numa experiência em que a criança participa.</p></div>
+        <div class="benefits">
+          <article class="card"><img class="benefit-image" src="beneficio-historias.png" width="1448" height="1086" alt="Duas crianças exploram histórias da Bíblia num livro ilustrado" loading="lazy"><div class="benefit-copy"><h3>Descobrir histórias</h3><p>Apresente os relatos da Bíblia de forma visual e acessível aos mais pequenos.</p></div></article>
+          <article class="card"><img class="benefit-image" src="beneficio-criar.png" width="1536" height="1024" alt="Mãe e filho recortam autocolantes bíblicos para compor uma cena" loading="lazy"><div class="benefit-copy"><h3>Criar com as mãos</h3><p>Imprima as páginas e convide a criança a recortar, organizar e compor as suas próprias cenas.</p></div></article>
+          <article class="card"><img class="benefit-image" src="beneficio-familia.png" width="1672" height="941" alt="Família conversa reunida no sofá" loading="lazy"><div class="benefit-copy"><h3>Conversar em família</h3><p>Cada autocolante pode abrir espaço para perguntas, curiosidade e momentos partilhados.</p></div></article>
+        </div>
+        <div class="section-offer-action"><a class="btn btn-primary" href="#colecao">Ver a oferta completa <span aria-hidden="true">→</span></a></div>
+      </div>
+    </section>
+    <section class="chapter" id="indice">
+      <div class="wrap"><div class="section-intro"><span class="eyebrow">O índice completo</span><h2>Do Génesis ao Apocalipse.</h2><p>Na coleção descrita na referência, os autocolantes cobrem os 39 livros do Antigo Testamento e os 27 do Novo Testamento — incluindo os livros menos conhecidos.</p></div>
+        <div class="book-grid">
+          <div class="book-panel"><h3>Antigo Testamento <span>39 livros</span></h3><p>Histórias, poesia, sabedoria e profecia.</p><div class="book-scroll" role="region" tabindex="0" aria-label="Lista horizontal dos 39 livros do Antigo Testamento"><div class="book-track"><ul class="books">
+            <li>Génesis</li><li>Êxodo</li><li>Levítico</li><li>Números</li><li>Deuteronómio</li><li>Josué</li><li>Juízes</li><li>Rute</li><li>1 Samuel</li><li>2 Samuel</li><li>1 Reis</li><li>2 Reis</li><li>1 Crónicas</li><li>2 Crónicas</li><li>Esdras</li><li>Neemias</li><li>Ester</li><li>Jó</li><li>Salmos</li><li>Provérbios</li><li>Eclesiastes</li><li>Cântico dos Cânticos</li><li>Isaías</li><li>Jeremias</li><li>Lamentações</li><li>Ezequiel</li><li>Daniel</li><li>Oseias</li><li>Joel</li><li>Amós</li><li class="rare">Obadias</li><li>Jonas</li><li>Miqueias</li><li class="rare">Naum</li><li class="rare">Habacuque</li><li class="rare">Sofonias</li><li>Ageu</li><li>Zacarias</li><li>Malaquias</li>
+          </ul></div></div></div>
+          <div class="book-panel"><h3>Novo Testamento <span>27 livros</span></h3><p>Evangelhos, Atos, cartas e Apocalipse.</p><div class="book-scroll" role="region" tabindex="0" aria-label="Lista horizontal dos 27 livros do Novo Testamento"><div class="book-track"><ul class="books">
+            <li>Mateus</li><li>Marcos</li><li>Lucas</li><li>João</li><li>Atos dos Apóstolos</li><li>Romanos</li><li>1 Coríntios</li><li>2 Coríntios</li><li>Gálatas</li><li>Efésios</li><li>Filipenses</li><li>Colossenses</li><li>1 Tessalonicenses</li><li>2 Tessalonicenses</li><li>1 Timóteo</li><li>2 Timóteo</li><li>Tito</li><li>Filémon</li><li>Hebreus</li><li>Tiago</li><li>1 Pedro</li><li>2 Pedro</li><li>1 João</li><li>2 João</li><li>3 João</li><li>Judas</li><li>Apocalipse</li>
+          </ul></div></div></div>
+        </div><p class="book-note">Esta lista segue o cânone de 66 livros da página de referência. Se o seu material usar outra edição da Bíblia, o índice deve ser ajustado antes de publicar.</p>
+      </div>
+    </section>
+    <section class="sheet-showcase" id="ilustracoes">
+      <div class="section-intro wrap"><span class="eyebrow">Antigo Testamento</span><h2>Histórias que ganham forma em autocolantes.</h2><p>Explore algumas das personagens e imagens inspiradas nesta parte da Bíblia.</p></div>
+      <div class="sheet-set antigo">
+        <div class="sheet-viewport" role="region" tabindex="0" aria-label="Galeria horizontal de ilustrações do Antigo Testamento"><div class="sheet-strip">
+          <div class="sheet-group">
+          <figure class="sheet-slide"><img src="slide-antigo-1.png" alt="Personagem bíblica ilustrada de cabelos brancos com um cajado" loading="lazy"></figure>
+          <figure class="sheet-slide"><img src="slide-antigo-2.png" alt="Mulher ilustrada com veste de folhas verdes" loading="lazy"></figure>
+          <figure class="sheet-slide"><img src="slide-antigo-3.png" alt="Pastor bíblico ilustrado a segurar um cajado" loading="lazy"></figure>
+          </div>
+        </div></div>
+      </div>
+      <div class="section-intro wrap"><span class="eyebrow">Novo Testamento</span><h2>Mais ilustrações para descobrir em conjunto.</h2><p>Outras personagens que podem acompanhar a leitura e as atividades.</p></div>
+      <div class="sheet-set">
+        <div class="sheet-viewport" role="region" tabindex="0" aria-label="Galeria horizontal de ilustrações do Novo Testamento"><div class="sheet-strip">
+          <div class="sheet-group">
+          <figure class="sheet-slide"><img src="slide-novo-1.png" alt="Figura ilustrada de Jesus com os braços abertos" loading="lazy"></figure>
+          <figure class="sheet-slide"><img src="slide-novo-2.png" alt="Outra figura ilustrada de Jesus a acolher" loading="lazy"></figure>
+          <figure class="sheet-slide"><img src="slide-novo-3.png" alt="Autocolante ilustrado de Jesus com contorno branco" loading="lazy"></figure>
+          <figure class="sheet-slide"><img src="slide-novo-4.png" alt="Figura ilustrada de Jesus a segurar um pergaminho" loading="lazy"></figure>
+          <figure class="sheet-slide"><img src="slide-novo-5.png" alt="Figura ilustrada de Maria com veste azul" loading="lazy"></figure>
+          <figure class="sheet-slide"><img src="slide-novo-6.png" alt="Figura ilustrada de uma mulher bíblica com veste azul e rosa" loading="lazy"></figure>
+          </div>
+        </div></div>
+      </div>
+      <p class="sheet-note wrap">Pré-visualizações ilustrativas dos personagens; as folhas finais para impressão devem ser confirmadas na oferta oficial.</p>
+    </section>
+    <section id="utilizacoes">
+      <div class="wrap"><div class="section-intro"><span class="eyebrow">Um ficheiro, várias ideias</span><h2>Use os autocolantes ao seu ritmo.</h2><p>O mesmo conjunto pode apoiar a leitura, o devocional e a aprendizagem das crianças.</p></div><div class="uses">
+        <article class="use-card"><span aria-hidden="true">📖</span><h3>Na sua Bíblia</h3><p>Assinale uma passagem e acrescente uma imagem que a ajude a recordar o relato.</p></article>
+        <article class="use-card"><span aria-hidden="true">👨‍👩‍👧</span><h3>Em família</h3><p>Conte a história e deixe os pequenos escolher e colocar as peças.</p></article>
+        <article class="use-card"><span aria-hidden="true">📝</span><h3>No devocional</h3><p>Personalize o seu caderno e organize temas e versículos.</p></article>
+        <article class="use-card"><span aria-hidden="true">🏫</span><h3>Na aula</h3><p>Prepare uma atividade visual para a catequese ou a escola dominical.</p></article>
+      </div></div>
+    </section>
+    <section class="how" id="como-funciona">
+      <div class="wrap"><div class="section-intro"><span class="eyebrow">Simples de começar</span><h2>Do ficheiro à brincadeira em três passos.</h2></div>
+        <div class="steps"><article class="step"><span class="num">1</span><h3>Descarregue</h3><p>Receba os ficheiros digitais e guarde-os no seu dispositivo.</p></article><article class="step"><span class="num">2</span><h3>Imprima e recorte</h3><p>Escolha as páginas que pretende utilizar, imprima-as e prepare os autocolantes.</p></article><article class="step"><span class="num">3</span><h3>Descubra em conjunto</h3><p>Use as peças para contar histórias, criar cenas e conversar com a criança.</p></article></div>
+        <div class="section-offer-action"><a class="btn btn-primary" href="#colecao">Ver a oferta completa <span aria-hidden="true">→</span></a></div>
+      </div>
+    </section>
+    <div class="sticker-break" aria-hidden="true">
+      <div class="sheet-set"><div class="sheet-viewport" aria-hidden="true"><div class="sheet-strip"><div class="sheet-group">
+        <figure class="sheet-slide"><img src="slide-novo-3.png" alt="" loading="lazy"></figure>
+        <figure class="sheet-slide"><img src="slide-antigo-3.png" alt="" loading="lazy"></figure>
+        <figure class="sheet-slide"><img src="slide-novo-5.png" alt="" loading="lazy"></figure>
+        <figure class="sheet-slide"><img src="slide-antigo-2.png" alt="" loading="lazy"></figure>
+        <figure class="sheet-slide"><img src="slide-novo-6.png" alt="" loading="lazy"></figure>
+        <figure class="sheet-slide"><img src="slide-antigo-1.png" alt="" loading="lazy"></figure>
+      </div></div></div></div>
+    </div>
+    <section class="chapter advantage-section" id="vantagens">
+      <svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <symbol id="adv-book" viewBox="0 0 24 24"><path d="M3 5c3-1 6-.5 9 1v13c-3-1.5-6-2-9-1V5Zm18 0c-3-1-6-.5-9 1v13c3-1.5 6-2 9-1V5Z"/></symbol>
+        <symbol id="adv-style" viewBox="0 0 24 24"><path d="m12 3 2.1 6.9L21 12l-6.9 2.1L12 21l-2.1-6.9L3 12l6.9-2.1L12 3Z"/></symbol>
+        <symbol id="adv-print" viewBox="0 0 24 24"><path d="M6 9V4h12v5M6 18H4V9h16v9h-2M7 15h10v6H7v-6ZM17 12h.01"/></symbol>
+        <symbol id="adv-family" viewBox="0 0 24 24"><circle cx="8" cy="7" r="2"/><circle cx="16" cy="7" r="2"/><path d="M3 18v-2a5 5 0 0 1 5-5c2 0 3.2.7 4 2M21 18v-2a5 5 0 0 0-5-5c-2 0-3.2.7-4 2M9 19v-2a3 3 0 0 1 6 0v2H9Z"/></symbol>
+        <symbol id="adv-journal" viewBox="0 0 24 24"><path d="M6 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2ZM8 3v18M11 8h6M11 12h5"/></symbol>
+        <symbol id="adv-class" viewBox="0 0 24 24"><path d="M3 4h18v13H3V4ZM8 21l4-4 4 4M7 10h10M7 13h7"/></symbol>
+      </svg>
+      <div class="wrap">
+        <div class="section-intro"><span class="eyebrow">O que muda</span><h2>Uma coleção organizada, em vez de peças dispersas.</h2><p>Escolha o livro que vai ler e prepare a atividade sem ter de procurar autocolantes em várias lojas ou ficheiros.</p></div>
+        <div class="advantage-grid">
+          <article class="advantage-item"><svg class="advantage-icon" aria-hidden="true"><use href="#adv-book"/></svg><div><h3>Livro a livro</h3><p>Um índice facilita encontrar as páginas ligadas à leitura do dia.</p></div></article>
+          <article class="advantage-item"><svg class="advantage-icon" aria-hidden="true"><use href="#adv-style"/></svg><div><h3>Um estilo consistente</h3><p>O conjunto mantém uma linguagem visual coerente ao longo da coleção.</p></div></article>
+          <article class="advantage-item"><svg class="advantage-icon" aria-hidden="true"><use href="#adv-print"/></svg><div><h3>Imprima quando precisar</h3><p>Com o ficheiro digital, prepare novamente as páginas para utilização pessoal, de acordo com a licença da oferta.</p></div></article>
+          <article class="advantage-item"><svg class="advantage-icon" aria-hidden="true"><use href="#adv-family"/></svg><div><h3>Para uma atividade em família</h3><p>Leia, recorte e componha uma cena com a criança.</p></div></article>
+          <article class="advantage-item"><svg class="advantage-icon" aria-hidden="true"><use href="#adv-journal"/></svg><div><h3>Para o seu devocional</h3><p>Use as imagens para destacar passagens e temas no caderno.</p></div></article>
+          <article class="advantage-item"><svg class="advantage-icon" aria-hidden="true"><use href="#adv-class"/></svg><div><h3>Para preparar uma aula</h3><p>Selecione o livro e leve uma atividade visual para o encontro.</p></div></article>
+        </div>
+      </div>
+    </section>
+    <section class="chapter" id="extras"><div class="wrap"><div class="section-intro"><span class="eyebrow">Conteúdo complementar</span><h2>Três conjuntos para ir além dos livros.</h2><p>A página de referência apresenta 90 autocolantes extra, distribuídos por três conjuntos de 30. A inclusão destes itens no seu produto deve ser confirmada antes de publicar.</p></div>
+      <div class="bonus-grid">
+        <article class="bonus"><div class="bonus-media"><img src="extra-card-evangelhos.png" loading="lazy" alt="Imagem ilustrativa de crianças a usar autocolantes bíblicos num caderno"></div><div class="bonus-copy"><strong>Conjunto 1 · 30 peças</strong><h3>Cenas dos Evangelhos</h3><p>Autocolantes de momentos e símbolos ligados às narrativas dos Evangelhos.</p></div></article>
+        <article class="bonus"><div class="bonus-media"><img src="extra-card-promessas.png" loading="lazy" alt="Imagem ilustrativa de um pai e um filho a montar uma atividade com autocolantes bíblicos"></div><div class="bonus-copy"><strong>Conjunto 2 · 30 peças</strong><h3>Promessas bíblicas</h3><p>Versículos e detalhes visuais para acompanhar a leitura e o devocional.</p></div></article>
+        <article class="bonus"><div class="bonus-media"><img src="extra-card-recortar.png" loading="lazy" alt="Imagem ilustrativa de uma criança a recortar uma folha de autocolantes"></div><div class="bonus-copy"><strong>Conjunto 3 · 30 peças</strong><h3>Elementos decorativos</h3><p>Molduras, notas, flores e outros elementos para personalizar páginas.</p></div></article>
+        <article class="bonus"><div class="bonus-media"><img src="extra-card-imprimir.png" loading="lazy" alt="Imagem ilustrativa de uma pessoa a imprimir folhas de autocolantes bíblicos"></div><div class="bonus-copy"><strong>Como usar</strong><h3>Imprima quando precisar</h3><p>Escolha as páginas, imprima as folhas e prepare a sua atividade.</p></div></article>
+      </div></div></section>
+    <section class="offer" id="colecao">
+      <div class="wrap offer-grid">
+        <div><span class="eyebrow">A coleção digital</span><h2>Escolha o seu plano.</h2><p>Uma opção essencial para começar ou a coleção completa para explorar mais livros e atividades. Ambas são ofertas digitais; não há envio de artigos físicos.</p></div>
+        <div class="offer-box offer-basic">
+          <img class="offer-product" src="mockup-plano-essencial.png" width="1086" height="1448" loading="lazy" alt="Mockup ilustrativo do Livro de Autocolantes Bíblicos">
+          <p class="mockup-note">Imagem ilustrativa · entrega digital em PDF</p>
+          <span class="eyebrow">Plano Essencial</span>
+          <h3>Bíblia em Autocolantes</h3>
+          <p class="offer-price"><strong>5,00 €</strong><span>Valor da oferta indicado pelo vendedor</span></p>
+          <ul><li>Ficheiro digital em PDF</li><li>Páginas de autocolantes para imprimir e recortar</li></ul>
+          <div class="checkout-visual"><a class="btn btn-primary" data-checkout data-essential-checkout href="https://pay.hotmart.com/U107626792F?off=iax98ngi&amp;checkoutMode=10">Comprar por 5,00 € <span aria-hidden="true">→</span></a>
+          <img class="payment-methods" src="metodos-pagamento.png" width="1600" height="400" loading="lazy" alt="Meios de pagamento: MB Way, transferência bancária, Multibanco, Visa e Mastercard"></div>
+        </div>
+        <div class="offer-box offer-complete">
+          <img class="offer-product" src="hero-autocolantes.png" width="1122" height="1402" alt="Imagem do Livro de Autocolantes Bíblicos">
+          <span class="eyebrow">Plano Completo</span>
+          <h3>Bíblia em Autocolantes</h3>
+          <p class="offer-price"><strong>9,70 €</strong><span>Valor da oferta indicado pelo vendedor</span></p>
+          <ul><li>39 livros do Antigo Testamento</li><li>27 livros do Novo Testamento</li><li>Mais de 150 páginas para imprimir</li><li>Ficheiro PDF preparado para impressão</li><li>Três conjuntos de autocolantes extra</li><li>Utilização em família, devocional ou aula</li></ul>
+          <div class="checkout-visual"><a class="btn btn-primary" data-checkout href="https://pay.hotmart.com/U107626792F?checkoutMode=10">Comprar por 9,70 € <span aria-hidden="true">→</span></a>
+          <img class="payment-methods" src="metodos-pagamento.png" width="1600" height="400" loading="lazy" alt="Meios de pagamento: MB Way, transferência bancária, Multibanco, Visa e Mastercard"></div>
+        </div>
+      </div>
+    </section>
+    <section class="chapter" id="garantia"><div class="wrap"><div class="section-intro"><span class="eyebrow">Compra com clareza</span><h2>Saiba o que recebe antes de pagar.</h2><p>Antes de comprar, confirme no checkout o formato, a entrega e as condições de utilização.</p></div><div class="guarantee"><img class="guarantee-badge" src="selo-garantia-15-dias.png" width="800" height="799" loading="lazy" alt="Selo de garantia de 15 dias"><div><h3>Garantia de 15 dias</h3><p>Esta garantia aplica-se ao Plano Essencial e ao Plano Completo. Consulte as condições e o procedimento de reembolso no checkout Hotmart.</p></div></div></div></section>
+    <section id="perguntas"><div class="wrap"><div class="section-intro"><span class="eyebrow">Perguntas frequentes</span><h2>Respostas antes da compra.</h2></div><div class="faq">
+      <details><summary>O que recebo ao comprar e quando?</summary><p>A proposta é um conjunto de ficheiros digitais com páginas de autocolantes. O conteúdo exato e o prazo de entrega serão confirmados no checkout oficial.</p></details>
+      <details><summary>Como posso imprimir os autocolantes?</summary><p>Pode usar uma impressora doméstica e papel autocolante. Também pode imprimir em papel normal e utilizar cola adequada. Antes de comprar, confirme os tamanhos e formatos dos ficheiros.</p></details>
+      <details><summary>Posso voltar a imprimir se as folhas acabarem?</summary><p>O ficheiro digital permite preparar novas impressões. Verifique no checkout as condições de uso pessoal e de partilha.</p></details>
+      <details><summary>Vou receber um produto físico?</summary><p>Não. Esta é uma proposta de material digital; não haverá envio de autocolantes já impressos.</p></details>
+      <details><summary>Existe garantia?</summary><p>Sim. Ambos os planos têm garantia de 15 dias. Consulte as condições e o procedimento de reembolso no checkout Hotmart.</p></details>
+    </div></div></section>
+    <div class="help"><div class="wrap"><span class="eyebrow">Ainda tem perguntas?</span><h2>Fale connosco antes de decidir.</h2><p>Podemos esclarecer o conteúdo, a impressão e o processo de entrega.</p><a class="btn" href="https://wa.me/5562998746623?text=Ol%C3%A1%21%20Tenho%20uma%20pergunta%20sobre%20a%20B%C3%ADblia%20em%20Autocolantes." target="_blank" rel="noopener noreferrer">Conversar pelo WhatsApp</a></div></div>
+  </main>
+  <footer><div class="wrap"><span>Bíblia em Autocolantes</span><p>Imagem ilustrativa. Confirme no checkout oficial o conteúdo, o preço, os direitos de utilização e as condições de entrega.</p></div></footer>
+  <dialog class="upgrade-dialog" id="upgrade-dialog" aria-labelledby="upgrade-title" aria-describedby="upgrade-description">
+    <button class="upgrade-close" type="button" aria-label="Fechar" data-upgrade-close>×</button>
+    <span class="eyebrow">Oferta para si</span>
+    <h2 id="upgrade-title">Prefere o Plano Completo com 20% de desconto?</h2>
+    <p id="upgrade-description">Antes de avançar para o Plano Essencial, pode escolher a oferta especial do Plano Completo. Confirme o valor final e o conteúdo no checkout.</p>
+    <div class="upgrade-actions">
+      <a class="btn btn-primary" data-checkout data-upgrade-full href="https://pay.hotmart.com/U107626792F?off=l0qlben9&amp;checkoutMode=10">Quero o Plano Completo com desconto <span aria-hidden="true">→</span></a>
+      <a class="btn btn-secondary" data-upgrade-essential href="https://pay.hotmart.com/U107626792F?off=iax98ngi&amp;checkoutMode=10">Não, continuar com o Plano Essencial</a>
+    </div>
+  </dialog>
+  <aside class="purchase-notice" id="purchase-notice" aria-label="Simulação de notificação de compra" aria-live="off"><span class="purchase-notice-icon" aria-hidden="true">✓</span><span class="purchase-notice-copy"><span class="purchase-notice-head"><b id="purchase-person"></b><em id="purchase-time"></em></span><span class="purchase-notice-detail" id="purchase-detail">COMPRA SIMULADA</span></span></aside>
+  <script>
+    document.querySelectorAll('.book-track').forEach((track) => {
+      const original = track.querySelector('.books');
+      const copy = original.cloneNode(true);
+      copy.setAttribute('aria-hidden', 'true');
+      track.appendChild(copy);
+      track.classList.add('is-animated');
+    });
+    document.querySelectorAll('.sheet-strip').forEach((strip) => {
+      const original = strip.querySelector('.sheet-group');
+      const baseSlides = Array.from(original.children);
+      let resizeTimer;
+      const fill = () => {
+        strip.classList.remove('is-animated');
+        strip.querySelector('.sheet-group[aria-hidden="true"]')?.remove();
+        original.replaceChildren(...baseSlides);
+        while (original.scrollWidth < window.innerWidth && original.children.length < 60) {
+          baseSlides.forEach((slide) => {
+            const repeat = slide.cloneNode(true);
+            repeat.setAttribute('aria-hidden', 'true');
+            repeat.querySelector('img').alt = '';
+            original.appendChild(repeat);
+          });
+        }
+        const copy = original.cloneNode(true);
+        copy.setAttribute('aria-hidden', 'true');
+        copy.querySelectorAll('img').forEach((image) => {image.alt = '';});
+        strip.appendChild(copy);
+        strip.style.setProperty('--sheet-duration', `${Math.max(18, Math.round(original.scrollWidth / 34))}s`);
+        strip.classList.add('is-animated');
+      };
+      fill();
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(fill, 150);
+      });
+    });
+    if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const advantageItems = document.querySelectorAll('#vantagens .advantage-item');
+      advantageItems.forEach((item) => {item.classList.add('will-reveal');});
+      const reveal = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {threshold: .1, rootMargin: '0px 0px -5% 0px'});
+      advantageItems.forEach((item) => {reveal.observe(item);});
+    }
+    const campaignParams = new URLSearchParams(window.location.search);
+    document.querySelectorAll('a[data-checkout]').forEach((link) => {
+      const checkout = new URL(link.href);
+      campaignParams.forEach((value, name) => {
+        if (/^utm_[a-z0-9]+$/i.test(name) || name === 'sck' || name === 'fbclid') checkout.searchParams.set(name, value);
+      });
+      link.href = checkout.toString();
+    });
+    const essentialLink = document.querySelector('[data-essential-checkout]');
+    const upgradeDialog = document.querySelector('#upgrade-dialog');
+    const continueEssential = document.querySelector('[data-upgrade-essential]');
+    continueEssential.href = essentialLink.href;
+    essentialLink.addEventListener('click', (event) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || !upgradeDialog.showModal) return;
+      event.preventDefault();
+      upgradeDialog.showModal();
+      document.querySelector('[data-upgrade-full]').focus();
+    });
+    document.querySelector('[data-upgrade-close]').addEventListener('click', () => upgradeDialog.close());
+    upgradeDialog.addEventListener('click', (event) => {
+      if (event.target === upgradeDialog) upgradeDialog.close();
+    });
+    const purchaseNames = ['Ana M.', 'Inês R.', 'Sofia C.', 'Marta P.', 'Joana F.', 'Rita S.', 'Catarina L.', 'Mariana A.', 'Tiago M.', 'Pedro R.', 'Miguel F.', 'André C.'];
+    const purchaseCities = ['Lisboa', 'Porto', 'Braga', 'Coimbra', 'Aveiro', 'Faro', 'Setúbal', 'Funchal', 'Leiria', 'Viseu', 'Évora', 'Guimarães'];
+    const purchaseNotice = document.querySelector('#purchase-notice');
+    const purchasePerson = document.querySelector('#purchase-person');
+    const purchaseTime = document.querySelector('#purchase-time');
+    let purchaseIndex = 0;
+    const shufflePurchases = (array) => array.sort(() => Math.random() - .5);
+    const nextPurchaseDelay = () => 5000 + Math.random() * 15000;
+    shufflePurchases(purchaseNames);
+    shufflePurchases(purchaseCities);
+    const showPurchaseNotice = () => {
+      const name = purchaseNames[purchaseIndex % purchaseNames.length];
+      const city = purchaseCities[purchaseIndex % purchaseCities.length];
+      const minutes = Math.floor(Math.random() * 18) + 3;
+      purchasePerson.textContent = `${name} - ${city}`;
+      purchaseTime.textContent = `há ${minutes} min`;
+      purchaseNotice.classList.add('show');
+      setTimeout(() => purchaseNotice.classList.remove('show'), 2300);
+      purchaseIndex++;
+      setTimeout(showPurchaseNotice, nextPurchaseDelay());
+    };
+    setTimeout(showPurchaseNotice, nextPurchaseDelay());
+    document.querySelectorAll('a[href^="https://wa.me/"]').forEach((link) => {
+      link.addEventListener('click', () => {
+        if (window.fbq) fbq('track', 'Contact');
+      });
+    });
+  </script>
+</body>
+</html>
