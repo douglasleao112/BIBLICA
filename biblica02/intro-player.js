@@ -100,7 +100,7 @@
       await video.play();
       // Muted preview may already be playing, so no new "play" event is emitted.
       if (!video.paused && !video.ended) state('playing');
-    } catch { state('paused'); }
+    } catch { state(!video.paused && !video.ended ? 'playing' : 'paused'); }
   };
   gate.addEventListener('click', () => playFrom(0));
   box.addEventListener('click', event => {
@@ -138,11 +138,30 @@
     }
   };
   soundButton.addEventListener('click', enableSound);
+  const startOnFirstGesture = (audible = true) => {
+    if (started) return;
+    // Prevent the click generated after a touch or mouse press from starting twice.
+    ignorePlayerClickUntil = performance.now() + 700;
+    playFrom(0, audible);
+  };
+  document.addEventListener('pointerdown', event => {
+    if (event.pointerType === 'mouse' && event.button === 0) startOnFirstGesture();
+  }, { capture: true, passive: true });
+  document.addEventListener('pointerup', event => {
+    if (event.pointerType === 'pen' && event.isPrimary) startOnFirstGesture();
+  }, { capture: true, passive: true });
+  document.addEventListener('touchstart', event => {
+    // Start the full video immediately, even when this touch becomes a drag.
+    if (event.touches.length) startOnFirstGesture(false);
+  }, { capture: true, passive: true });
+  document.addEventListener('touchend', event => {
+    // Mobile browsers grant audible playback on release, including after a drag.
+    if (event.changedTouches.length && started && video.muted) enableSound();
+  }, { capture: true, passive: true });
   document.addEventListener('click', event => {
     if (event.target.closest('[data-intro-pause], [data-intro-speed], [data-intro-restart]')) return;
-    // The first genuine tap anywhere on the page replaces the looping preview
-    // with the complete video. Keeping this on `click` avoids treating a swipe
-    // used to scroll the page as an intent to start playback on mobile.
+    // Keyboard-triggered clicks still start the video; pointer and touch gestures
+    // are handled above, including swipes that do not generate a click.
     if (!started) {
       playFrom(0);
       return;
