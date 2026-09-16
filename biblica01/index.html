@@ -120,7 +120,7 @@
       const storageKey='criancas_biblia_utm';
       const incoming={};
       new URLSearchParams(window.location.search).forEach((value,key)=>{
-        if((/^utm_/i.test(key)||/^sck$/i.test(key))&&value.trim()) incoming[key.toLowerCase()]=value;
+        if(/^utm_/i.test(key)&&value.trim()) incoming[key.toLowerCase()]=value;
       });
       let utms={...incoming};
       try{
@@ -131,7 +131,7 @@
       document.querySelectorAll('a[href^="https://pay.hotmart.com/"]').forEach(link=>{
         const destination=new URL(link.href);
         Object.entries(utms||{}).forEach(([key,value])=>destination.searchParams.set(key,value));
-        if(!destination.searchParams.has('sck')) destination.searchParams.set('sck','biblica_site');
+        destination.searchParams.set('sck','biblica01');
         link.href=destination.toString();
       });
       document.querySelectorAll('a.whatsapp-float').forEach(link=>{

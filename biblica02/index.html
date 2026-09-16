@@ -92,7 +92,7 @@
     <section class="section gifts"><div class="wrap"><div class="center" data-reveal><span class="eyebrow" style="color:#ffd84d">O que recebe</span><h2>Cinco presentes digitais para ensinar e viver a fé</h2><p class="lead">Ficheiros PDF, áudios, cursos e séries online para acompanhar crianças, pais, professores e líderes em qualquer lugar.</p></div><div class="gift-list">
       <article class="gift-card" data-reveal><img class="gift-visual" src="assets/presente-01-livro-aberto.png?v=b8a897e" alt="Representação do ficheiro PDF bíblico com cenas para colorir"><div><span class="gift-number">PRESENTE #01 · PDF DIGITAL</span><h3>Crianças da Bíblia — Histórias e atividades</h3><p>Ficheiro PDF com histórias inspiradoras, versículos, atividades e aplicações práticas para utilizar em casa, na igreja ou nos devocionais.</p></div></article>
       <article class="gift-card" data-reveal><img class="gift-visual" src="assets/livro-direita.png?v=b8a897e" alt="Representação do ficheiro PDF Descobre a Bíblia"><div><span class="gift-number">PRESENTE #02 · PDF DIGITAL</span><h3>Crianças da Bíblia — Para colorir</h3><p>Ficheiro PDF com ilustrações e atividades para pintar no tablet ou imprimir quantas vezes quiser.</p></div></article>
-      <article class="gift-card" data-reveal><img class="gift-visual" src="assets/curso-ensinar-biblia-tablet.png?v=b8a897e" alt="Curso Como Ensinar a Bíblia para Crianças apresentado num tablet"><div><span class="gift-number">PRESENTE #03</span><h3>Como Ensinar a Bíblia para Crianças</h3><p>Curso online para preparar lições objetivas, utilizar recursos simples e adaptar a linguagem às diferentes idades.</p></div></article>
+      <article class="gift-card" data-reveal><img class="gift-visual" src="assets/presente-03-oracoes-para-agradecer.png" alt="Quatro cartões ilustrados de oração para agradecer"><div><span class="gift-number">PRESENTE #03</span><h3>Como Ensinar a Bíblia para Crianças</h3><p>Curso online para preparar lições objetivas, utilizar recursos simples e adaptar a linguagem às diferentes idades.</p></div></article>
       <article class="gift-card" data-reveal><img class="gift-visual" src="assets/devocional-mockup.webp?v=b8a897e" alt="Devocional Descobertas da Fé numa plataforma de vídeo"><div><span class="gift-number">PRESENTE #04</span><h3>Devocional Descobertas da Fé</h3><p>Vídeos diários com o professor Rodrigo Silva, com leitura bíblica, explicação breve e reflexão prática.</p></div></article>
 <article class="gift-card" data-reveal><img class="gift-visual" src="assets/momento-com-deus.png?v=b8a897e" alt="O Meu Primeiro Momento com Deus, uma pausa de oração para crianças"><div><span class="gift-number">PRESENTE #05</span><h3>Tesouros do MAB — Temporadas I, II e III</h3><p>Série filmada no Museu de Arqueologia Bíblica que mostra como fé e pesquisa caminham juntas.</p></div></article>
     </div></div></section>
@@ -134,7 +134,7 @@
       const storageKey='criancas_biblia_utm';
       const incoming={};
       new URLSearchParams(window.location.search).forEach((value,key)=>{
-        if((/^utm_/i.test(key)||/^sck$/i.test(key))&&value.trim()) incoming[key.toLowerCase()]=value;
+        if(/^utm_/i.test(key)&&value.trim()) incoming[key.toLowerCase()]=value;
       });
       let utms={...incoming};
       try{
@@ -145,7 +145,7 @@
       document.querySelectorAll('a[href^="https://pay.hotmart.com/"]').forEach(link=>{
         const destination=new URL(link.href);
         Object.entries(utms||{}).forEach(([key,value])=>destination.searchParams.set(key,value));
-        if(!destination.searchParams.has('sck')) destination.searchParams.set('sck','biblica_site');
+        destination.searchParams.set('sck','biblica02');
         link.href=destination.toString();
       });
       document.querySelectorAll('a.whatsapp-float').forEach(link=>{
