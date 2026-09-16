@@ -17,8 +17,8 @@
 .intro-controls{position:absolute;bottom:19px;left:10px;right:10px;display:flex;align-items:center;justify-content:space-between;pointer-events:none}
 .intro-controls button{pointer-events:auto;background:transparent;border:0;padding:4px 6px;text-shadow:0 1px 4px #0008}
 .intro-player:not(.is-floating) [data-intro-pause]{transform:translate(-6px,12px)}
-.intro-player:not(.is-floating) .intro-controls [data-intro-speed]{transform:translateY(2px);font-size:14px;line-height:1.2;padding:6px 12px}
-.intro-controls [data-intro-speed]{font-size:14px;border:1px solid #ffffffb3;border-radius:99px;background:#ffffff29;backdrop-filter:blur(8px)}
+.intro-player:not(.is-floating) .intro-controls [data-intro-speed]{transform:translateY(7px);font-size:12px;line-height:1.2;padding:4px 8px}
+.intro-controls [data-intro-speed]{font-size:12px;border:1px solid #ffffffb3;border-radius:99px;background:#ffffff29;backdrop-filter:blur(8px)}
 .intro-progress{position:absolute;bottom:0;left:0;right:0;height:9px;background:#ffffff12}.intro-progress i{display:block;height:100%;width:0;background:#ffd84d;transition:width .15s linear}
 @keyframes intro-breathe{0%,100%{transform:scale(.97)}50%{transform:scale(1.02)}}
 @media(max-width:760px){.intro-player{width:100%;margin:22px auto}}
@@ -39,7 +39,7 @@
 .intro-player.is-floating .intro-controls{left:3px;right:3px;bottom:8px}
 .intro-player.is-floating .intro-controls button{padding:2px;line-height:1;min-height:0}
 .intro-player.is-floating [data-intro-pause] svg{display:block;width:12px;height:12px}
-.intro-player.is-floating .intro-controls [data-intro-speed]{font-size:14px;line-height:1.2;padding:5px 8px;min-width:0;transform:translateY(-3px)}
+.intro-player.is-floating .intro-controls [data-intro-speed]{font-size:12px;line-height:1.2;padding:3px 5px;min-width:0;transform:translateY(2px)}
 .intro-player.is-floating .intro-progress{height:5px}
 @media(max-width:760px){
   .intro-player-slot{width:100%;margin:22px auto}
