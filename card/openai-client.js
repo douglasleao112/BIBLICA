@@ -38,7 +38,7 @@ window.BENCAO_IMAGE = (() => {
     });
   }
 
-  function stampWebsite(dataUrl) {
+  function stampWebsite(dataUrl, locale = 'pt') {
     return new Promise((resolve, reject) => {
       const image = new Image();
       image.onload = () => {
@@ -49,23 +49,32 @@ window.BENCAO_IMAGE = (() => {
           const context = canvas.getContext('2d');
           if (!context) throw new Error('Não foi possível escrever o endereço no cartão.');
           context.drawImage(image, 0, 0, canvas.width, canvas.height);
-          const address = 'https://vivalavidas.com/card';
+          const address = `${locale === 'es' ? 'Genera también' : 'Gere também'} www.vivalavidas.com/card`;
           let fontSize = Math.max(18, Math.round(canvas.width * .037));
           context.font = `700 ${fontSize}px Arial, Helvetica, sans-serif`;
-          const textWidth = context.measureText(address).width;
+          let textWidth = context.measureText(address).width;
           if (textWidth > canvas.width * .9) {
             fontSize = Math.max(12, Math.floor(fontSize * canvas.width * .9 / textWidth));
             context.font = `700 ${fontSize}px Arial, Helvetica, sans-serif`;
+            textWidth = context.measureText(address).width;
           }
           context.textAlign = 'center';
           context.textBaseline = 'bottom';
+          const baseline = canvas.height - Math.max(16, Math.round(canvas.height * .02));
+          const labelHeight = Math.round(fontSize * 1.7);
+          context.fillStyle = 'rgba(0,0,0,.78)';
+          context.fillRect(
+            (canvas.width - textWidth) / 2 - fontSize * .55,
+            baseline - labelHeight + fontSize * .25,
+            textWidth + fontSize * 1.1,
+            labelHeight
+          );
           context.lineJoin = 'round';
           context.lineWidth = Math.max(4, Math.round(fontSize * .22));
           context.strokeStyle = 'rgba(0,0,0,.92)';
           context.shadowColor = 'rgba(0,0,0,.98)';
           context.shadowBlur = Math.max(8, Math.round(fontSize * .4));
           context.shadowOffsetY = Math.max(2, Math.round(fontSize * .14));
-          const baseline = canvas.height - Math.max(16, Math.round(canvas.height * .02));
           context.strokeText(address, canvas.width / 2, baseline);
           context.fillStyle = '#fff';
           context.fillText(address, canvas.width / 2, baseline);
@@ -122,7 +131,7 @@ window.BENCAO_IMAGE = (() => {
     if (typeof payload.image !== 'string' || !/^data:image\/png;base64,/.test(payload.image)) {
       throw new Error('A API não devolveu uma imagem válida. Tente novamente.');
     }
-    return stampWebsite(payload.image);
+    return stampWebsite(payload.image, input.locale);
   }
 
   return { generate, stampWebsite };

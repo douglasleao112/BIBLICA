@@ -13,7 +13,7 @@ window.BENCAO_CARD_STORAGE = (() => {
       const raw = localStorage.getItem(keys().card);
       if (!raw) return null;
       const card = JSON.parse(raw);
-      return [1, 2].includes(card?.version) && typeof card.name === 'string' &&
+      return [1, 2, 3].includes(card?.version) && typeof card.name === 'string' &&
         /^data:image\/(?:png|jpeg|webp);base64,/.test(card.preview || '') ? card : null;
     } catch { return null; }
   }
@@ -54,7 +54,7 @@ window.BENCAO_CARD_STORAGE = (() => {
     for (const [width, quality] of [[1024, .86], [900, .78], [720, .7], [560, .62]]) {
       const preview = await compact(image, width, quality);
       try {
-        localStorage.setItem(card, JSON.stringify({ version: 2, name, preview }));
+        localStorage.setItem(card, JSON.stringify({ version: 3, name, preview }));
         release(token);
         return preview;
       } catch (error) {
@@ -63,17 +63,17 @@ window.BENCAO_CARD_STORAGE = (() => {
     }
   }
 
-  async function ensureWatermark(saved) {
-    if (saved.version === 2) return saved;
-    const image = await window.BENCAO_IMAGE.stampWebsite(saved.preview);
+  async function ensureWatermark(saved, locale = 'pt') {
+    if (saved.version === 3) return saved;
+    const image = await window.BENCAO_IMAGE.stampWebsite(saved.preview, locale);
     const { card } = keys();
     for (const [width, quality] of [[1024, .86], [900, .78], [720, .7], [560, .62]]) {
       const preview = await compact(image, width, quality);
       try {
-        localStorage.setItem(card, JSON.stringify({ version: 2, name: saved.name, preview }));
-        return { version: 2, name: saved.name, preview };
+        localStorage.setItem(card, JSON.stringify({ version: 3, name: saved.name, preview }));
+        return { version: 3, name: saved.name, preview };
       } catch (error) {
-        if (width === 560) return { version: 2, name: saved.name, preview: image, storageError: true };
+        if (width === 560) return { version: 3, name: saved.name, preview: image, storageError: true };
       }
     }
   }
