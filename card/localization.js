@@ -30,7 +30,7 @@ window.BENCAO_I18N = (() => {
   function checkoutUrl(language) {
     const base = language === 'es'
       ? 'https://pay.hotmart.com/V107625840T?checkoutMode=10'
-      : 'https://pay.hotmart.com/B107588580K?off=mfqr0cf8&checkoutMode=10&sck=biblica01';
+      : 'https://pay.hotmart.com/B107588580K?checkoutMode=10';
     const url = new URL(base);
     for (const key of UTM_KEYS) {
       const value = params.get(key);
