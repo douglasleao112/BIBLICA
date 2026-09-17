@@ -38,6 +38,46 @@ window.BENCAO_IMAGE = (() => {
     });
   }
 
+  function stampWebsite(dataUrl) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = image.naturalWidth || image.width;
+          canvas.height = image.naturalHeight || image.height;
+          const context = canvas.getContext('2d');
+          if (!context) throw new Error('Não foi possível escrever o endereço no cartão.');
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          const address = 'https://vivalavidas.com/card';
+          let fontSize = Math.max(18, Math.round(canvas.width * .037));
+          context.font = `700 ${fontSize}px Arial, Helvetica, sans-serif`;
+          const textWidth = context.measureText(address).width;
+          if (textWidth > canvas.width * .9) {
+            fontSize = Math.max(12, Math.floor(fontSize * canvas.width * .9 / textWidth));
+            context.font = `700 ${fontSize}px Arial, Helvetica, sans-serif`;
+          }
+          context.textAlign = 'center';
+          context.textBaseline = 'bottom';
+          context.lineJoin = 'round';
+          context.lineWidth = Math.max(4, Math.round(fontSize * .22));
+          context.strokeStyle = 'rgba(0,0,0,.92)';
+          context.shadowColor = 'rgba(0,0,0,.98)';
+          context.shadowBlur = Math.max(8, Math.round(fontSize * .4));
+          context.shadowOffsetY = Math.max(2, Math.round(fontSize * .14));
+          const baseline = canvas.height - Math.max(16, Math.round(canvas.height * .02));
+          context.strokeText(address, canvas.width / 2, baseline);
+          context.fillStyle = '#fff';
+          context.fillText(address, canvas.width / 2, baseline);
+          const format = /^data:image\/webp;/.test(dataUrl) ? 'image/webp' : 'image/png';
+          resolve(canvas.toDataURL(format, .9));
+        } catch (error) { reject(error); }
+      };
+      image.onerror = () => reject(new Error('Não foi possível abrir a imagem para escrever o endereço.'));
+      image.src = dataUrl;
+    });
+  }
+
   function buildPrompt(template, input, hasSample) {
     const replacements = {
       SEU_NOME: input.recipientName,
@@ -82,8 +122,8 @@ window.BENCAO_IMAGE = (() => {
     if (typeof payload.image !== 'string' || !/^data:image\/png;base64,/.test(payload.image)) {
       throw new Error('A API não devolveu uma imagem válida. Tente novamente.');
     }
-    return payload.image;
+    return stampWebsite(payload.image);
   }
 
-  return { generate };
+  return { generate, stampWebsite };
 })();

@@ -175,10 +175,10 @@
     </div>
   </div>
   <script src="character-catalog.js"></script>
-  <script src="openai-client.js"></script>
+  <script src="openai-client.js?v=20260916-watermark"></script>
   <script src="tracking-config.js"></script>
   <script src="lead-tracking.js"></script>
-  <script src="card-storage.js"></script>
+  <script src="card-storage.js?v=20260916-watermark"></script>
   <script src="localization.js"></script>
   <script>
   (()=>{
@@ -427,8 +427,7 @@
       try { reservation=cardStorage.reserve(); }
       catch { return error(t('storageUnavailable')); }
       if(reservation.status==='completed'){
-        const saved=cardStorage.load();
-        if(saved){state.name=saved.name;state.preview=saved.preview;state.step=8;render()}
+        await restoreCard();
         return;
       }
       if(reservation.status==='busy')return error(t('generationInProgress'));
@@ -553,16 +552,18 @@
       render();
       if(focusedId)stage.querySelector(`#${focusedId}`)?.focus();
     });
-    function restoreCard(){
+    async function restoreCard(){
       const saved=cardStorage.load();
       if(!saved)return false;
-      state.name=saved.name;state.preview=saved.preview;state.step=8;resultCelebrated=true;render();
+      const ready=await cardStorage.ensureWatermark(saved);
+      state.name=ready.name;state.preview=ready.preview;state.step=8;resultCelebrated=true;render();
+      if(ready.storageError)window.setTimeout(()=>error(t('storageSaveError')),250);
       return true;
     }
-    window.addEventListener('pageshow',()=>{if(state.step!==8)restoreCard()});
-    window.addEventListener('storage',event=>{if(event.key?.startsWith('bencao_card_v1:')&&event.newValue)restoreCard()});
+    window.addEventListener('pageshow',()=>{if(state.step!==8)void restoreCard()});
+    window.addEventListener('storage',event=>{if(event.key?.startsWith('bencao_card_v1:')&&event.newValue)void restoreCard()});
     i18n.start();
-    if(!restoreCard())render();
+    void restoreCard().then(restored=>{if(!restored)render()}).catch(()=>render());
   })();
   </script>
 </body>
