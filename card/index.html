@@ -118,6 +118,7 @@
     @keyframes loadingWaiting{from{width:90%}to{width:96%}}
     @media(prefers-reduced-motion:reduce){.loading-fill{animation:none;width:90%}}
     .intro-language{margin-top:18px}.language-toggle{gap:6px;min-height:32px;padding:5px 11px;border-color:#91a9c480;background:#ffffff08;color:#c4d4e7;font-size:11px;font-weight:700;box-shadow:none}.language-toggle:hover,.language-toggle:focus-visible{background:#ffffff16;color:#fff}.language-toggle .language-flag{font-size:15px}.language-chevron{font-size:10px;color:#c4d4e7}
+    .site-footer{width:100%;max-width:560px;margin:clamp(100px,16vh,180px) auto 0;padding:0 12px 22px;color:#8798ad;text-align:center;font-size:10px;line-height:1.55}.site-footer p{margin:0 0 7px;color:inherit;font-size:inherit;line-height:inherit}.site-footer .legal-details{margin:0 auto 8px}.site-footer summary{display:inline-block;cursor:pointer;text-decoration:underline;text-underline-offset:2px}.site-footer summary:hover,.site-footer summary:focus-visible{color:#c7d5e5}.site-footer .legal-details p{max-width:500px;margin:7px auto 0}.site-footer .copyright{margin-top:5px}@media(max-width:520px){.site-footer{margin-top:100px;padding-bottom:25px;font-size:10px}}
   </style>
 </head>
 <body>
@@ -155,6 +156,14 @@
         <img class="payment-methods" src="metodos-pagamento.png" alt="MB Way, transferência bancária, Multibanco, Visa e Mastercard" width="1600" height="400" loading="eager" decoding="async">
       </div>
     </aside>
+    <footer class="site-footer">
+      <p id="image-rights">Ao enviar uma fotografia, confirme que tem autorização para a utilizar e partilhar, sobretudo se retratar uma criança.</p>
+      <details class="legal-details">
+        <summary id="terms-label">Termos de uso</summary>
+        <p id="terms-copy">Use apenas imagens cuja utilização está autorizada. A fotografia é enviada ao serviço de geração para criar o cartão. A arte gerada por IA pode conter diferenças; reveja-a antes de a partilhar.</p>
+      </details>
+      <p class="copyright" id="copyright">© 2026 Viva La Vida. Todos os direitos reservados.</p>
+    </footer>
   </main>
   <a id="floating-whatsapp" class="floating-whatsapp" href="https://api.whatsapp.com/send/?phone=5562998746623&amp;text=Ol%C3%A1%21%20Vi%20o%20Descobre%20a%20B%C3%ADblia%20e%20gostava%20de%20receber%20mais%20informa%C3%A7%C3%B5es&amp;type=phone_number&amp;app_absent=0" target="_blank" rel="noopener noreferrer" aria-label="Falar connosco pelo WhatsApp" hidden><img src="whatsapp-icon.jpg" alt="" decoding="async"><span class="notification-badge" aria-hidden="true">1</span></a>
   <div id="example-modal" class="example-modal" role="dialog" aria-modal="true" aria-label="Exemplo de presente. Toque na imagem para fechar" tabindex="0" hidden>
@@ -179,7 +188,7 @@
   <script src="tracking-config.js"></script>
   <script src="lead-tracking.js"></script>
   <script src="card-storage.js?v=20260917-fallback"></script>
-  <script src="localization.js?v=20260917-payment-pt"></script>
+  <script src="localization.js?v=20260917-legal-footer"></script>
   <script>
   (()=>{
     'use strict';
