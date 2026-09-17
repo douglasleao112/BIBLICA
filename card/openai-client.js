@@ -8,7 +8,7 @@ window.BENCAO_IMAGE = (() => {
     if (window.BENCAO_GENERATION_ASSETS) return Promise.resolve(window.BENCAO_GENERATION_ASSETS);
     if (!assetsPromise) assetsPromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = 'generation-assets.js?v=20260917-sample-required';
+      script.src = 'generation-assets.js?v=20260917-face-fidelity';
       script.onload = () => window.BENCAO_GENERATION_ASSETS
         ? resolve(window.BENCAO_GENERATION_ASSETS)
         : reject(new Error('As referências da imagem não estão disponíveis.'));
