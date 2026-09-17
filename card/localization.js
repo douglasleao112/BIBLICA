@@ -73,6 +73,7 @@ window.BENCAO_I18N = (() => {
     document.querySelector('.payment-once').textContent = t('offerPayment');
     document.querySelectorAll('.offer-benefits li').forEach((item, index) => { item.textContent = t('offerBenefits')[index]; });
     document.querySelector('.payment-methods').alt = t('offerPaymentsAlt');
+    document.querySelector('.payment-methods').hidden = lang === 'es';
     document.querySelector('#floating-whatsapp').setAttribute('aria-label', lang === 'es' ? 'Hablar con nosotros por WhatsApp' : 'Falar connosco pelo WhatsApp');
     document.querySelector('#discount-offer .offer-button-label').textContent = t('offerButton');
     document.querySelector('#discount-offer a').href = checkoutUrl(lang);
