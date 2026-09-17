@@ -8,7 +8,7 @@ window.BENCAO_IMAGE = (() => {
     if (window.BENCAO_GENERATION_ASSETS) return Promise.resolve(window.BENCAO_GENERATION_ASSETS);
     if (!assetsPromise) assetsPromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.src = 'generation-assets.js';
+      script.src = 'generation-assets.js?v=20260917-sample-required';
       script.onload = () => window.BENCAO_GENERATION_ASSETS
         ? resolve(window.BENCAO_GENERATION_ASSETS)
         : reject(new Error('As referências da imagem não estão disponíveis.'));
@@ -44,12 +44,16 @@ window.BENCAO_IMAGE = (() => {
       image.onload = () => {
         try {
           const canvas = document.createElement('canvas');
-          canvas.width = image.naturalWidth || image.width;
+          const sourceWidth = image.naturalWidth || image.width;
           const sourceHeight = image.naturalHeight || image.height;
-          canvas.height = sourceHeight;
+          // Entregar sempre 4:5, sem recortar o título ou qualquer parte da arte.
+          canvas.width = Math.ceil(Math.max(sourceWidth, sourceHeight * .8) / 4) * 4;
+          canvas.height = canvas.width * 5 / 4;
           const context = canvas.getContext('2d');
           if (!context) throw new Error('Não foi possível escrever o endereço no cartão.');
-          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          context.fillStyle = '#172b45';
+          context.fillRect(0, 0, canvas.width, canvas.height);
+          context.drawImage(image, (canvas.width - sourceWidth) / 2, (canvas.height - sourceHeight) / 2, sourceWidth, sourceHeight);
           const address = `${locale === 'es' ? 'Genera también' : 'Gere também'} www.vivalavidas.com/card`;
           let fontSize = Math.max(18, Math.round(canvas.width * .037));
           context.font = `700 ${fontSize}px Arial, Helvetica, sans-serif`;
@@ -110,15 +114,7 @@ window.BENCAO_IMAGE = (() => {
     });
   }
 
-  function buildPrompt(template, input, hasSample) {
-    if (!hasSample) {
-      const characters = input.selectedCharacters.map(item => item.name);
-      return `Cria uma ILUSTRAÇÃO CARTOON BÍBLICA personalizada, vertical, colorida e acabada como um presente. Não cries um site, interface, botão, cartão de contacto, anúncio, ecrã branco ou mockup. A imagem inteira deve ser uma cena ilustrada rica em cor e detalhes, sem espaços vazios.
-
-Referências anexadas, por ordem: 1) fotografia da pessoa presenteada; 2–4) imagens dos personagens ${characters.join(', ')}; 5) leão; 6) pomba; 7) cordeiro. Usa estas imagens apenas para identidade visual. Transforma a pessoa da primeira imagem num avatar cartoon reconhecível, conservando os traços individuais. Inclui exatamente uma versão dela e exatamente estes três personagens bíblicos, com aparência fiel às referências. Os quatro humanos devem interagir alegremente, com o personagem principal ao centro junto da pessoa. Inclui também um leão, uma pomba e um cordeiro, uma vez cada.
-
-    Cenário bíblico vivo: paisagem ensolarada, vegetação exuberante, flores, céu azul, arquitetura bíblica discreta e luz dourada. Estilo de ilustração infantil premium, personagens expressivos, contornos nítidos, composição profunda e cores saturadas. Ocupa o quadro completo. No topo, integrado na arte, escreve SOMENTE esta frase, exatamente como está: ${JSON.stringify(input.message)}. Não acrescentes outras palavras, marcas, botões, ícones de telefone, e-mail ou texto em inglês. O nome da pessoa é ${JSON.stringify(input.recipientName)}. A imagem final é vertical 4:5 e não será recortada. Coloca TODO o texto dentro da imagem com margem de segurança de pelo menos 10% em cima e 8% dos lados; nenhuma letra pode tocar ou ultrapassar as bordas.`;
-    }
+  function buildPrompt(template, input) {
     const replacements = {
       SEU_NOME: input.recipientName,
       FRASE_ESCOLHIDA: input.message,
@@ -128,15 +124,18 @@ Referências anexadas, por ordem: 1) fotografia da pessoa presenteada; 2–4) im
       PERSONAGEM_3: input.selectedCharacters[2].name
     };
     const filled = template.replace(/\{\{([A-Z_0-9]+)\}\}/g, (match, key) => replacements[key] ?? match);
-    return `${filled}\n\nDADOS DESTA CRIAÇÃO: o primeiro anexo é a fotografia da pessoa presenteada; os três seguintes são os personagens selecionados, na ordem ${input.selectedCharacters.map(item => item.name).join(', ')}; em seguida vêm as referências fixas de leão, pomba e cordeiro.${hasSample ? ' O último anexo é a imagem amostra obrigatória de estilo e composição.' : ' A imagem amostra mencionada no texto ainda não foi fornecida; siga as descrições de estilo sem fingir que a recebeu.'} Gerar uma única imagem vertical 4:5, sem recorte posterior. Mantenha o nome e a frase totalmente dentro da imagem, com margem de segurança de pelo menos 10% no topo e 8% nas laterais; nenhuma letra pode tocar as bordas. Texto exato do nome: ${JSON.stringify(input.recipientName)}. Texto exato da frase: ${JSON.stringify(input.message)}. Não acrescente nem troque palavras.`;
+    return `${filled}\n\nPRIORIDADES OBRIGATÓRIAS DESTA CRIAÇÃO: o primeiro anexo é a fotografia da pessoa presenteada e é a ÚNICA referência para a identidade do rosto, cabelo, tom de pele e traços individuais. Transforma essa pessoa num avatar cartoon reconhecível; não copies o rosto da figura verde nem o de qualquer personagem do sample. Os três anexos seguintes são os personagens selecionados, na ordem ${input.selectedCharacters.map(item => item.name).join(', ')}; em seguida vêm leão, pomba e cordeiro. O ÚLTIMO anexo é o sample.png: usa-o como referência PRINCIPAL de composição, paleta, acabamento e sobretudo tipografia arredondada tridimensional amarelo/dourado/laranja com contornos escuros e realce branco. Substitui completamente a figura verde pela pessoa da PRIMEIRA foto. Faz uma única arte vertical 4:5 já pronta, não uma captura de interface, sem recorte posterior. Reserva pelo menos 10% de margem no topo e 8% nas laterais; TODO o título, incluindo acentos e sombras, deve ficar dentro da imagem. Texto exato do nome: ${JSON.stringify(input.recipientName)}. Texto exato da frase: ${JSON.stringify(input.message)}. Não acrescentes nem troques palavras.`;
   }
 
   async function generate(input) {
     const assets = await loadAssets();
+    if (!assets.references?.sample || !assets.prompt) {
+      throw new Error('A referência visual obrigatória não está disponível. Recarregue a página.');
+    }
     const selected = input.selectedCharacters.map(item => item.id);
     const fixed = input.fixedCharacters.map(item => item.id);
     const keys = [...selected, ...fixed];
-    if (assets.references.sample) keys.push('sample');
+    keys.push('sample');
     const images = [await shrinkImage(input.photo, 1200)];
     for (const key of keys) {
       const encoded = assets.references[key];
@@ -147,7 +146,7 @@ Referências anexadas, por ordem: 1) fotografia da pessoa presenteada; 2–4) im
       method: 'POST',
       headers: { 'Content-Type': 'application/json', apikey: PUBLIC_ANON_KEY, Authorization: `Bearer ${PUBLIC_ANON_KEY}` },
       body: JSON.stringify({
-        input: [{ type: 'text', text: buildPrompt(assets.prompt, input, !!assets.references.sample) }, ...images]
+        input: [{ type: 'text', text: buildPrompt(assets.prompt, input) }, ...images]
       })
     });
     const payload = await response.json().catch(() => ({}));
