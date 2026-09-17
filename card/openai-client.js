@@ -88,7 +88,7 @@ window.BENCAO_IMAGE = (() => {
     });
   }
 
-  function rejectBlankResult(dataUrl) {
+  function isLikelyBlank(dataUrl) {
     return new Promise((resolve, reject) => {
       const image = new Image();
       image.onload = () => {
@@ -103,12 +103,7 @@ window.BENCAO_IMAGE = (() => {
         for (let i = 0; i < pixels.length; i += 4) {
           if (pixels[i] > 242 && pixels[i + 1] > 242 && pixels[i + 2] > 242) nearWhite++;
         }
-        if (nearWhite / (pixels.length / 4) > .72) {
-          const failure = new Error('A imagem gerada não corresponde ao cartão pedido. Tente novamente.');
-          failure.invalidResult = true;
-          return reject(failure);
-        }
-        resolve();
+        resolve(nearWhite / (pixels.length / 4) > .72);
       };
       image.onerror = () => reject(new Error('A imagem gerada não pôde ser aberta.'));
       image.src = dataUrl;
@@ -167,9 +162,13 @@ Cenário bíblico vivo: paisagem ensolarada, vegetação exuberante, flores, cé
     if (typeof payload.image !== 'string' || !/^data:image\/png;base64,/.test(payload.image)) {
       throw new Error('A API não devolveu uma imagem válida. Tente novamente.');
     }
-    await rejectBlankResult(payload.image);
+    if (await isLikelyBlank(payload.image)) {
+      const failure = new Error('A imagem gerada não corresponde ao cartão pedido. Tente novamente.');
+      failure.invalidResult = true;
+      throw failure;
+    }
     return stampWebsite(payload.image, input.locale);
   }
 
-  return { generate, stampWebsite };
+  return { generate, stampWebsite, isLikelyBlank };
 })();

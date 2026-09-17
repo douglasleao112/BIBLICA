@@ -38,6 +38,12 @@ window.BENCAO_CARD_STORAGE = (() => {
     } catch { /* O bloqueio expira automaticamente. */ }
   }
 
+  function clearSaved() {
+    const { card, pending } = keys();
+    localStorage.removeItem(card);
+    localStorage.removeItem(pending);
+  }
+
   async function compact(image, width, quality) {
     const picture = new Image();
     picture.src = image;
@@ -78,5 +84,5 @@ window.BENCAO_CARD_STORAGE = (() => {
     }
   }
 
-  return { load, reserve, release, save, ensureWatermark };
+  return { load, reserve, release, save, ensureWatermark, clearSaved };
 })();
