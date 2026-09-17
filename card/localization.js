@@ -26,6 +26,18 @@ window.BENCAO_I18N = (() => {
   };
 
   const params = new URLSearchParams(location.search);
+  const UTM_KEYS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id'];
+  function checkoutUrl(language) {
+    const base = language === 'es'
+      ? 'https://pay.hotmart.com/V107625840T?checkoutMode=10'
+      : 'https://pay.hotmart.com/B107588580K?off=mfqr0cf8&checkoutMode=10&sck=biblica01';
+    const url = new URL(base);
+    for (const key of UTM_KEYS) {
+      const value = params.get(key);
+      if (value) url.searchParams.set(key, value);
+    }
+    return url.href;
+  }
   const forced = ['pt','es'].includes(params.get('lang')) ? params.get('lang') : null;
   const localeHint = /-(AR|BO|BR|BZ|CL|CO|CR|CU|DO|EC|SV|GT|HT|HN|MX|NI|PA|PY|PE|PR|UY|VE)$/i.exec(navigator.language || '');
   let lang = forced || (localeHint ? 'es' : 'pt');
@@ -61,7 +73,7 @@ window.BENCAO_I18N = (() => {
     document.querySelector('.payment-methods').alt = t('offerPaymentsAlt');
     document.querySelector('#floating-whatsapp').setAttribute('aria-label', lang === 'es' ? 'Hablar con nosotros por WhatsApp' : 'Falar connosco pelo WhatsApp');
     document.querySelector('#discount-offer a').textContent = t('offerButton');
-    document.querySelector('#discount-offer a').href = lang === 'es' ? 'https://pay.hotmart.com/V107625840T?checkoutMode=10' : 'https://pay.hotmart.com/B107588580K?off=mfqr0cf8&checkoutMode=10&sck=biblica01';
+    document.querySelector('#discount-offer a').href = checkoutUrl(lang);
   }
 
   function setLanguage(next, country = '') {
