@@ -46,10 +46,10 @@ window.BENCAO_IMAGE = (() => {
           const canvas = document.createElement('canvas');
           canvas.width = image.naturalWidth || image.width;
           const sourceHeight = image.naturalHeight || image.height;
-          canvas.height = Math.min(sourceHeight, Math.round(canvas.width * 1.25));
+          canvas.height = sourceHeight;
           const context = canvas.getContext('2d');
           if (!context) throw new Error('Não foi possível escrever o endereço no cartão.');
-          context.drawImage(image, 0, (sourceHeight - canvas.height) / 2, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
           const address = `${locale === 'es' ? 'Genera también' : 'Gere também'} www.vivalavidas.com/card`;
           let fontSize = Math.max(18, Math.round(canvas.width * .037));
           context.font = `700 ${fontSize}px Arial, Helvetica, sans-serif`;
@@ -117,7 +117,7 @@ window.BENCAO_IMAGE = (() => {
 
 Referências anexadas, por ordem: 1) fotografia da pessoa presenteada; 2–4) imagens dos personagens ${characters.join(', ')}; 5) leão; 6) pomba; 7) cordeiro. Usa estas imagens apenas para identidade visual. Transforma a pessoa da primeira imagem num avatar cartoon reconhecível, conservando os traços individuais. Inclui exatamente uma versão dela e exatamente estes três personagens bíblicos, com aparência fiel às referências. Os quatro humanos devem interagir alegremente, com o personagem principal ao centro junto da pessoa. Inclui também um leão, uma pomba e um cordeiro, uma vez cada.
 
-Cenário bíblico vivo: paisagem ensolarada, vegetação exuberante, flores, céu azul, arquitetura bíblica discreta e luz dourada. Estilo de ilustração infantil premium, personagens expressivos, contornos nítidos, composição profunda e cores saturadas. Ocupa o quadro completo. No topo, integrado na arte, escreve SOMENTE esta frase, exatamente como está: ${JSON.stringify(input.message)}. Não acrescentes outras palavras, marcas, botões, ícones de telefone, e-mail ou texto em inglês. O nome da pessoa é ${JSON.stringify(input.recipientName)}. A imagem da API é 2:3; mantém todos os personagens e a frase dentro da área central 4:5 para posterior recorte.`;
+    Cenário bíblico vivo: paisagem ensolarada, vegetação exuberante, flores, céu azul, arquitetura bíblica discreta e luz dourada. Estilo de ilustração infantil premium, personagens expressivos, contornos nítidos, composição profunda e cores saturadas. Ocupa o quadro completo. No topo, integrado na arte, escreve SOMENTE esta frase, exatamente como está: ${JSON.stringify(input.message)}. Não acrescentes outras palavras, marcas, botões, ícones de telefone, e-mail ou texto em inglês. O nome da pessoa é ${JSON.stringify(input.recipientName)}. A imagem final é vertical 4:5 e não será recortada. Coloca TODO o texto dentro da imagem com margem de segurança de pelo menos 10% em cima e 8% dos lados; nenhuma letra pode tocar ou ultrapassar as bordas.`;
     }
     const replacements = {
       SEU_NOME: input.recipientName,
@@ -128,7 +128,7 @@ Cenário bíblico vivo: paisagem ensolarada, vegetação exuberante, flores, cé
       PERSONAGEM_3: input.selectedCharacters[2].name
     };
     const filled = template.replace(/\{\{([A-Z_0-9]+)\}\}/g, (match, key) => replacements[key] ?? match);
-    return `${filled}\n\nDADOS DESTA CRIAÇÃO: o primeiro anexo é a fotografia da pessoa presenteada; os três seguintes são os personagens selecionados, na ordem ${input.selectedCharacters.map(item => item.name).join(', ')}; em seguida vêm as referências fixas de leão, pomba e cordeiro.${hasSample ? ' O último anexo é a imagem amostra obrigatória de estilo e composição.' : ' A imagem amostra mencionada no texto ainda não foi fornecida; siga as descrições de estilo sem fingir que a recebeu.'} Gerar uma única imagem vertical. A tela da API é 2:3; componha toda a arte essencial e o texto dentro da área central 4:5, deixando margens superior e inferior que podem ser recortadas. Texto exato do nome: ${JSON.stringify(input.recipientName)}. Texto exato da frase: ${JSON.stringify(input.message)}. Não acrescente nem troque palavras.`;
+    return `${filled}\n\nDADOS DESTA CRIAÇÃO: o primeiro anexo é a fotografia da pessoa presenteada; os três seguintes são os personagens selecionados, na ordem ${input.selectedCharacters.map(item => item.name).join(', ')}; em seguida vêm as referências fixas de leão, pomba e cordeiro.${hasSample ? ' O último anexo é a imagem amostra obrigatória de estilo e composição.' : ' A imagem amostra mencionada no texto ainda não foi fornecida; siga as descrições de estilo sem fingir que a recebeu.'} Gerar uma única imagem vertical 4:5, sem recorte posterior. Mantenha o nome e a frase totalmente dentro da imagem, com margem de segurança de pelo menos 10% no topo e 8% nas laterais; nenhuma letra pode tocar as bordas. Texto exato do nome: ${JSON.stringify(input.recipientName)}. Texto exato da frase: ${JSON.stringify(input.message)}. Não acrescente nem troque palavras.`;
   }
 
   async function generate(input) {
