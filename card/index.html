@@ -201,14 +201,49 @@
       if(!file)return;
       cropReturnFocus=document.activeElement;
       const url=URL.createObjectURL(file);
-      cropState={file,url,zoom:1,x:0,y:0,pointer:null};
+      cropState={file,url,zoom:1,x:0,y:0,pointers:new Map(),drag:null,pinch:null};
       cropImage.onload=()=>{if(!cropState||cropState.url!==url)return;cropModal.hidden=false;document.body.classList.add('modal-open');paintCrop();cropFrame.focus()};
       cropImage.onerror=()=>{closeCrop();error(t('imageOpenError'))};
       cropImage.src=url;
     }
-    cropFrame.addEventListener('pointerdown',event=>{if(!cropState)return;event.preventDefault();cropState.pointer={id:event.pointerId,startX:event.clientX,startY:event.clientY,x:cropState.x,y:cropState.y};cropFrame.setPointerCapture(event.pointerId)});
-    cropFrame.addEventListener('pointermove',event=>{const pointer=cropState?.pointer;if(!pointer||pointer.id!==event.pointerId)return;cropState.x=pointer.x+event.clientX-pointer.startX;cropState.y=pointer.y+event.clientY-pointer.startY;paintCrop()});
-    for(const type of ['pointerup','pointercancel'])cropFrame.addEventListener(type,event=>{if(cropState?.pointer?.id===event.pointerId)cropState.pointer=null});
+    function beginCropPinch(){
+      const [first,second]=[...cropState.pointers.values()];
+      const rect=cropFrame.getBoundingClientRect();
+      cropState.pinch={distance:Math.max(1,Math.hypot(second.x-first.x,second.y-first.y)),midX:(first.x+second.x)/2-rect.left-cropFrame.clientWidth/2,midY:(first.y+second.y)/2-rect.top-cropFrame.clientHeight/2,zoom:cropState.zoom,x:cropState.x,y:cropState.y};
+      cropState.drag=null;
+    }
+    cropFrame.addEventListener('pointerdown',event=>{
+      if(!cropState||event.pointerType==='mouse'&&event.button!==0||cropState.pointers.size>=2)return;
+      event.preventDefault();cropFrame.setPointerCapture(event.pointerId);
+      cropState.pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+      if(cropState.pointers.size===2)beginCropPinch();
+      else cropState.drag={id:event.pointerId,startX:event.clientX,startY:event.clientY,x:cropState.x,y:cropState.y};
+    });
+    cropFrame.addEventListener('pointermove',event=>{
+      if(!cropState?.pointers.has(event.pointerId))return;
+      event.preventDefault();cropState.pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+      if(cropState.pointers.size===2&&cropState.pinch){
+        const [first,second]=[...cropState.pointers.values()];
+        const rect=cropFrame.getBoundingClientRect(),pinch=cropState.pinch;
+        const midpointX=(first.x+second.x)/2-rect.left-cropFrame.clientWidth/2;
+        const midpointY=(first.y+second.y)/2-rect.top-cropFrame.clientHeight/2;
+        cropState.zoom=Math.max(1,Math.min(3,pinch.zoom*Math.hypot(second.x-first.x,second.y-first.y)/pinch.distance));
+        const ratio=cropState.zoom/pinch.zoom;
+        cropState.x=midpointX-(pinch.midX-pinch.x)*ratio;
+        cropState.y=midpointY-(pinch.midY-pinch.y)*ratio;
+      }else if(cropState.drag?.id===event.pointerId){
+        const drag=cropState.drag;
+        cropState.x=drag.x+event.clientX-drag.startX;
+        cropState.y=drag.y+event.clientY-drag.startY;
+      }
+      paintCrop();
+    });
+    for(const type of ['pointerup','pointercancel'])cropFrame.addEventListener(type,event=>{
+      if(!cropState?.pointers.has(event.pointerId))return;
+      cropState.pointers.delete(event.pointerId);cropState.pinch=null;
+      const remaining=[...cropState.pointers.entries()][0];
+      cropState.drag=remaining?{id:remaining[0],startX:remaining[1].x,startY:remaining[1].y,x:cropState.x,y:cropState.y}:null;
+    });
     cropFrame.addEventListener('keydown',event=>{if(!cropState)return;if(event.key==='+'||event.key==='='){event.preventDefault();changeCropZoom(.2);return}if(event.key==='-'){event.preventDefault();changeCropZoom(-.2);return}const offsets={ArrowLeft:[-12,0],ArrowRight:[12,0],ArrowUp:[0,-12],ArrowDown:[0,12]};if(!offsets[event.key])return;event.preventDefault();cropState.x+=offsets[event.key][0];cropState.y+=offsets[event.key][1];paintCrop()});
     cropOut.addEventListener('click',()=>changeCropZoom(-.2));
     cropIn.addEventListener('click',()=>changeCropZoom(.2));
