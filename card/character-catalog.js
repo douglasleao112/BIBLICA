@@ -19,6 +19,6 @@ window.BENCAO_CHARACTER_CATALOG = Object.freeze({
     visualReference: 'references/sample.png',
     aspectRatio: '4:5',
     recommendedResolution: '1024x1280',
-    model: 'gpt-image-2.5-flare'
+    model: 'gpt-image-1-mini'
   })
 });

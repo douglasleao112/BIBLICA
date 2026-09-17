@@ -45,10 +45,11 @@ window.BENCAO_IMAGE = (() => {
         try {
           const canvas = document.createElement('canvas');
           canvas.width = image.naturalWidth || image.width;
-          canvas.height = image.naturalHeight || image.height;
+          const sourceHeight = image.naturalHeight || image.height;
+          canvas.height = Math.min(sourceHeight, Math.round(canvas.width * 1.25));
           const context = canvas.getContext('2d');
           if (!context) throw new Error('Não foi possível escrever o endereço no cartão.');
-          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          context.drawImage(image, 0, (sourceHeight - canvas.height) / 2, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
           const address = `${locale === 'es' ? 'Genera también' : 'Gere também'} www.vivalavidas.com/card`;
           let fontSize = Math.max(18, Math.round(canvas.width * .037));
           context.font = `700 ${fontSize}px Arial, Helvetica, sans-serif`;
@@ -97,7 +98,7 @@ window.BENCAO_IMAGE = (() => {
       PERSONAGEM_3: input.selectedCharacters[2].name
     };
     const filled = template.replace(/\{\{([A-Z_0-9]+)\}\}/g, (match, key) => replacements[key] ?? match);
-    return `${filled}\n\nDADOS DESTA CRIAÇÃO: o primeiro anexo é a fotografia da pessoa presenteada; os três seguintes são os personagens selecionados, na ordem ${input.selectedCharacters.map(item => item.name).join(', ')}; em seguida vêm as referências fixas de leão, pomba e cordeiro.${hasSample ? ' O último anexo é a imagem amostra obrigatória de estilo e composição.' : ' A imagem amostra mencionada no texto ainda não foi fornecida; siga as descrições de estilo sem fingir que a recebeu.'} Gerar uma única imagem vertical 4:5. Texto exato do nome: ${JSON.stringify(input.recipientName)}. Texto exato da frase: ${JSON.stringify(input.message)}. Não acrescente nem troque palavras.`;
+    return `${filled}\n\nDADOS DESTA CRIAÇÃO: o primeiro anexo é a fotografia da pessoa presenteada; os três seguintes são os personagens selecionados, na ordem ${input.selectedCharacters.map(item => item.name).join(', ')}; em seguida vêm as referências fixas de leão, pomba e cordeiro.${hasSample ? ' O último anexo é a imagem amostra obrigatória de estilo e composição.' : ' A imagem amostra mencionada no texto ainda não foi fornecida; siga as descrições de estilo sem fingir que a recebeu.'} Gerar uma única imagem vertical. A tela da API é 2:3; componha toda a arte essencial e o texto dentro da área central 4:5, deixando margens superior e inferior que podem ser recortadas. Texto exato do nome: ${JSON.stringify(input.recipientName)}. Texto exato da frase: ${JSON.stringify(input.message)}. Não acrescente nem troque palavras.`;
   }
 
   async function generate(input) {
