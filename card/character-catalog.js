@@ -2,12 +2,12 @@
 // Os personagens fixos não aparecem na etapa de seleção.
 window.BENCAO_CHARACTER_CATALOG = Object.freeze({
   selectable: Object.freeze([
-    { id: 'jesus', name: 'Jesus', image: 'jesus.png' },
-    { id: 'maria', name: 'Maria', image: 'maria.png' },
-    { id: 'noe', name: 'Noé', image: 'noe.png' },
-    { id: 'moises', name: 'Moisés', image: 'moises.png' },
-    { id: 'adao', name: 'Adão', image: 'adao.png' },
-    { id: 'eva', name: 'Eva', image: 'eva.png' }
+    { id: 'jesus', name: 'Jesus', image: 'character-thumbs/jesus.webp' },
+    { id: 'maria', name: 'Maria', image: 'character-thumbs/maria.webp' },
+    { id: 'noe', name: 'Noé', image: 'character-thumbs/noe.webp' },
+    { id: 'moises', name: 'Moisés', image: 'character-thumbs/moises.webp' },
+    { id: 'adao', name: 'Adão', image: 'character-thumbs/adao.webp' },
+    { id: 'eva', name: 'Eva', image: 'character-thumbs/eva.webp' }
   ]),
   fixed: Object.freeze([
     { id: 'leao', name: 'Leão', image: 'references/leao.png' },
