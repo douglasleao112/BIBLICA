@@ -382,9 +382,11 @@
     let renderedStep=state.step,fadeTimer=0;
     function render(){
       if(fadeTimer){clearTimeout(fadeTimer);fadeTimer=0}
-      if(state.step===renderedStep||window.matchMedia('(prefers-reduced-motion: reduce)').matches){renderedStep=state.step;stage.classList.remove('is-fading');renderContent();return}
+      const changedStep=state.step!==renderedStep;
+      if(changedStep)window.scrollTo(0,0);
+      if(!changedStep||window.matchMedia('(prefers-reduced-motion: reduce)').matches){renderedStep=state.step;stage.classList.remove('is-fading');renderContent();if(changedStep)window.requestAnimationFrame(()=>window.scrollTo(0,0));return}
       stage.classList.add('is-fading');
-      fadeTimer=window.setTimeout(()=>{fadeTimer=0;renderedStep=state.step;renderContent();window.requestAnimationFrame(()=>stage.classList.remove('is-fading'))},220);
+      fadeTimer=window.setTimeout(()=>{fadeTimer=0;renderedStep=state.step;renderContent();window.requestAnimationFrame(()=>{stage.classList.remove('is-fading');window.scrollTo(0,0)})},220);
     }
     async function startGeneration(){
       if(state.step!==6||!state.photo||!state.whatsapp||!state.leadReason)return;
