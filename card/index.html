@@ -200,6 +200,22 @@
     const tracker=window.BENCAO_TRACKER;
     const cardStorage=window.BENCAO_CARD_STORAGE;
     const trackedSteps=['intro','relation','name','phrase','characters','reason','photo','whatsapp','loading','result'];
+    const pixelEventsByStep={1:'ViewContent',2:'Lead',6:'Contact',8:'CompleteRegistration'};
+    const pixelEventsSent=new Set();
+    function trackPixelStep(step){
+      const event=pixelEventsByStep[step];
+      if(!event||pixelEventsSent.has(event)||typeof window.fbq!=='function')return;
+      let completedKey='';
+      if(event==='CompleteRegistration'){
+        try{
+          const browserId=localStorage.getItem('bencao_browser_id_v1');
+          if(browserId){completedKey=`bencao_pixel_complete_v1:${browserId}`;if(localStorage.getItem(completedKey))return}
+        }catch{/* O evento ainda pode ser enviado sem armazenamento local. */}
+      }
+      window.fbq('track',event);
+      pixelEventsSent.add(event);
+      if(completedKey)try{localStorage.setItem(completedKey,'1')}catch{/* A deduplicação continua ativa nesta visita. */}
+    }
     let lastTrackedStep=null;
     const stage=document.getElementById('stage'),status=document.getElementById('status-label'),count=document.getElementById('status-count'),bar=document.querySelector('.progress'),fill=document.getElementById('progress-fill');
     const giftEffect=document.getElementById('gift-effect'),confetti=document.getElementById('gift-confetti');
@@ -397,7 +413,7 @@
     function error(message){const el=stage.querySelector('.error');if(el)el.textContent=message}
     function renderContent(){
       const n=state.step,enteringCharacters=n===3&&lastTrackedStep!==n;stage.classList.toggle('is-centered',n<0);document.querySelector('.shell').classList.toggle('has-offer',n===8);document.querySelector('.panel').classList.toggle('intro-panel',n<0);document.querySelector('.panel').classList.toggle('result-panel',n===8);document.querySelector('.panel').classList.toggle('phone-panel',n===6);giftEffect.hidden=n>=0;giftEffect.classList.toggle('play',n<0&&introPlayed);examples.hidden=n>=0;document.getElementById('discount-offer').hidden=n!==8;document.getElementById('floating-whatsapp').hidden=n!==8;document.querySelector('.quiz-progress').hidden=n<0||n>=7;status.textContent=n<0?'':n>=7?t('yourGift'):t('steps')[n];count.textContent=n<0||n>=7?'':`${n+1} / 7`;
-      if(lastTrackedStep!==n){lastTrackedStep=n;tracker.track('step_view',{step:trackedSteps[n+1]})}
+      if(lastTrackedStep!==n){lastTrackedStep=n;tracker.track('step_view',{step:trackedSteps[n+1]});trackPixelStep(n)}
       const progress=n<0?0:n>=7?7:n;bar.setAttribute('aria-valuenow',progress);fill.style.width=`${progress/7*100}%`;
       if(n<0){stage.innerHTML=`<p class="kicker">${t('introKicker')}</p><h1>${t('introHeading')}</h1><p>${t('introText')}</p><div class="actions intro-action">${btn(`${t('start')} ${forwardArrow}`,'start')}</div><p class="intro-note"><span aria-hidden="true">⚠️</span> ${t('introNote')}</p><div class="intro-language"><button type="button" class="language-toggle" data-action="toggle-language" aria-expanded="false" aria-controls="language-options"><span class="language-flag" aria-hidden="true">${i18n.lang==='es'?'🇪🇸':'🇵🇹'}</span><span>${t('languageChoice')}</span><span class="language-chevron" aria-hidden="true">▴</span></button><div class="language-options" id="language-options" hidden><button type="button" data-lang="pt" aria-current="${i18n.lang==='pt'}"><span class="language-flag" aria-hidden="true">🇵🇹</span> Português (Portugal)</button><button type="button" data-lang="es" aria-current="${i18n.lang==='es'}"><span class="language-flag" aria-hidden="true">🇪🇸</span> Español</button></div></div>`;return}
       if(n===0){stage.innerHTML=`<h2>${t('relationHeading')}</h2><p>${t('relationText')}</p><div class="grid">${relations.map((id,i)=>`<button type="button" class="pick" data-relation="${id}" aria-pressed="${state.relation===id}">${t('relationLabels')[i]}</button>`).join('')}</div><div class="error" role="status"></div>${backOnly()}`;return}
