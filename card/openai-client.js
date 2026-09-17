@@ -72,9 +72,11 @@ window.BENCAO_IMAGE = (() => {
     });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const detail = payload.error?.message || `HTTP ${response.status}`;
+      const detail = typeof payload.error === 'string' ? payload.error : payload.error?.message || `HTTP ${response.status}`;
       const failure = new Error(`Geração: ${detail}`);
       failure.status = response.status;
+      failure.dailyLimit = response.status === 429 &&
+        (payload.error?.code === 'DAILY_LIMIT' || /^Limite de criações atingido\./i.test(detail));
       throw failure;
     }
     if (typeof payload.image !== 'string' || !/^data:image\/png;base64,/.test(payload.image)) {

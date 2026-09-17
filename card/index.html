@@ -450,7 +450,7 @@
         cardStorage.release(reservation.token);
         tracker.track('generation_error',{category:cause instanceof TypeError?'rede':'api'});
         state.step=6;render();
-        const message=cause?.status===429?t('generationLimitError'):cause instanceof TypeError?t('generationConnectionError'):t('generationError');
+        const message=cause?.dailyLimit?t('generationLimitError'):cause?.status===429||cause instanceof TypeError?t('generationConnectionError'):t('generationError');
         window.setTimeout(()=>error(message),250);
       }
     }
