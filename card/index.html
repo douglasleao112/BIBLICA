@@ -175,7 +175,7 @@
     </div>
   </div>
   <script src="character-catalog.js?v=20260917-thumbs"></script>
-  <script src="openai-client.js?v=20260917-mini"></script>
+  <script src="openai-client.js?v=20260917-card-fix"></script>
   <script src="tracking-config.js"></script>
   <script src="lead-tracking.js"></script>
   <script src="card-storage.js?v=20260917-share"></script>
@@ -483,7 +483,7 @@
         cardStorage.release(reservation.token);
         tracker.track('generation_error',{category:cause instanceof TypeError?'rede':'api'});
         state.step=6;render();
-        const message=cause?.dailyLimit?t('generationLimitError'):cause?.status===429||cause instanceof TypeError?t('generationConnectionError'):t('generationError');
+        const message=cause?.invalidResult?(i18n.lang==='es'?'La imagen no corresponde a la tarjeta solicitada. Inténtalo de nuevo.':'A imagem não corresponde ao cartão pedido. Tente novamente.'):cause?.dailyLimit?t('generationLimitError'):cause?.status===429||cause instanceof TypeError?t('generationConnectionError'):t('generationError');
         window.setTimeout(()=>error(message),250);
       }
     }

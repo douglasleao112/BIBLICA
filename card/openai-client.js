@@ -88,7 +88,42 @@ window.BENCAO_IMAGE = (() => {
     });
   }
 
+  function rejectBlankResult(dataUrl) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 80;
+        canvas.height = 100;
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        if (!context) return reject(new Error('Não foi possível verificar a imagem gerada.'));
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+        let nearWhite = 0;
+        for (let i = 0; i < pixels.length; i += 4) {
+          if (pixels[i] > 242 && pixels[i + 1] > 242 && pixels[i + 2] > 242) nearWhite++;
+        }
+        if (nearWhite / (pixels.length / 4) > .72) {
+          const failure = new Error('A imagem gerada não corresponde ao cartão pedido. Tente novamente.');
+          failure.invalidResult = true;
+          return reject(failure);
+        }
+        resolve();
+      };
+      image.onerror = () => reject(new Error('A imagem gerada não pôde ser aberta.'));
+      image.src = dataUrl;
+    });
+  }
+
   function buildPrompt(template, input, hasSample) {
+    if (!hasSample) {
+      const characters = input.selectedCharacters.map(item => item.name);
+      return `Cria uma ILUSTRAÇÃO CARTOON BÍBLICA personalizada, vertical, colorida e acabada como um presente. Não cries um site, interface, botão, cartão de contacto, anúncio, ecrã branco ou mockup. A imagem inteira deve ser uma cena ilustrada rica em cor e detalhes, sem espaços vazios.
+
+Referências anexadas, por ordem: 1) fotografia da pessoa presenteada; 2–4) imagens dos personagens ${characters.join(', ')}; 5) leão; 6) pomba; 7) cordeiro. Usa estas imagens apenas para identidade visual. Transforma a pessoa da primeira imagem num avatar cartoon reconhecível, conservando os traços individuais. Inclui exatamente uma versão dela e exatamente estes três personagens bíblicos, com aparência fiel às referências. Os quatro humanos devem interagir alegremente, com o personagem principal ao centro junto da pessoa. Inclui também um leão, uma pomba e um cordeiro, uma vez cada.
+
+Cenário bíblico vivo: paisagem ensolarada, vegetação exuberante, flores, céu azul, arquitetura bíblica discreta e luz dourada. Estilo de ilustração infantil premium, personagens expressivos, contornos nítidos, composição profunda e cores saturadas. Ocupa o quadro completo. No topo, integrado na arte, escreve SOMENTE esta frase, exatamente como está: ${JSON.stringify(input.message)}. Não acrescentes outras palavras, marcas, botões, ícones de telefone, e-mail ou texto em inglês. O nome da pessoa é ${JSON.stringify(input.recipientName)}. A imagem da API é 2:3; mantém todos os personagens e a frase dentro da área central 4:5 para posterior recorte.`;
+    }
     const replacements = {
       SEU_NOME: input.recipientName,
       FRASE_ESCOLHIDA: input.message,
@@ -132,6 +167,7 @@ window.BENCAO_IMAGE = (() => {
     if (typeof payload.image !== 'string' || !/^data:image\/png;base64,/.test(payload.image)) {
       throw new Error('A API não devolveu uma imagem válida. Tente novamente.');
     }
+    await rejectBlankResult(payload.image);
     return stampWebsite(payload.image, input.locale);
   }
 
