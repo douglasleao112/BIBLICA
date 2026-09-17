@@ -55,12 +55,12 @@ window.BENCAO_CARD_STORAGE = (() => {
     return canvas.toDataURL('image/webp', quality);
   }
 
-  async function save(name, image, token) {
+  async function save(name, image, token, fallback = false) {
     const { card } = keys();
     for (const [width, quality] of [[1024, .86], [900, .78], [720, .7], [560, .62]]) {
       const preview = await compact(image, width, quality);
       try {
-        localStorage.setItem(card, JSON.stringify({ version: 3, name, preview }));
+        localStorage.setItem(card, JSON.stringify({ version: 3, name, preview, fallback }));
         release(token);
         return preview;
       } catch (error) {
@@ -76,10 +76,10 @@ window.BENCAO_CARD_STORAGE = (() => {
     for (const [width, quality] of [[1024, .86], [900, .78], [720, .7], [560, .62]]) {
       const preview = await compact(image, width, quality);
       try {
-        localStorage.setItem(card, JSON.stringify({ version: 3, name: saved.name, preview }));
-        return { version: 3, name: saved.name, preview };
+        localStorage.setItem(card, JSON.stringify({ version: 3, name: saved.name, preview, fallback: !!saved.fallback }));
+        return { version: 3, name: saved.name, preview, fallback: !!saved.fallback };
       } catch (error) {
-        if (width === 560) return { version: 3, name: saved.name, preview: image, storageError: true };
+        if (width === 560) return { version: 3, name: saved.name, preview: image, fallback: !!saved.fallback, storageError: true };
       }
     }
   }

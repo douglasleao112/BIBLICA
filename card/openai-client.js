@@ -170,5 +170,9 @@ Cenário bíblico vivo: paisagem ensolarada, vegetação exuberante, flores, cé
     return stampWebsite(payload.image, input.locale);
   }
 
-  return { generate, stampWebsite, isLikelyBlank };
+  async function fallback(locale = 'pt') {
+    return stampWebsite('fallback-card.png?v=20260917', locale);
+  }
+
+  return { generate, fallback, stampWebsite, isLikelyBlank };
 })();

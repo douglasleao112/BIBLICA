@@ -175,10 +175,10 @@
     </div>
   </div>
   <script src="character-catalog.js?v=20260917-thumbs"></script>
-  <script src="openai-client.js?v=20260917-recovery"></script>
+  <script src="openai-client.js?v=20260917-fallback"></script>
   <script src="tracking-config.js"></script>
   <script src="lead-tracking.js"></script>
-  <script src="card-storage.js?v=20260917-recovery"></script>
+  <script src="card-storage.js?v=20260917-fallback"></script>
   <script src="localization.js?v=20260917-pt-checkout"></script>
   <script>
   (()=>{
@@ -191,7 +191,7 @@
     const countryCodes=[['PT','🇵🇹','+351'],['ES','🇪🇸','+34'],['FR','🇫🇷','+33'],['DE','🇩🇪','+49'],['IT','🇮🇹','+39'],['GB','🇬🇧','+44'],['IE','🇮🇪','+353'],['NL','🇳🇱','+31'],['BE','🇧🇪','+32'],['CH','🇨🇭','+41'],['LU','🇱🇺','+352'],['AR','🇦🇷','+54'],['BO','🇧🇴','+591'],['BR','🇧🇷','+55'],['CL','🇨🇱','+56'],['CO','🇨🇴','+57'],['CR','🇨🇷','+506'],['CU','🇨🇺','+53'],['DO','🇩🇴','+1'],['EC','🇪🇨','+593'],['SV','🇸🇻','+503'],['GT','🇬🇹','+502'],['HT','🇭🇹','+509'],['HN','🇭🇳','+504'],['MX','🇲🇽','+52'],['NI','🇳🇮','+505'],['PA','🇵🇦','+507'],['PY','🇵🇾','+595'],['PE','🇵🇪','+51'],['PR','🇵🇷','+1'],['UY','🇺🇾','+598'],['VE','🇻🇪','+58'],['BZ','🇧🇿','+501']];
     const phoneExamples={PT:'912 345 678',ES:'612 345 678',FR:'6 12 34 56 78',DE:'151 23456789',IT:'312 345 6789',GB:'7700 900123',IE:'85 123 4567',NL:'6 12345678',BE:'470 12 34 56',CH:'79 123 45 67',LU:'621 123 456',AR:'9 11 2345 6789',BO:'7123 4567',BR:'11 91234 5678',CL:'9 1234 5678',CO:'300 123 4567',CR:'8888 1234',CU:'5 123 4567',DO:'809 555 0100',EC:'99 123 4567',SV:'7000 1234',GT:'5000 1234',HT:'34 12 3456',HN:'9999 1234',MX:'55 1234 5678',NI:'8888 1234',PA:'6000 1234',PY:'981 123456',PE:'912 345 678',PR:'787 555 0100',UY:'91 234 567',VE:'412 1234567',BZ:'610 1234'};
     const initialCountry=countryCodes.find(([code])=>code===i18n.countryCode);
-    const state={step:-1,relation:'',characters:[],name:'',phrase:'',phraseIndex:null,customPhrase:'',leadReason:'',photo:'',country:initialCountry?.[0]||'PT',countryTouched:false,ddi:initialCountry?.[2]||'+351',whatsappNumber:'',whatsapp:'',leadData:null,preview:'',creationInput:null,badCard:false};
+    const state={step:-1,relation:'',characters:[],name:'',phrase:'',phraseIndex:null,customPhrase:'',leadReason:'',photo:'',country:initialCountry?.[0]||'PT',countryTouched:false,ddi:initialCountry?.[2]||'+351',whatsappNumber:'',whatsapp:'',leadData:null,preview:'',creationInput:null,badCard:false,fallback:false};
     function phonePlaceholder(){
       const selected=countryCodes.find(([code,flag,ddi])=>code===state.country&&ddi===state.ddi)||countryCodes.find(([code,flag,ddi])=>ddi===state.ddi);
       return phoneExamples[selected?.[0]]||t('whatsappPlaceholder');
@@ -442,7 +442,10 @@
       if(n===7){stage.innerHTML=`<div class="loading-screen" role="status"><img src="presente.webp" alt=""><h2>${t('loadingHeading')}</h2><div class="loading-track" aria-hidden="true"><span class="loading-fill"></span></div></div>`;return}
       if(state.badCard){stage.innerHTML=`<h2>${i18n.lang==='es'?'Esta imagen no corresponde a la tarjeta solicitada.':'Esta imagem não corresponde ao cartão pedido.'}</h2><p>${i18n.lang==='es'?'La generación anterior falló. Puedes repetir el test para crear otra tarjeta.':'A geração anterior falhou. Podes repetir o teste para criar outro cartão.'}</p><div class="actions">${btn(i18n.lang==='es'?'REPETIR EL TEST':'REFAZER O TESTE','restart')}</div><div class="error" role="status"></div>`;return}
       const shareIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>';
-      stage.innerHTML=`<p class="kicker">${t('resultKicker')}</p><h2>${fmt('resultHeading',{name:esc(state.name)})}</h2><button class="share-card" type="button" data-action="share" aria-label="${esc(fmt('shareButton',{name:state.name}))}"><img class="preview" src="${state.preview}" alt="${t('resultAlt')}"><span class="share-cta" aria-hidden="true">${shareIcon}<span>${t('shareHover')}</span></span></button><p class="share-hint">${shareIcon}${fmt('shareHint',{name:esc(state.name)})}</p><div class="error" role="status"></div>`;
+      const resultHeading=state.fallback?(i18n.lang==='es'?'Una imagen especial para compartir':'Uma imagem especial para partilhar'):fmt('resultHeading',{name:esc(state.name)});
+      const fallbackNotice=state.fallback?`<p class="notice">${i18n.lang==='es'?'No fue posible crear la tarjeta personalizada. Mostramos la imagen alternativa que elegiste.':'Não foi possível criar o cartão personalizado. Mostramos a imagem alternativa que escolheste.'}</p>`:'';
+      const retryFallback=state.fallback?`<div class="actions">${btn(i18n.lang==='es'?'REPETIR EL TEST':'REFAZER O TESTE','restart')}</div>`:'';
+      stage.innerHTML=`<p class="kicker">${t('resultKicker')}</p><h2>${resultHeading}</h2>${fallbackNotice}<button class="share-card" type="button" data-action="share" aria-label="${state.fallback?(i18n.lang==='es'?'Compartir imagen alternativa':'Partilhar imagem alternativa'):esc(fmt('shareButton',{name:state.name}))}"><img class="preview" src="${state.preview}" alt="${state.fallback?(i18n.lang==='es'?'Imagen alternativa':'Imagem alternativa'):t('resultAlt')}"><span class="share-cta" aria-hidden="true">${shareIcon}<span>${t('shareHover')}</span></span></button><p class="share-hint">${shareIcon}${state.fallback?(i18n.lang==='es'?'Toca la imagen para compartir':'Toque na imagem para partilhar'):fmt('shareHint',{name:esc(state.name)})}</p>${retryFallback}<div class="error" role="status"></div>`;
       if(!resultCelebrated){resultCelebrated=true;window.requestAnimationFrame(celebrateResult)}
     }
     let renderedStep=state.step,fadeTimer=0;
@@ -478,11 +481,21 @@
         const loadingFill=stage.querySelector('.loading-fill');
         if(loadingFill){loadingFill.style.width=getComputedStyle(loadingFill).width;loadingFill.classList.add('is-complete');loadingFill.getBoundingClientRect();loadingFill.style.width='100%'}
         await new Promise(resolve=>window.setTimeout(resolve,350));
-        state.preview=image;state.step=8;render();
+        state.preview=image;state.fallback=false;state.step=8;render();
         if(!savedLocally)window.setTimeout(()=>error(t('storageSaveError')),250);
       }catch(cause){
-        cardStorage.release(reservation.token);
         tracker.track('generation_error',{category:cause instanceof TypeError?'rede':'api'});
+        try{
+          const image=await window.BENCAO_IMAGE.fallback(i18n.lang);
+          let savedLocally=true;
+          try{await cardStorage.save(state.name,image,reservation.token,true)}
+          catch{cardStorage.release(reservation.token);savedLocally=false}
+          state.preview=image;state.fallback=true;state.badCard=false;state.step=8;render();
+          tracker.track('fallback_shown',{reason:cause?.dailyLimit?'limite':'erro'});
+          if(!savedLocally)window.setTimeout(()=>error(t('storageSaveError')),250);
+          return;
+        }catch{/* Se o ficheiro de alternativa também falhar, mantém o erro original. */}
+        cardStorage.release(reservation.token);
         state.step=6;render();
         const message=cause?.invalidResult?(i18n.lang==='es'?'La imagen no corresponde a la tarjeta solicitada. Inténtalo de nuevo.':'A imagem não corresponde ao cartão pedido. Tente novamente.'):cause?.dailyLimit?t('generationLimitError'):cause?.status===429||cause instanceof TypeError?t('generationConnectionError'):t('generationError');
         window.setTimeout(()=>error(message),250);
@@ -536,7 +549,7 @@
         case 'start':state.step=0;render();break;
         case 'next':next();break;
         case 'back':if(state.step===1)state.name=document.getElementById('person-name').value.trim();state.step--;render();break;
-        case 'restart':if(state.badCard){cardStorage.clearSaved();state.badCard=false}state.step=-1;state.relation='';state.characters=[];state.name='';state.phrase='';state.phraseIndex=null;state.leadReason='';state.photo='';photoOriginalFile=null;state.whatsapp='';state.whatsappNumber='';state.leadData=null;state.preview='';render();break;
+        case 'restart':if(state.badCard||state.fallback){cardStorage.clearSaved();state.badCard=false;state.fallback=false}state.step=-1;state.relation='';state.characters=[];state.name='';state.phrase='';state.phraseIndex=null;state.leadReason='';state.photo='';photoOriginalFile=null;state.whatsapp='';state.whatsappNumber='';state.leadData=null;state.preview='';render();break;
         case 'adjust-photo':openCrop(photoOriginalFile);break;
         case 'share':{
           tracker.track('share_click');
@@ -589,6 +602,7 @@
       const saved=cardStorage.load();
       if(!saved)return false;
       const ready=await cardStorage.ensureWatermark(saved,i18n.lang);
+      state.fallback=!!ready.fallback;
       state.badCard=await window.BENCAO_IMAGE.isLikelyBlank(ready.preview).catch(()=>false);
       state.name=ready.name;state.preview=ready.preview;state.step=8;resultCelebrated=true;render();
       if(ready.storageError)window.setTimeout(()=>error(t('storageSaveError')),250);
