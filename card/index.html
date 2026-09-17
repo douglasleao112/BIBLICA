@@ -2,13 +2,13 @@
 <html lang="pt-PT">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="theme-color" content="#10233f">
   <meta name="description" content="Crie uma mensagem de bênção personalizada para alguém que ama.">
   <title>Um presente de bênção</title>
   <style>
     :root{font-family:Arial,Helvetica,sans-serif;color:#fff;background:#10233f;font-synthesis:none}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;overflow-x:hidden;background:radial-gradient(circle at 84% 5%,#34314f 0,transparent 37%),#10233f}button,input,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #ffe276;outline-offset:3px}
+    *{box-sizing:border-box}html,body{touch-action:pan-y}body{margin:0;min-height:100vh;overflow-x:hidden;background:radial-gradient(circle at 84% 5%,#34314f 0,transparent 37%),#10233f}button,input,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #ffe276;outline-offset:3px}
     .shell{width:min(100% - 30px,680px);min-height:100svh;margin:auto;padding:68px 0 30px;display:flex;flex-direction:column;justify-content:center}.ribbon{position:fixed;top:0;left:0;right:0;z-index:50;min-height:42px;background:linear-gradient(90deg,#34dc69,#17bf50);color:#09243b;text-align:center;font-size:12px;letter-spacing:.1em;font-weight:900;padding:13px;border-radius:0;text-transform:uppercase}.ribbon-star{color:#ffe276;text-shadow:0 1px 2px #096b36}
     .panel{margin-top:22px;padding:clamp(22px,5vw,44px);min-height:620px;border:1px solid #4a6280;border-radius:24px;background:radial-gradient(circle at 90% 15%,#33334d 0,transparent 46%),linear-gradient(150deg,#11223c,#1c3558);box-shadow:0 22px 65px #03102270;display:flex;flex-direction:column;position:relative;overflow:hidden}.panel:before{content:"";position:absolute;width:380px;height:380px;right:-245px;top:-160px;border-radius:50%;border:1px solid #ffffff18;pointer-events:none}.panel.phone-panel{overflow:visible;z-index:2}.panel.phone-panel:before{display:none}
     .status{display:flex;justify-content:space-between;gap:12px;color:#ffe276;font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;position:relative}.progress{height:8px;border-radius:20px;background:#ffffff2c;margin:17px 0 32px;overflow:hidden}.progress span{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#ffe276,#30d765);transition:width .25s}.stage{position:relative;flex:1;display:flex;flex-direction:column;opacity:1;transform:translateY(0);transition:opacity .22s ease,transform .22s ease}.stage.is-fading{opacity:0;transform:translateY(8px);pointer-events:none}.stage.is-centered{justify-content:center}.stage.is-centered .actions{margin-top:8px}
@@ -172,6 +172,9 @@
     const giftEffect=document.getElementById('gift-effect'),confetti=document.getElementById('gift-confetti');
     const examples=document.getElementById('intro-examples'),exampleModal=document.getElementById('example-modal'),exampleFull=document.getElementById('example-full');
     const cropModal=document.getElementById('photo-crop-modal'),cropFrame=document.getElementById('photo-crop-frame'),cropImage=document.getElementById('photo-crop-image'),cropOut=document.getElementById('photo-crop-out'),cropIn=document.getElementById('photo-crop-in');
+    const outsideCrop=target=>!target?.closest?.('#photo-crop-frame');
+    for(const type of ['gesturestart','gesturechange'])document.addEventListener(type,event=>{if(outsideCrop(event.target))event.preventDefault()},{passive:false});
+    document.addEventListener('touchmove',event=>{if(event.touches.length>1&&outsideCrop(event.target))event.preventDefault()},{passive:false});
     let cropState=null,photoOriginalFile=null,cropReturnFocus=null;
     function cropGeometry(){
       const size=cropFrame.clientWidth,scale=Math.max(size/cropImage.naturalWidth,size/cropImage.naturalHeight)*cropState.zoom;
