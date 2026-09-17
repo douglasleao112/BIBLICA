@@ -112,10 +112,10 @@
     .result-panel .share-card::after{content:"";position:absolute;inset:0;z-index:1;border-radius:18px;background:#b8ffd96b;opacity:0;pointer-events:none;transition:opacity .2s}.result-panel .share-card:hover::after,.result-panel .share-card:focus-visible::after{opacity:1}.result-panel .share-icon{z-index:2}.share-hover-text{position:absolute;top:calc(68% + 39px);left:0;z-index:2;width:100%;color:#b8ffd5;font-size:15px;font-weight:900;text-align:center;text-shadow:0 2px 8px #082638,0 1px 2px #082638;pointer-events:none}
     .share-hint svg{display:inline-block;width:18px;height:18px;margin-right:6px;vertical-align:-4px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
     @media(prefers-reduced-motion:reduce){.result-panel .share-icon{animation:none;transform:translate(-50%,-50%)}}
-    .loading-fill{animation:loadingStages 21.5s linear forwards}
-    .loading-fill.is-complete{animation:loadingComplete .35s ease forwards}
-    @keyframes loadingStages{0%{width:0}2.326%,48.837%{width:33.333%}51.163%,97.674%{width:66.667%}100%{width:90%}}
-    @keyframes loadingComplete{from{width:90%}to{width:100%}}
+    .loading-fill{animation:loadingStages 20s linear forwards,loadingWaiting 60s linear 20s infinite alternate}
+    .loading-fill.is-complete{animation:none;transition:width .35s ease}
+    @keyframes loadingStages{0%{width:0}2.5%{width:33.333%}50%{width:38%}52.5%{width:66.667%}100%{width:71%}}
+    @keyframes loadingWaiting{from{width:90%}to{width:96%}}
     @media(prefers-reduced-motion:reduce){.loading-fill{animation:none;width:90%}}
     .intro-language{margin-top:18px}.language-toggle{gap:6px;min-height:32px;padding:5px 11px;border-color:#91a9c480;background:#ffffff08;color:#c4d4e7;font-size:11px;font-weight:700;box-shadow:none}.language-toggle:hover,.language-toggle:focus-visible{background:#ffffff16;color:#fff}.language-toggle .language-flag{font-size:15px}.language-chevron{font-size:10px;color:#c4d4e7}
   </style>
@@ -443,7 +443,8 @@
         catch { cardStorage.release(reservation.token);savedLocally=false }
         tracker.track('generation_success');
         await minimumLoadingTime;
-        stage.querySelector('.loading-fill')?.classList.add('is-complete');
+        const loadingFill=stage.querySelector('.loading-fill');
+        if(loadingFill){loadingFill.style.width=getComputedStyle(loadingFill).width;loadingFill.classList.add('is-complete');loadingFill.getBoundingClientRect();loadingFill.style.width='100%'}
         await new Promise(resolve=>window.setTimeout(resolve,350));
         state.preview=image;state.step=8;render();
         if(!savedLocally)window.setTimeout(()=>error(t('storageSaveError')),250);
