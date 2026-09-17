@@ -470,17 +470,12 @@
       state.creationInput={recipientName:state.name,message:state.phrase,locale:i18n.lang,photo:state.photo,selectedCharacters:state.characters.map(name=>{const item=characterCatalog.selectable.find(entry=>entry.name===name);return {...item,name:t('characterLabels')[name]||name}}),fixedCharacters:characterCatalog.fixed,generation:characterCatalog.generation};
       tracker.track('generation_started');
       state.step=7;render();
-      const minimumLoadingTime=new Promise(resolve=>window.setTimeout(resolve,21500));
       try{
         const image=await window.BENCAO_IMAGE.generate(state.creationInput);
         let savedLocally=true;
         try { await cardStorage.save(state.name,image,reservation.token); }
         catch { cardStorage.release(reservation.token);savedLocally=false }
         tracker.track('generation_success');
-        await minimumLoadingTime;
-        const loadingFill=stage.querySelector('.loading-fill');
-        if(loadingFill){loadingFill.style.width=getComputedStyle(loadingFill).width;loadingFill.classList.add('is-complete');loadingFill.getBoundingClientRect();loadingFill.style.width='100%'}
-        await new Promise(resolve=>window.setTimeout(resolve,350));
         state.preview=image;state.fallback=false;state.step=8;render();
         if(!savedLocally)window.setTimeout(()=>error(t('storageSaveError')),250);
       }catch(cause){

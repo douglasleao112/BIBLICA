@@ -1,6 +1,6 @@
 window.BENCAO_IMAGE = (() => {
   const ENDPOINT = 'https://zpupfwlufzbafwwebrgb.supabase.co/functions/v1/generate-card';
-  // A chave pública anon do Supabase pode ficar no navegador; a chave OpenAI permanece na Edge Function.
+  // A chave pública anon do Supabase pode ficar no navegador; a chave Gemini permanece na Edge Function.
   const PUBLIC_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwdXBmd2x1ZnpiYWZ3d2VicmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1OTYyNTMsImV4cCI6MjEwNTE3MjI1M30.YHgjIfU1nhFW4Ggkzr6WLg3wIkk5WOIWdJlQIe2wfl0';
   let assetsPromise;
 
@@ -159,7 +159,7 @@ Cenário bíblico vivo: paisagem ensolarada, vegetação exuberante, flores, cé
         (payload.error?.code === 'DAILY_LIMIT' || /^Limite de criações atingido\./i.test(detail));
       throw failure;
     }
-    if (typeof payload.image !== 'string' || !/^data:image\/png;base64,/.test(payload.image)) {
+    if (typeof payload.image !== 'string' || !/^data:image\/(png|jpeg|webp);base64,/.test(payload.image)) {
       throw new Error('A API não devolveu uma imagem válida. Tente novamente.');
     }
     if (await isLikelyBlank(payload.image)) {
