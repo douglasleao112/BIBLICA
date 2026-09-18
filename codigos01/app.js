@@ -516,7 +516,7 @@
     return frame(`<p class="eyebrow">A CONVERGÊNCIA</p><h2>Os seus sinais estão a <span class="gold">encontrar-se.</span></h2>${handImage ? '' : '<p class="subtle">Estamos a organizar as suas respostas para apresentar uma leitura personalizada.</p>'}
       ${handProgress}
       ${state.handLineSources?.head === 'reference' ? '<p class="hand-reference-note">As linhas da cabeça e do destino são traçados de referência, posicionados a partir das linhas visíveis da palma.</p>' : ''}
-      <div class="video-box">${config.videoUrl ? `<div class="mini-vsl" data-state="ready" role="group" aria-label="Apresentação em vídeo"><video id="analysis-video" autoplay muted ${handImage ? '' : 'loop '}playsinline webkit-playsinline preload="auto" disablepictureinpicture src="${escapeHTML(config.videoUrl)}" aria-label="Mini apresentação da leitura"></video><button class="mini-vsl-gate" type="button" data-action="vsl-start" ${handImage ? 'hidden' : videoReady ? '' : 'disabled'}><strong>O seu vídeo está pronto</strong><span aria-hidden="true">▶</span><small>${videoReady ? 'Toque para escutar' : 'Disponível ao concluir a análise'}</small></button><button class="mini-vsl-sound" type="button" data-action="vsl-sound" hidden>Toque para escutar</button><div class="mini-vsl-overlay" hidden><strong>Continue a ver o vídeo.</strong><button type="button" data-action="vsl-resume">▶ Continuar a ver</button><button type="button" data-action="vsl-restart">↻ Ver desde o início</button></div><div class="mini-vsl-controls" hidden><button type="button" data-action="vsl-speed" aria-label="Alterar velocidade do vídeo">1.0x</button></div><div class="mini-vsl-progress" role="progressbar" aria-label="Progresso do vídeo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div></div>` : '<div class="video-placeholder"><strong>◈</strong>Vídeo indisponível. Pode avançar quando a análise terminar.</div>'}</div>
+      <div class="video-box">${config.videoUrl ? `<div class="mini-vsl" data-state="ready" role="group" aria-label="Apresentação em vídeo"><video id="analysis-video" autoplay muted ${handImage ? '' : 'loop '}playsinline webkit-playsinline preload="auto" disablepictureinpicture src="${escapeHTML(config.videoUrl)}" aria-label="Mini apresentação da leitura"></video><button class="mini-vsl-gate" type="button" data-action="vsl-start" ${handImage ? 'hidden' : videoReady ? '' : 'disabled'}><strong>O seu vídeo está pronto</strong><span aria-hidden="true">▶</span><small>${videoReady ? 'Toque para escutar' : 'Disponível ao concluir a análise'}</small></button><div class="mini-vsl-overlay" hidden><strong>Continue a ver o vídeo.</strong><button type="button" data-action="vsl-resume">▶ Continuar a ver</button><button type="button" data-action="vsl-restart">↻ Ver desde o início</button></div><div class="mini-vsl-controls" hidden><button type="button" data-action="vsl-speed" aria-label="Alterar velocidade do vídeo">1.0x</button></div><div class="mini-vsl-progress" role="progressbar" aria-label="Progresso do vídeo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div></div>` : '<div class="video-placeholder"><strong>◈</strong>Vídeo indisponível. Pode avançar quando a análise terminar.</div>'}</div>
       <div id="analysis-continue" class="actions" ${canContinue ? '' : 'hidden'}><button class="primary" type="button" data-action="analysis-next">Ver o meu resultado <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>
       <p class="privacy-note analysis-privacy-note">As interpretações obtidas aqui são baseadas nas suas escolhas e respostas individuais.</p>`);
   }
@@ -694,7 +694,6 @@
     const gate = player.querySelector('.mini-vsl-gate');
     const overlay = player.querySelector('.mini-vsl-overlay');
     const controls = player.querySelector('.mini-vsl-controls');
-    const sound = player.querySelector('.mini-vsl-sound');
     const progress = player.querySelector('.mini-vsl-progress');
     const sync = () => {
       const playing = !video.paused && !video.loop;
@@ -702,7 +701,6 @@
       gate.hidden = !video.loop;
       overlay.hidden = video.loop || playing || video.ended;
       controls.hidden = !playing;
-      sound.hidden = !playing || !video.muted;
     };
     video.addEventListener('play', () => { if (!video.loop) { videoPlaying = true; trackVideo('video_play'); } setSoundtrackDucked(!video.loop && !video.muted); sync(); });
     video.addEventListener('pause', () => { if (videoPlaying && !video.ended) { trackVideo('video_exit'); videoPlaying = false; } setSoundtrackDucked(false); sync(); });
@@ -717,6 +715,13 @@
     });
     video.addEventListener('ended', () => { progress.querySelector('i').style.width = '100%'; sync(); });
     video.addEventListener('error', () => { setSoundtrackDucked(false); });
+    video.addEventListener('click', () => {
+      if (!video.loop && video.muted) {
+        video.muted = false;
+        setSoundtrackDucked(true);
+        void video.play().catch(() => {});
+      }
+    });
     if ('IntersectionObserver' in window) {
       vslObserver = new IntersectionObserver(() => {
         player.classList.toggle('is-floating', slot.getBoundingClientRect().bottom < 0 && !video.loop && !video.ended);
@@ -736,7 +741,6 @@
         gate.hidden = false;
         overlay.hidden = true;
         controls.hidden = true;
-        sound.hidden = true;
         player.dataset.state = 'ready';
         setSoundtrackDucked(false);
       };
@@ -778,10 +782,6 @@
         player.querySelector('.mini-vsl-overlay').hidden = false;
         setSoundtrackDucked(false);
       });
-    } else if (action === 'vsl-sound') {
-      video.muted = false;
-      player.querySelector('.mini-vsl-sound').hidden = true;
-      setSoundtrackDucked(true);
     } else if (action === 'vsl-speed') {
       const speeds = [1, 1.2, 1.5];
       video.playbackRate = speeds[(speeds.indexOf(video.playbackRate) + 1) % speeds.length];
@@ -1019,7 +1019,7 @@
       return;
     }
     switch (button.dataset.action) {
-      case 'vsl-start': case 'vsl-resume': case 'vsl-restart': case 'vsl-speed': case 'vsl-sound': controlVsl(button.dataset.action); break;
+      case 'vsl-start': case 'vsl-resume': case 'vsl-restart': case 'vsl-speed': controlVsl(button.dataset.action); break;
       case 'diagnosis-audio-toggle': {
         const audio = app.querySelector('#diagnosis-audio');
         if (audio?.paused) void audio.play().catch(() => { app.querySelector('#diagnosis-time').textContent = 'Não foi possível reproduzir'; });
