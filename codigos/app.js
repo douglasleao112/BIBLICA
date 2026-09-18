@@ -33,7 +33,34 @@
     return `<svg class="vector-icon ${className}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths[name] || paths.geral}</svg>`;
   };
   const analyticsEvents = new Set(['QuizStarted', 'AreaSelected', 'CardsCompleted', 'PartialDiagnosisViewed', 'HandUploaded', 'AnalysisStarted', 'ResultViewed', 'CheckoutClicked']);
-  const freshState = () => ({ flowVersion: 5, step: 0, name: '', fullName: '', showPyramid: false, area: '', cards: [], birthDate: '', birthTime: '', showBirthTime: false, handPhoto: '', handPhotoWidth: 0, handPhotoHeight: 0, handLines: null, handFileName: '', handAnalysisError: '', answers: {}, analysisStartedAt: 0, analysisDone: false, videoEnded: false, fired: [] });
+  const freshState = () => ({ flowVersion: 5, step: 0, name: '', fullName: '', showPyramid: false, area: '', cards: [], birthDate: '', birthTime: '', showBirthTime: false, handPhoto: '', handPhotoWidth: 0, handPhotoHeight: 0, handLines: null, handLineSources: null, handFileName: '', handAnalysisError: '', answers: {}, analysisStartedAt: 0, analysisDone: false, videoEnded: false, fired: [] });
+  function standardPalmLines(lines) {
+    const life = lines.life;
+    const heart = lines.heart;
+    if (life.length < 4 || heart.length < 4) return { lines, sources: null };
+    const xs = heart.map(point => point.x);
+    const left = Math.min(...xs);
+    const right = Math.max(...xs);
+    if (right - left < 140) return { lines, sources: null };
+    const clamp = (value, low, high) => Math.round(Math.max(low, Math.min(high, value)));
+    const heartY = heart.reduce((sum, point) => sum + point.y, 0) / heart.length;
+    const lifeTop = life.reduce((top, point) => point.y < top.y ? point : top);
+    const thumbLeft = life.reduce((sum, point) => sum + point.x, 0) / life.length < (left + right) / 2;
+    const startX = clamp(lifeTop.x, left + 20, right - 20);
+    const endX = thumbLeft ? right - 18 : left + 18;
+    const headY = clamp(Math.max(heartY + 90, lifeTop.y + 70), 160, 740);
+    const head = Array.from({ length: 5 }, (_, index) => {
+      const part = index / 4;
+      return { x: clamp(startX + (endX - startX) * part, 0, 1000), y: clamp(headY + Math.sin(part * Math.PI) * 20 + part * 26, 0, 1000) };
+    });
+    const centerX = clamp((left + right) / 2, 0, 1000);
+    const bottomY = clamp(headY + 280, headY + 120, 900);
+    const fate = Array.from({ length: 5 }, (_, index) => {
+      const part = index / 4;
+      return { x: clamp(centerX + Math.sin(part * Math.PI) * (thumbLeft ? -16 : 16), 0, 1000), y: clamp(bottomY - (bottomY - headY - 12) * part, 0, 1000) };
+    });
+    return { lines: { ...lines, head, fate }, sources: { head: 'reference', fate: 'reference' } };
+  }
   let state = freshState();
   let analysisTimer = null;
   let pyramidRevealTimer = null;
@@ -507,6 +534,7 @@
     const canContinue = state.analysisDone && (state.videoEnded || !config.videoUrl);
     return frame(`<p class="eyebrow">A CONVERGÊNCIA</p><h2>Os seus sinais estão a <span class="gold">encontrar-se.</span></h2>${handImage ? '' : '<p class="subtle">Estamos a organizar as suas respostas para apresentar uma leitura personalizada.</p>'}
       ${handProgress}
+      ${state.handLineSources?.head === 'reference' ? '<p class="hand-reference-note">As linhas da cabeça e do destino são traçados de referência, posicionados a partir das linhas visíveis da palma.</p>' : ''}
       <div class="video-box">${config.videoUrl ? `<div class="mini-vsl" data-state="ready" role="group" aria-label="Apresentação em vídeo"><video id="analysis-video" autoplay muted ${handImage ? '' : 'loop '}playsinline webkit-playsinline preload="auto" disablepictureinpicture src="${escapeHTML(config.videoUrl)}" aria-label="Mini apresentação da leitura"></video><button class="mini-vsl-gate" type="button" data-action="vsl-start" ${handImage ? 'hidden' : videoReady ? '' : 'disabled'}><strong>O seu vídeo está pronto</strong><span aria-hidden="true">▶</span><small>${videoReady ? 'Toque para escutar' : 'Disponível ao concluir a análise'}</small></button><button class="mini-vsl-sound" type="button" data-action="vsl-sound" hidden>Toque para escutar</button><div class="mini-vsl-overlay" hidden><strong>Continue a ver o vídeo.</strong><button type="button" data-action="vsl-resume">▶ Continuar a ver</button><button type="button" data-action="vsl-restart">↻ Ver desde o início</button></div><div class="mini-vsl-controls" hidden><button type="button" data-action="vsl-speed" aria-label="Alterar velocidade do vídeo">1.0x</button></div><div class="mini-vsl-progress" role="progressbar" aria-label="Progresso do vídeo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div></div>` : '<div class="video-placeholder"><strong>◈</strong>Vídeo indisponível. Pode avançar quando a análise terminar.</div>'}</div>
       <div id="analysis-continue" class="actions" ${canContinue ? '' : 'hidden'}><button class="primary" type="button" data-action="analysis-next">Ver o meu resultado <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>
       <p class="privacy-note analysis-privacy-note">As interpretações obtidas aqui são baseadas nas suas escolhas e respostas individuais.</p>`);
@@ -551,15 +579,15 @@
       return `<figure class="report-editorial-image"><img src="${escapeHTML(card?.image || 'assets/cards/tras.png')}" alt="Ilustração simbólica: ${escapeHTML(title)}" width="120" height="180" loading="lazy" decoding="async"><figcaption>${escapeHTML(title)}</figcaption></figure>`;
     };
     const handLabels = { life: 'vida', head: 'cabeça', fate: 'destino', heart: 'coração' };
-    const foundLines = Object.entries(handLabels).filter(([id]) => state.handLines?.[id]?.length >= 4).map(([, label]) => label);
+    const foundLines = Object.entries(handLabels).filter(([id]) => state.handLines?.[id]?.length >= 4 && state.handLineSources?.[id] !== 'reference').map(([, label]) => label);
     const handNote = foundLines.length
-      ? `A fotografia permitiu assinalar ${foundLines.length} ${foundLines.length === 1 ? 'linha' : 'linhas'}: ${foundLines.join(', ')}. São referências visuais para a leitura simbólica, não indicadores de saúde nem previsões.`
+      ? `A fotografia permitiu assinalar ${foundLines.length} ${foundLines.length === 1 ? 'linha' : 'linhas'}: ${foundLines.join(', ')}. ${state.handLineSources?.head === 'reference' ? 'Cabeça e destino usam traçados de referência.' : ''} São referências visuais para a leitura simbólica, não indicadores de saúde nem previsões.`
       : 'A etapa da mão não forneceu linhas suficientemente nítidas para esta prévia. Nenhuma marca foi inventada para preencher a leitura.';
     const handLineArticles = { life: 'da vida', head: 'da cabeça', fate: 'do destino', heart: 'do coração' };
-    const namedLines = Object.keys(handLineArticles).filter(id => state.handLines?.[id]?.length >= 4).map(id => handLineArticles[id]);
+    const namedLines = Object.keys(handLineArticles).filter(id => state.handLines?.[id]?.length >= 4 && state.handLineSources?.[id] !== 'reference').map(id => handLineArticles[id]);
     const lineList = namedLines.join(', ').replace(/, ([^,]*)$/, ' e $1');
     const handSummary = namedLines.length
-      ? `Identificámos ${namedLines.length === 1 ? 'a linha' : 'as linhas'} ${lineList} na fotografia. Estas marcas completam o quarto sinal da leitura.`
+      ? `Identificámos ${namedLines.length === 1 ? 'a linha' : 'as linhas'} ${lineList} na fotografia. ${state.handLineSources?.head === 'reference' ? 'Cabeça e destino seguem traçados de referência, não deteções confirmadas.' : 'Estas marcas completam o quarto sinal da leitura.'}`
       : 'Não foi possível distinguir as linhas da palma com nitidez. A leitura segue com os restantes sinais disponíveis.';
     const handWidth = state.handPhotoWidth || 800;
     const handHeight = state.handPhotoHeight || 800;
@@ -601,6 +629,7 @@
 
   function render() {
     app.innerHTML = screens[state.step]();
+    if (state.handLineSources?.head === 'reference') app.querySelectorAll?.('.hand-trace-head, .hand-trace-fate').forEach(path => path.classList.add('reference'));
     progress();
     if (state.step === 2 && state.showPyramid) setupPyramidReveal();
     if (state.step === 3 && cardPhase === 'reading') setupDiagnosisAudio();
@@ -835,6 +864,7 @@
     state.handPhotoWidth = 0;
     state.handPhotoHeight = 0;
     state.handLines = null;
+    state.handLineSources = null;
     state.handAnalysisError = '';
     state.analysisDone = false;
     state.analysisStartedAt = 0;
@@ -898,7 +928,10 @@
       const valid = points => Array.isArray(points) && (points.length === 0 || points.length >= 4 && points.length <= 15) && points.every(point => Number.isFinite(point?.x) && Number.isFinite(point?.y) && point.x >= 0 && point.x <= 1000 && point.y >= 0 && point.y <= 1000);
       if (!ids.every(id => valid(payload.lines?.[id])) || !ids.some(id => payload.lines[id].length >= 4)) throw new Error('Não conseguimos distinguir as linhas da palma. Tire outra fotografia com boa luz e a palma aberta.');
       if (state.step !== 6 && state.step !== 7) return;
-      state.handLines = Object.fromEntries(ids.map(id => [id, payload.lines[id].map(point => ({ x: Math.round(point.x), y: Math.round(point.y) }))]));
+      const detected = Object.fromEntries(ids.map(id => [id, payload.lines[id].map(point => ({ x: Math.round(point.x), y: Math.round(point.y) }))]));
+      const standardized = standardPalmLines(detected);
+      state.handLines = standardized.lines;
+      state.handLineSources = standardized.sources;
       save();
       handScanActive = false;
       app.querySelector('.hand-analysis-preview .hand-scan')?.remove();
@@ -907,6 +940,7 @@
         if (state.step !== 6 && state.step !== 7) return;
         const check = app.querySelector(`[data-check="${id}"]`);
         const path = app.querySelector(`[data-trace="${id}"]`);
+        if (state.handLineSources?.[id] === 'reference') path?.classList?.add('reference');
         const lineVisible = state.handLines[id].length >= 4;
         if (lineVisible) check?.classList.add('active');
         if (path && lineVisible) {
@@ -936,6 +970,7 @@
       handAnalyzing = false;
       handScanActive = false;
       state.handLines = null;
+      state.handLineSources = null;
       state.handAnalysisError = error instanceof TypeError
         ? 'O serviço de análise da mão não está acessível neste momento. Tente novamente mais tarde.'
         : error.message || 'Não foi possível concluir a análise.';
@@ -1003,6 +1038,7 @@
       case 'micro-next': go(5); break;
       case 'hand-retry':
         state.handLines = null;
+        state.handLineSources = null;
         state.handAnalysisError = '';
         state.analysisDone = false;
         handTraceStep = 0;
@@ -1014,6 +1050,7 @@
         state.handPhotoWidth = 0;
         state.handPhotoHeight = 0;
         state.handLines = null;
+        state.handLineSources = null;
         state.handAnalysisError = '';
         state.analysisDone = false;
         state.videoEnded = false;
