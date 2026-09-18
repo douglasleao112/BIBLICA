@@ -244,7 +244,7 @@
 
   function intro() {
     const today = new Intl.DateTimeFormat('pt-PT', { day: 'numeric', month: 'long' }).format(new Date());
-    return frame(`<div class="intro-stage"><div class="intro-sigil" aria-hidden="true">${icon('sparkle')}</div><p class="eyebrow">Hoje, dia ${today}</p>
+    return frame(`<div class="intro-stage"><p class="eyebrow">Hoje, dia ${today}</p>
       <h1>Agora, <span class="gold" id="geo-phrase">${escapeHTML(geoPhrase)}</span>: os seus 4 sinais estão a ser revelados.</h1>
       <p class="lead hero-subtitle">Descubra o que o Código dos 4 Sinais revela sobre o momento que está a viver.</p>
       <div class="intro-moon"><img class="intro-moon-image" src="assets/lua.png" alt="Lua iluminada pela metade" width="1254" height="1254" decoding="async"><img class="intro-moon-lines" src="assets/lines.png" alt="" width="1254" height="1254" aria-hidden="true" decoding="async"></div>
@@ -502,7 +502,7 @@
       ${state.handPhoto ? '' : '<button class="secondary hand-camera-open" type="button" data-action="hand-camera-open">Abrir câmara com guia da mão</button>'}
       <label class="upload ${state.handPhoto ? 'has-photo' : ''}" for="hand-input"><input id="hand-input" type="file" accept="image/jpeg,image/png,image/webp" aria-label="${state.handPhoto ? 'Substituir fotografia da mão' : 'Tirar ou enviar fotografia da mão'}">${state.handPhoto ? `<img class="upload-preview" src="${state.handPhoto}" alt="Fotografia da palma da mão escolhida">${state.analysisDone ? handLayerMarkup(4) : ''}` : `<svg class="upload-icon" viewBox="0 0 48 48" width="42" height="42" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 15h9l3-4h10l3 4h9a3 3 0 0 1 3-3V18a3 3 0 0 1 3-3Z"/><circle cx="24" cy="27" r="8"/><path d="M36 21h2"/></svg><strong>Tirar ou enviar fotografia da mão</strong><small>JPG, PNG ou WebP · até 5 MB</small>`}</label>
       <div class="form-error" id="hand-error" role="alert"></div>
-      ${state.handPhoto ? `<div class="actions hand-review-actions"><button class="secondary" type="button" data-action="hand-camera-open">Tirar outra fotografia</button><button class="primary" type="button" data-action="hand-next">Avançar e iniciar vídeo <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>` : ''}`);
+      ${state.handPhoto ? `<div class="actions hand-review-actions"><button class="secondary" type="button" data-action="hand-camera-open">Tirar outra fotografia</button><button class="primary" type="button" data-action="hand-next">Avançar e iniciar diagnóstico <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>` : ''}`);
   }
 
   const handSuitShapes = {
