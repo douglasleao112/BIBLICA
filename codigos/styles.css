@@ -356,3 +356,11 @@
 .mini-vsl-gate>span[aria-hidden="true"]:after{content:'';display:inline-block;width:0;height:0;border-top:15px solid transparent;border-bottom:15px solid transparent;border-left:24px solid currentColor}
 .analysis-item:not(.hand-analysis-item) .analysis-tick,.hand-check.done .hand-check-icon{font-size:0}
 .analysis-item:not(.hand-analysis-item) .analysis-tick:after,.hand-check.done .hand-check-icon:after{content:'';width:10px;height:6px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg)}
+
+/* Keep every quiz step inside the phone viewport, including flex/grid children. */
+html,body{max-width:100%;overflow-x:clip}
+.site-shell,.app,.screen,.screen-inner,.screen form,.actions,.choices,.choice,.video-box,.report-cta,.plan-grid,.card-table,.pyramid-stage{min-width:0;max-width:100%}
+.screen input:not([type="checkbox"]):not([type="file"]),.screen textarea,.screen select{box-sizing:border-box;min-width:0;max-width:100%}
+.screen h1,.screen h2,.screen h3,.screen p,.screen label,.choice span,.primary,.secondary{overflow-wrap:anywhere}
+.actions>*{min-width:0;max-width:100%}
+@media(max-width:650px){.site-shell{width:calc(100% - 32px)}.screen .primary,.screen .secondary{white-space:normal;text-align:center}.pyramid-scroll{min-width:0;max-width:100%}}
