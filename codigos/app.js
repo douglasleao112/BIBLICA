@@ -847,8 +847,8 @@
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || 'Não foi possível identificar as linhas da mão.');
       const ids = ['life', 'head', 'fate', 'heart'];
-      const valid = points => Array.isArray(points) && points.length >= 4 && points.every(point => Number.isFinite(point?.x) && Number.isFinite(point?.y) && point.x >= 0 && point.x <= 1000 && point.y >= 0 && point.y <= 1000);
-      if (!ids.every(id => valid(payload.lines?.[id]))) throw new Error('A análise da mão ficou incompleta. Experimente outra fotografia.');
+      const valid = points => Array.isArray(points) && (points.length === 0 || points.length >= 4 && points.length <= 15) && points.every(point => Number.isFinite(point?.x) && Number.isFinite(point?.y) && point.x >= 0 && point.x <= 1000 && point.y >= 0 && point.y <= 1000);
+      if (!ids.every(id => valid(payload.lines?.[id])) || !ids.some(id => payload.lines[id].length >= 4)) throw new Error('Não conseguimos distinguir as linhas da palma. Tire outra fotografia com boa luz e a palma aberta.');
       if (state.step !== 6 && state.step !== 7) return;
       state.handLines = Object.fromEntries(ids.map(id => [id, payload.lines[id].map(point => ({ x: Math.round(point.x), y: Math.round(point.y) }))]));
       save();
@@ -859,8 +859,9 @@
         if (state.step !== 6 && state.step !== 7) return;
         const check = app.querySelector(`[data-check="${id}"]`);
         const path = app.querySelector(`[data-trace="${id}"]`);
-        check?.classList.add('active');
-        if (path) {
+        const lineVisible = state.handLines[id].length >= 4;
+        if (lineVisible) check?.classList.add('active');
+        if (path && lineVisible) {
           path.setAttribute('d', `M ${state.handLines[id].map(point => `${Math.round(point.x * (state.handPhotoWidth || 800) / 1000)} ${Math.round(point.y * (state.handPhotoHeight || 800) / 1000)}`).join(' L ')}`);
           const length = path.getTotalLength();
           path.style.strokeDasharray = String(length);
@@ -869,9 +870,13 @@
           path.style.transition = reducedMotion ? 'none' : 'stroke-dashoffset .72s ease-in-out';
           path.style.strokeDashoffset = '0';
         }
-        await new Promise(resolve => setTimeout(resolve, reducedMotion ? 0 : 760));
+        await new Promise(resolve => setTimeout(resolve, reducedMotion || !lineVisible ? 0 : 760));
         check?.classList.remove('active');
-        check?.classList.add('done');
+        check?.classList.add(lineVisible ? 'done' : 'unavailable');
+        if (!lineVisible) {
+          const icon = check?.querySelector('.analysis-tick');
+          if (icon) icon.textContent = '—';
+        }
         handTraceStep = index + 1;
       }
       handAnalyzing = false;
