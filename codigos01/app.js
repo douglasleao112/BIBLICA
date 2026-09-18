@@ -498,10 +498,10 @@
     const headingStart = zodiac ? `${zodiac.address}, mostre-me a` : 'Mostre-me a';
     return frame(`<p class="eyebrow">SINAL 4 · MARCAS</p><h2>${escapeHTML(headingStart)} <span class="gold">palma da sua mão</span> para a leitura.</h2>${state.handPhoto ? '' : '<p class="lead">Para incluir as marcas da sua palma no quarto sinal, tire ou envie uma fotografia nítida da mão.</p>'}
       <div class="hand-camera" id="hand-camera" role="dialog" aria-modal="true" aria-label="Fotografar a palma da mão" hidden><button class="hand-camera-close" type="button" data-action="hand-camera-close" aria-label="Fechar câmara">×</button><p class="hand-camera-hint">Coloque a palma dentro do contorno e procure boa luz.</p><div class="hand-camera-view"><video id="hand-camera-video" autoplay muted playsinline webkit-playsinline aria-label="Imagem ao vivo da câmara para posicionar a mão"></video><img class="hand-camera-mask" src="hand-camera-mask.png" alt="" aria-hidden="true" width="1254" height="1254"></div><div class="hand-camera-actions"><button class="hand-camera-shutter" type="button" data-action="hand-camera-capture" aria-label="Fotografar a mão"><span aria-hidden="true"></span></button></div></div>
-      <button class="secondary hand-camera-open" type="button" data-action="hand-camera-open">${state.handPhoto ? 'Fotografar novamente com a câmara' : 'Abrir câmara com guia da mão'}</button>
+      ${state.handPhoto ? '' : '<button class="secondary hand-camera-open" type="button" data-action="hand-camera-open">Abrir câmara com guia da mão</button>'}
       <label class="upload ${state.handPhoto ? 'has-photo' : ''}" for="hand-input"><input id="hand-input" type="file" accept="image/jpeg,image/png,image/webp" aria-label="${state.handPhoto ? 'Substituir fotografia da mão' : 'Tirar ou enviar fotografia da mão'}">${state.handPhoto ? `<img class="upload-preview" src="${state.handPhoto}" alt="Fotografia da palma da mão escolhida">${state.analysisDone ? handLayerMarkup(4) : ''}` : `<svg class="upload-icon" viewBox="0 0 48 48" width="42" height="42" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 15h9l3-4h10l3 4h9a3 3 0 0 1 3-3V18a3 3 0 0 1 3-3Z"/><circle cx="24" cy="27" r="8"/><path d="M36 21h2"/></svg><strong>Tirar ou enviar fotografia da mão</strong><small>JPG, PNG ou WebP · até 5 MB</small>`}</label>
       <div class="form-error" id="hand-error" role="alert"></div>
-      ${state.handPhoto ? `<div class="actions"><button class="primary" type="button" data-action="hand-next">Avançar e iniciar vídeo <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>` : ''}`);
+      ${state.handPhoto ? `<div class="actions hand-review-actions"><button class="secondary" type="button" data-action="hand-camera-open">Tirar outra fotografia</button><button class="primary" type="button" data-action="hand-next">Avançar e iniciar vídeo <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>` : ''}`);
   }
 
   const handSuitShapes = {
@@ -811,6 +811,7 @@
   }
 
   function stopHandCamera() {
+    document.body?.classList?.remove('hand-camera-active');
     handCameraStream?.getTracks().forEach(track => track.stop());
     handCameraStream = null;
     const video = app.querySelector('#hand-camera-video');
@@ -836,6 +837,7 @@
       handCameraStream = stream;
       video.srcObject = stream;
       panel.hidden = false;
+      document.body?.classList?.add('hand-camera-active');
       await video.play();
     } catch {
       stopHandCamera();
@@ -910,6 +912,7 @@
       save();
       track('HandUploaded');
       render();
+      app.querySelector('.hand-review-actions')?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
     } catch {
       pendingHandUrl = '';
       handPhotoProcessing = false;
