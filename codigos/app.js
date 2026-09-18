@@ -124,6 +124,24 @@
     return String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
   }
 
+  function displayBirthDate(value) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    return match ? `${match[3]}/${match[2]}/${match[1]}` : '';
+  }
+
+  function parseBirthDate(value) {
+    const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value.trim());
+    if (!match) return '';
+    const date = `${match[3]}-${match[2]}-${match[1]}`;
+    return zodiacForBirthDate(date) && date <= new Date().toLocaleDateString('sv-SE') ? date : '';
+  }
+
+  function parseBirthTime(value) {
+    const match = /^(\d{1,2}):(\d{2})$/.exec(value.trim());
+    if (!match || Number(match[1]) > 23 || Number(match[2]) > 59) return '';
+    return `${match[1].padStart(2, '0')}:${match[2]}`;
+  }
+
   function zodiacForBirthDate(birthDate) {
     const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(birthDate);
     if (!parts) return null;
@@ -446,9 +464,9 @@
 
   function birthScreen() {
     return frame(`<p class="eyebrow">SINAL 3 · ORIGEM</p><h2>O seu nascimento é <em class="gold">outra peça desta história.</em></h2><p class="lead">Indique a data de nascimento. A hora é opcional.</p>
-      <form id="birth-form"><label class="field-label" for="birth-date">Data de nascimento</label><input class="text-input" id="birth-date" type="date" required max="${new Date().toISOString().slice(0, 10)}" value="${escapeHTML(state.birthDate)}">
+      <form id="birth-form"><label class="field-label" for="birth-date">Data de nascimento</label><input class="text-input" id="birth-date" type="text" inputmode="numeric" autocomplete="bday" placeholder="DD/MM/AAAA" maxlength="10" required value="${escapeHTML(displayBirthDate(state.birthDate))}" aria-describedby="birth-error">
       <label class="check-row birth-time-toggle"><input id="show-birth-time" type="checkbox" aria-controls="birth-time-field" aria-expanded="${state.showBirthTime}" ${state.showBirthTime ? 'checked' : ''}> Hora de nascimento</label>
-      <div id="birth-time-field" ${state.showBirthTime ? '' : 'hidden'}><label class="field-label" for="birth-time">Selecione a hora de nascimento</label><input class="text-input" id="birth-time" type="time" value="${escapeHTML(state.birthTime)}" ${state.showBirthTime ? '' : 'disabled'}></div>
+      <div id="birth-time-field" ${state.showBirthTime ? '' : 'hidden'}><label class="field-label" for="birth-time">Digite a hora de nascimento</label><input class="text-input" id="birth-time" type="text" inputmode="numeric" placeholder="HH:MM" maxlength="5" value="${escapeHTML(state.birthTime)}" ${state.showBirthTime ? '' : 'disabled'}></div>
       <div class="form-error" id="birth-error" role="alert"></div><div class="actions"><button class="primary" type="submit">Continuar <span aria-hidden="true">↗</span></button></div></form>`);
   }
 
@@ -974,14 +992,29 @@
     }
     if (event.target.id === 'birth-form') {
       event.preventDefault();
-      const date = app.querySelector('#birth-date').value;
-      const time = app.querySelector('#birth-time').value;
-      if (!date || date > new Date().toISOString().slice(0, 10)) { app.querySelector('#birth-error').textContent = 'Indique uma data de nascimento válida.'; return; }
+      const date = parseBirthDate(app.querySelector('#birth-date').value);
+      const timeInput = app.querySelector('#birth-time').value.trim();
+      const time = timeInput ? parseBirthTime(timeInput) : '';
+      if (!date) { app.querySelector('#birth-error').textContent = 'Indique uma data válida no formato DD/MM/AAAA.'; return; }
+      if (state.showBirthTime && timeInput && !time) { app.querySelector('#birth-error').textContent = 'Indique uma hora válida no formato HH:MM.'; return; }
       state.birthDate = date;
       state.birthTime = state.showBirthTime ? time : '';
       tracker?.emit('answer_birth', { birthDate: date, birthTime: state.birthTime });
       save();
       go(6);
+    }
+  });
+
+  app.addEventListener('input', event => {
+    if (event.target.id === 'birth-date') {
+      const digits = event.target.value.replace(/\D/g, '').slice(0, 8);
+      event.target.value = [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4)].filter(Boolean).join('/');
+      app.querySelector('#birth-error').textContent = '';
+    }
+    if (event.target.id === 'birth-time') {
+      const digits = event.target.value.replace(/\D/g, '').slice(0, 4);
+      event.target.value = digits.length > 2 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : digits;
+      app.querySelector('#birth-error').textContent = '';
     }
   });
 
