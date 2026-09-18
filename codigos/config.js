@@ -48,7 +48,7 @@ window.CODIGO4_CONFIG = {
   ],
   areas: [
     { id: 'amor', icon: '♡', label: 'Amor', scores: { amor: 4, relacionamento: 1 } },
-    { id: 'trabalho-dinheiro', icon: '◈', label: 'Trabalho e dinheiro', scores: { trabalho: 4, prosperidade: 4 } },
+    { id: 'trabalho-dinheiro', icon: '◈', label: 'Dinheiro e Trabalho', scores: { trabalho: 4, prosperidade: 4 } },
     { id: 'familia-pessoal', icon: '♧', label: 'Família e vida pessoal', scores: { relacionamento: 4, pessoal: 4 } },
     { id: 'bem-estar', icon: '❋', label: 'Saúde e bem-estar', scores: { pessoal: 3, geral: 1 } },
     { id: 'geral', icon: '✳', label: 'Outro', scores: { geral: 4 } }
