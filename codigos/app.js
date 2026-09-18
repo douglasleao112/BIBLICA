@@ -796,6 +796,29 @@
     window.location.assign(destination);
   }
 
+  function enhancePalmImage(context, width, height) {
+    if (typeof context.getImageData !== 'function' || typeof context.putImageData !== 'function') return;
+    try {
+      const image = context.getImageData(0, 0, width, height);
+      const pixels = image.data;
+      let brightness = 0;
+      let samples = 0;
+      for (let index = 0; index < pixels.length; index += 64) {
+        brightness += .2126 * pixels[index] + .7152 * pixels[index + 1] + .0722 * pixels[index + 2];
+        samples++;
+      }
+      const lift = Math.max(-8, Math.min(22, (145 - brightness / samples) * .32));
+      for (let index = 0; index < pixels.length; index += 4) {
+        const light = .2126 * pixels[index] + .7152 * pixels[index + 1] + .0722 * pixels[index + 2];
+        for (let channel = 0; channel < 3; channel++) {
+          const desaturated = light + (pixels[index + channel] - light) * .72;
+          pixels[index + channel] = Math.max(0, Math.min(255, (desaturated - 128) * 1.18 + 128 + lift));
+        }
+      }
+      context.putImageData(image, 0, 0);
+    } catch { /* Se o navegador não permitir manipular pixels, mantemos a fotografia original. */ }
+  }
+
   async function processHand(file) {
     const error = app.querySelector('#hand-error');
     if (!file || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
@@ -811,8 +834,14 @@
         const canvas = document.createElement('canvas');
         canvas.width = Math.round(image.naturalWidth * scale);
         canvas.height = Math.round(image.naturalHeight * scale);
-        canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
-        state.handPhoto = canvas.toDataURL('image/jpeg', .78);
+        const context = canvas.getContext('2d');
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        enhancePalmImage(context, canvas.width, canvas.height);
+        let quality = .86;
+        do {
+          state.handPhoto = canvas.toDataURL('image/jpeg', quality);
+          quality -= .08;
+        } while (state.handPhoto.length > 800_000 && quality >= .62);
         state.handPhotoWidth = canvas.width;
         state.handPhotoHeight = canvas.height;
         state.handLines = null;
