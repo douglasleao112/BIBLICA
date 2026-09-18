@@ -1009,8 +1009,37 @@
   for (const type of ['selectstart', 'dblclick', 'dragstart', 'contextmenu']) {
     app.addEventListener(type, event => { if (event.target.closest?.('.report-stack')) event.preventDefault(); });
   }
-  app.addEventListener('wheel', event => { if (event.ctrlKey && event.target.closest?.('.report-stack')) event.preventDefault(); }, { passive: false });
-  app.addEventListener('touchstart', event => { if (event.touches.length > 1 && event.target.closest?.('.report-stack')) event.preventDefault(); }, { passive: false });
+  const reportAtEdge = (stack, delta) => delta < 0
+    ? stack.scrollTop <= 1
+    : delta > 0 && stack.scrollTop + stack.clientHeight >= stack.scrollHeight - 2;
+  app.addEventListener('wheel', event => {
+    const stack = event.target.closest?.('.report-stack');
+    if (!stack) return;
+    if (event.ctrlKey) { event.preventDefault(); return; }
+    if (reportAtEdge(stack, event.deltaY)) {
+      event.preventDefault();
+      window.scrollBy({ top: event.deltaY, behavior: 'instant' });
+    }
+  }, { passive: false });
+  let reportTouchY = null;
+  app.addEventListener('touchstart', event => {
+    const stack = event.target.closest?.('.report-stack');
+    if (!stack) { reportTouchY = null; return; }
+    if (event.touches.length > 1) { event.preventDefault(); reportTouchY = null; return; }
+    reportTouchY = event.touches[0]?.clientY ?? null;
+  }, { passive: false });
+  app.addEventListener('touchmove', event => {
+    const stack = event.target.closest?.('.report-stack');
+    if (!stack || event.touches.length !== 1 || reportTouchY === null) return;
+    const currentY = event.touches[0].clientY;
+    const delta = reportTouchY - currentY;
+    reportTouchY = currentY;
+    if (reportAtEdge(stack, delta)) {
+      event.preventDefault();
+      window.scrollBy({ top: delta, behavior: 'instant' });
+    }
+  }, { passive: false });
+  app.addEventListener('touchend', () => { reportTouchY = null; });
   app.addEventListener('gesturestart', event => { if (event.target.closest?.('.report-stack')) event.preventDefault(); }, { passive: false });
   app.addEventListener('keydown', event => {
     if (event.key === 'Enter' || event.key === ' ') startSoundtrack();
