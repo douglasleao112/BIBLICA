@@ -104,11 +104,18 @@
 .site-footer{margin-top:76px;padding:28px 0 38px;border-top-color:#e5d5bd0d;color:#687386;font-size:10px;line-height:1.55}
 @media(max-width:650px){.site-footer{margin-top:92px;padding-bottom:46px;font-size:9px}}
 
-/* Entrada, empilhamento e três aberturas das cartas antes da escolha. */
-.card-table .is-dealing,.card-table .is-stacking,.card-table .is-fanning,.card-table .is-spreading,.card-table .is-ready{position:relative;min-height:270px}
-.card-table .is-dealing .card,.card-table .is-stacking .card,.card-table .is-fanning .card,.card-table .is-spreading .card,.card-table .is-ready .card{position:absolute;top:50%;left:50%;z-index:var(--card-index)}
-.card-table .is-dealing .card,.card-table .is-stacking .card,.card-table .is-fanning .card{width:clamp(110px,26%,160px);max-width:160px}
-.card-table .is-dealing .card{animation:cardDealIntoPile .95s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--card-index) * .5s);pointer-events:none}
+/* Mostra as cinco faces, vira-as e baralha antes da sequência de escolha. */
+.card-table .is-dealing,.card-table .is-turning,.card-table .is-shuffling,.card-table .is-stacking,.card-table .is-fanning,.card-table .is-spreading,.card-table .is-ready{position:relative;min-height:270px}
+.card-table .is-dealing .card,.card-table .is-turning .card,.card-table .is-shuffling .card,.card-table .is-stacking .card,.card-table .is-fanning .card,.card-table .is-spreading .card,.card-table .is-ready .card{position:absolute;top:50%;left:50%;z-index:var(--card-index)}
+.card-table .is-dealing .card,.card-table .is-turning .card,.card-table .is-shuffling .card{width:18%;max-width:112px;pointer-events:none}
+.card-table .is-stacking .card,.card-table .is-fanning .card{width:clamp(110px,26%,160px);max-width:160px}
+.card-table .is-dealing .card{animation:cardFaceUpEntrance .8s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--card-index) * .16s)}
+.card-table .is-dealing .card-face-back{transform:rotateY(180deg)}
+.card-table .is-dealing .card-face-front{transform:rotateY(0)}
+.card-table .is-turning .card{transform:translate(calc(-50% + var(--intro-x)),-50%)}
+.card-table .is-turning .card-face-back{animation:cardTurnBack .9s ease-in-out both;animation-delay:calc(var(--card-index) * .1s)}
+.card-table .is-turning .card-face-front{animation:cardTurnFront .9s ease-in-out both;animation-delay:calc(var(--card-index) * .1s)}
+.card-table .is-shuffling .card{animation:cardIntroShuffle 1.5s ease-in-out both;animation-delay:calc(var(--card-index) * .055s)}
 .card-table .is-stacking .card{animation:cardGather .75s ease-in-out both;pointer-events:none}
 .card-table .is-fanning .card{animation:cardFanThree 4.2s ease-in-out both;pointer-events:none}
 .card-table .is-spreading .card{width:18%;max-width:112px;animation:cardFinalSpread .85s ease-in-out both;pointer-events:none}
@@ -117,13 +124,17 @@
 .card-table .is-ready .card:not(:disabled):hover{transform:translate(-50%,calc(-50% - 9px))}
 .card-table .is-ready .card.is-spinning{z-index:10;animation:cardSpinChoose 1s ease-in-out both}
 @keyframes cardSpinChoose{0%{transform:translate(-50%,-50%) rotateY(0)}50%{transform:translate(-50%,calc(-50% - 18px)) rotateY(180deg)}100%{transform:translate(-50%,calc(-50% - 13px)) rotateY(360deg)}}
+@keyframes cardFaceUpEntrance{from{opacity:0;transform:translate(calc(-50% + var(--intro-x)),calc(-50% + 55px)) scale(.8)}to{opacity:1;transform:translate(calc(-50% + var(--intro-x)),-50%) scale(1)}}
+@keyframes cardTurnBack{from{transform:rotateY(180deg)}to{transform:rotateY(0)}}
+@keyframes cardTurnFront{from{transform:rotateY(0)}to{transform:rotateY(-180deg)}}
+@keyframes cardIntroShuffle{0%{transform:translate(calc(-50% + var(--intro-x)),-50%) rotate(0)}32%{transform:translate(calc(-50% - var(--intro-x)),-80%) rotate(var(--deal-rotate))}67%{transform:translate(calc(-50% - var(--deal-x)),-35%) rotate(calc(0deg - var(--deal-rotate)))}100%{transform:translate(calc(-50% + var(--deal-x)),-50%) rotate(var(--deal-rotate))}}
 .card-table .is-ready{min-height:190px}
 .card-table + .card-count{margin-top:0}
 @keyframes cardDealIntoPile{from{opacity:0;transform:translate(calc(-50% + 210px),-110%) rotate(27deg) scale(.7)}to{opacity:1;transform:translate(calc(-50% + var(--deal-x)),-50%) rotate(var(--deal-rotate)) scale(1)}}
 @keyframes cardGather{from{transform:translate(calc(-50% + var(--deal-x)),-50%) rotate(var(--deal-rotate))}to{transform:translate(-50%,-50%) rotate(0)}}
 @keyframes cardFanThree{0%,33.33%,66.66%,100%{transform:translate(-50%,-50%) rotate(0)}16.66%{transform:translate(calc(-50% + var(--fan-x-1)),-58%) rotate(var(--fan-rotate-1))}50%{transform:translate(calc(-50% + var(--fan-x-2)),-58%) rotate(var(--fan-rotate-2))}83.33%{transform:translate(calc(-50% + var(--fan-x-3)),-58%) rotate(var(--fan-rotate-3))}}
 @keyframes cardFinalSpread{from{left:50%;transform:translate(-50%,-50%) rotate(0)}to{left:calc(50% + var(--spread-offset));transform:translate(-50%,-50%) rotate(0)}}
-@media(max-width:650px){.card-table .is-dealing,.card-table .is-stacking,.card-table .is-fanning,.card-table .is-spreading,.card-table .is-ready{min-height:210px}.card-table .is-fanning .card{animation-name:cardFanThreeMobile}}
+@media(max-width:650px){.card-table .is-dealing,.card-table .is-turning,.card-table .is-shuffling,.card-table .is-stacking,.card-table .is-fanning,.card-table .is-spreading,.card-table .is-ready{min-height:210px}.card-table .is-dealing .card,.card-table .is-turning .card,.card-table .is-shuffling .card{--intro-x:var(--intro-x-mobile)}.card-table .is-fanning .card{animation-name:cardFanThreeMobile}}
 @media(max-width:650px){.card-table .is-ready{min-height:165px}}
 @media(prefers-reduced-motion:reduce){.card-table .is-ready .card.is-spinning{animation:none}}
 @keyframes cardFanThreeMobile{0%,33.33%,66.66%,100%{transform:translate(-50%,-50%) rotate(0)}16.66%{transform:translate(calc(-50% + var(--fan-x-1-mobile)),-58%) rotate(var(--fan-rotate-1))}50%{transform:translate(calc(-50% + var(--fan-x-2-mobile)),-58%) rotate(var(--fan-rotate-2))}83.33%{transform:translate(calc(-50% + var(--fan-x-3-mobile)),-58%) rotate(var(--fan-rotate-3))}}

@@ -384,7 +384,7 @@
     const ready = cardPhase === 'ready' || cardPhase === 'reading';
     const orderedCards = [...config.cards].sort((a, b) => cardRitual.final.get(a.id) - cardRitual.final.get(b.id));
     return frame(`${state.cards.length === 3 ? '' : '<p class="eyebrow">SINAL 2 · CARTAS</p><h2>Não pense demasiado. <span class="gold">Revele 3 cartas.</span></h2>'}
-      <div class="card-table"><div class="card-deck is-${cardPhase}" role="group" aria-label="Cinco cartas; revele três">${orderedCards.map((card, index) => { const chosenIndex = state.cardSlots.indexOf(card.id); const chosen = chosenIndex >= 0; const revealedCard = chosen ? config.cards.find(item => item.id === fixedCardIds[chosenIndex]) : card; const float = cardFloats.get(card.id) || { x: 0, y: 8, duration: 4, delay: 0 }; const fanStyles = cardRitual.fans.map((fan, cycle) => { const slot = fan.get(card.id); return `--fan-x-${cycle + 1}:${slot * 88}px;--fan-x-${cycle + 1}-mobile:${slot * 42}px;--fan-rotate-${cycle + 1}:${slot * 17}deg`; }).join(';'); return `<button class="card ${chosen ? 'chosen' : ''} ${spinningCardId === card.id ? 'is-spinning' : ''}" style="--card-index:${index};--deal-x:${(index - 2) * 26}px;--deal-rotate:${(index - 2) * 4}deg;${fanStyles};--spread-offset:${cardRitual.final.get(card.id) * 20}%;--chosen-tilt:${cardTilts.get(card.id) ?? 0}deg;--float-x:${float.x}px;--float-y:${float.y}px;--float-duration:${float.duration}s;--float-delay:${float.delay}s" type="button" data-card="${card.id}" aria-label="${chosen ? `${revealedCard.title}, carta revelada` : 'Carta virada para baixo'}" aria-pressed="${chosen}" ${!ready || chosen || state.cards.length >= 3 ? 'disabled' : ''}><span class="card-face card-face-back" aria-hidden="true"><img src="assets/cards/tras.png" alt="" width="1024" height="1536"></span><span class="card-face card-face-front" aria-hidden="true"><img src="${revealedCard.image}" alt="" width="1024" height="1536"></span></button>`; }).join('')}</div></div>
+      <div class="card-table"><div class="card-deck is-${cardPhase}" role="group" aria-label="Cinco cartas; revele três">${orderedCards.map((card, index) => { const chosenIndex = state.cardSlots.indexOf(card.id); const chosen = chosenIndex >= 0; const revealedCard = chosen ? config.cards.find(item => item.id === fixedCardIds[chosenIndex]) : card; const float = cardFloats.get(card.id) || { x: 0, y: 8, duration: 4, delay: 0 }; const fanStyles = cardRitual.fans.map((fan, cycle) => { const slot = fan.get(card.id); return `--fan-x-${cycle + 1}:${slot * 88}px;--fan-x-${cycle + 1}-mobile:${slot * 42}px;--fan-rotate-${cycle + 1}:${slot * 17}deg`; }).join(';'); return `<button class="card ${chosen ? 'chosen' : ''} ${spinningCardId === card.id ? 'is-spinning' : ''}" style="--card-index:${index};--intro-x:${(index - 2) * 88}px;--intro-x-mobile:${(index - 2) * 42}px;--deal-x:${(index - 2) * 26}px;--deal-rotate:${(index - 2) * 4}deg;${fanStyles};--spread-offset:${cardRitual.final.get(card.id) * 20}%;--chosen-tilt:${cardTilts.get(card.id) ?? 0}deg;--float-x:${float.x}px;--float-y:${float.y}px;--float-duration:${float.duration}s;--float-delay:${float.delay}s" type="button" data-card="${card.id}" aria-label="${chosen ? `${revealedCard.title}, carta revelada` : cardPhase === 'dealing' || cardPhase === 'turning' ? `${card.title}, carta apresentada` : 'Carta virada para baixo'}" aria-pressed="${chosen}" ${!ready || chosen || state.cards.length >= 3 ? 'disabled' : ''}><span class="card-face card-face-back" aria-hidden="true"><img src="assets/cards/tras.png" alt="" width="1024" height="1536"></span><span class="card-face card-face-front" aria-hidden="true"><img src="${revealedCard.image}" alt="" width="1024" height="1536"></span></button>`; }).join('')}</div></div>
       ${cardPhase === 'ready' ? `<p class="card-count" aria-live="polite">${state.cards.length} DE 3 CARTAS REVELADAS</p>` : ''}${cardPhase === 'reading' ? `${cardReading()}<div class="actions"><button class="primary" type="button" data-action="cards-next">Continuar a minha leitura <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>` : ''}`);
   }
 
@@ -450,20 +450,28 @@
   function startCardSequence() {
     cardTimer = setTimeout(() => {
       if (state.step !== 3 || cardPhase !== 'dealing') return;
-      cardPhase = 'stacking'; render();
+      cardPhase = 'turning'; render();
       cardTimer = setTimeout(() => {
-        if (state.step !== 3 || cardPhase !== 'stacking') return;
-        cardPhase = 'fanning'; render();
+        if (state.step !== 3 || cardPhase !== 'turning') return;
+        cardPhase = 'shuffling'; render();
         cardTimer = setTimeout(() => {
-          if (state.step !== 3 || cardPhase !== 'fanning') return;
-          cardPhase = 'spreading'; render();
+          if (state.step !== 3 || cardPhase !== 'shuffling') return;
+          cardPhase = 'stacking'; render();
           cardTimer = setTimeout(() => {
-            if (state.step !== 3 || cardPhase !== 'spreading') return;
-            cardPhase = 'ready'; render(); cardTimer = null;
-          }, 850);
-        }, 4200);
-      }, 750);
-    }, 3200);
+            if (state.step !== 3 || cardPhase !== 'stacking') return;
+            cardPhase = 'fanning'; render();
+            cardTimer = setTimeout(() => {
+              if (state.step !== 3 || cardPhase !== 'fanning') return;
+              cardPhase = 'spreading'; render();
+              cardTimer = setTimeout(() => {
+                if (state.step !== 3 || cardPhase !== 'spreading') return;
+                cardPhase = 'ready'; render(); cardTimer = null;
+              }, 850);
+            }, 4200);
+          }, 750);
+        }, 1800);
+      }, 1500);
+    }, 2400);
   }
 
   function microScreen() {
