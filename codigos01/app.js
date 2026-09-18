@@ -47,6 +47,7 @@
   let handAnalyzing = false;
   let handPhotoProcessing = false;
   let pendingHandUrl = '';
+  let handCameraStream = null;
   let startVideoOnRender = false;
   let handScanActive = false;
   let handTraceStep = 0;
@@ -205,6 +206,7 @@
   }
 
   function go(step) {
+    if (state.step === 6 && step !== 6) stopHandCamera();
     if (state.step === 7 && step !== 7 && videoPlaying) { trackVideo('video_exit'); videoPlaying = false; }
     if (analysisTimer) { clearTimeout(analysisTimer); analysisTimer = null; }
     if (pyramidRevealTimer) { clearTimeout(pyramidRevealTimer); pyramidRevealTimer = null; }
@@ -495,6 +497,8 @@
       return `M ${scaled.map(point => `${point.x} ${point.y}`).join(' L ')}`;
     };
     return frame(`<p class="eyebrow">SINAL 4 · MARCAS</p><h2>${escapeHTML(headingStart)} <span class="gold">palma da sua mão</span> para a leitura.</h2>${state.handPhoto ? '' : '<p class="lead">Para incluir as marcas da sua palma no quarto sinal, tire ou envie uma fotografia nítida da mão.</p>'}
+      <div class="hand-camera" id="hand-camera" hidden><div class="hand-camera-view"><video id="hand-camera-video" autoplay muted playsinline webkit-playsinline aria-label="Imagem ao vivo da câmara para posicionar a mão"></video><img class="hand-camera-mask" src="hand-camera-mask.png" alt="" aria-hidden="true" width="1254" height="1254"></div><p>Coloque a palma aberta dentro do contorno e procure boa luz.</p><div class="hand-camera-actions"><button class="primary" type="button" data-action="hand-camera-capture">Fotografar a mão <span aria-hidden="true">${icon('arrowUpRight')}</span></button><button class="secondary" type="button" data-action="hand-camera-close">Cancelar</button></div></div>
+      <button class="secondary hand-camera-open" type="button" data-action="hand-camera-open">${state.handPhoto ? 'Fotografar novamente com a câmara' : 'Abrir câmara com guia da mão'}</button>
       <label class="upload ${state.handPhoto ? 'has-photo' : ''}" for="hand-input"><input id="hand-input" type="file" accept="image/jpeg,image/png,image/webp" aria-label="${state.handPhoto ? 'Substituir fotografia da mão' : 'Tirar ou enviar fotografia da mão'}" ${handAnalyzing ? 'disabled' : ''}>${state.handPhoto ? `<img class="upload-preview" src="${state.handPhoto}" alt="Fotografia da palma da mão escolhida">${handScanActive ? '<span class="hand-scan" aria-hidden="true"></span>' : ''}${state.handLines ? `<svg class="hand-traces ${handTraceStep === 4 ? 'complete' : ''}" viewBox="0 0 ${dimensions.width} ${dimensions.height}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${traceLabels.map(([id]) => `<path class="hand-trace hand-trace-${id}" data-trace="${id}" d="${tracePath(state.handLines[id])}"/>`).join('')}</svg>` : ''}` : `<svg class="upload-icon" viewBox="0 0 48 48" width="42" height="42" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 15h9l3-4h10l3 4h9a3 3 0 0 1 3 3v20a3 3 0 0 1 3-3V18a3 3 0 0 1 3-3Z"/><circle cx="24" cy="27" r="8"/><path d="M36 21h2"/></svg><strong>Tirar ou enviar fotografia da mão</strong><small>JPG, PNG ou WebP · até 5 MB</small>`}</label>
       ${state.handLines ? `<div class="hand-checks" role="status" aria-live="polite" ${handTraceStep === 0 ? 'hidden' : ''}>${traceLabels.map(([id, label], index) => `<div class="hand-check ${handTraceStep === 4 ? state.handLines[id]?.length >= 4 ? 'done' : 'unavailable' : ''}" data-check="${id}" ${handTraceStep <= index ? 'hidden' : ''}><span class="hand-check-icon" aria-hidden="true">${state.handLines[id]?.length >= 4 ? '✓' : '—'}</span><span>${label}</span></div>`).join('')}</div>` : ''}
       <div class="form-error" id="hand-error" role="alert"></div>
@@ -818,12 +822,64 @@
     } catch { /* Se o navegador não permitir manipular pixels, mantemos a fotografia original. */ }
   }
 
+  function stopHandCamera() {
+    handCameraStream?.getTracks().forEach(track => track.stop());
+    handCameraStream = null;
+    const video = app.querySelector('#hand-camera-video');
+    if (video) { video.pause(); video.srcObject = null; }
+    const panel = app.querySelector('#hand-camera');
+    if (panel) panel.hidden = true;
+  }
+
+  async function openHandCamera() {
+    if (state.step !== 6 || handCameraStream) return;
+    const panel = app.querySelector('#hand-camera');
+    const video = app.querySelector('#hand-camera-video');
+    const error = app.querySelector('#hand-error');
+    if (!panel || !video) return;
+    if (!window.navigator?.mediaDevices?.getUserMedia) {
+      error.textContent = 'A câmara não está disponível neste navegador. Pode enviar uma fotografia da galeria.';
+      return;
+    }
+    error.textContent = '';
+    try {
+      const stream = await window.navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' } } });
+      if (state.step !== 6 || !video.isConnected) { stream.getTracks().forEach(track => track.stop()); return; }
+      handCameraStream = stream;
+      video.srcObject = stream;
+      panel.hidden = false;
+      await video.play();
+    } catch {
+      stopHandCamera();
+      if (state.step === 6) error.textContent = 'Não foi possível abrir a câmara. Autorize o acesso ou envie uma fotografia da galeria.';
+    }
+  }
+
+  async function captureHandCamera() {
+    const video = app.querySelector('#hand-camera-video');
+    const error = app.querySelector('#hand-error');
+    if (!handCameraStream || !video?.videoWidth || !video.videoHeight) {
+      error.textContent = 'Aguarde a imagem da câmara aparecer e tente novamente.';
+      return;
+    }
+    const side = Math.min(video.videoWidth, video.videoHeight);
+    const canvas = document.createElement('canvas');
+    canvas.width = side;
+    canvas.height = side;
+    canvas.getContext('2d').drawImage(video, (video.videoWidth - side) / 2, (video.videoHeight - side) / 2, side, side, 0, 0, side, side);
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', .9));
+    if (!blob) { error.textContent = 'Não foi possível guardar a fotografia. Tente novamente.'; return; }
+    stopHandCamera();
+    await processHand(new File([blob], 'palma-da-mao.jpg', { type: 'image/jpeg' }));
+  }
+
   async function processHand(file) {
     const error = app.querySelector('#hand-error');
     if (!file || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
       error.textContent = 'Escolha uma fotografia JPG, PNG ou WebP com até 5 MB.';
       return;
     }
+    stopHandCamera();
     const objectUrl = URL.createObjectURL(file);
     pendingHandUrl = objectUrl;
     handPhotoProcessing = true;
@@ -1001,6 +1057,9 @@
       case 'cards-next': if (state.cards.length === 3) go(4); break;
       case 'pyramid-next': if (state.area) go(3); break;
       case 'micro-next': go(5); break;
+      case 'hand-camera-open': void openHandCamera(); break;
+      case 'hand-camera-close': stopHandCamera(); break;
+      case 'hand-camera-capture': void captureHandCamera(); break;
       case 'hand-next': if (state.step === 6 && state.handPhoto && !handPhotoProcessing) continueToAnalysis(); break;
       case 'hand-retry':
         state.handLines = null;
@@ -1066,6 +1125,7 @@
       tracker?.emit('answer_birth', { birthDate: date, birthTime: state.birthTime });
       save();
       go(6);
+      void openHandCamera();
     }
   });
 
@@ -1107,7 +1167,7 @@
   }
   render();
   trackStep();
-  window.addEventListener?.('pagehide', () => { if (videoPlaying) trackVideo('video_exit'); });
-  document.addEventListener?.('visibilitychange', () => { if (document.hidden && videoPlaying) { trackVideo('video_exit'); videoPlaying = false; } });
+  window.addEventListener?.('pagehide', () => { stopHandCamera(); if (videoPlaying) trackVideo('video_exit'); });
+  document.addEventListener?.('visibilitychange', () => { if (document.hidden) { stopHandCamera(); if (videoPlaying) { trackVideo('video_exit'); videoPlaying = false; } } });
   if (state.step === 0) void loadGeo();
 })();

@@ -156,6 +156,15 @@
 .upload-icon{display:block;width:42px;height:42px;margin:auto;color:#deb879}
 .upload.has-photo{display:block;width:100%;aspect-ratio:1;min-height:0;margin-bottom:8px;padding:0;overflow:visible;border-style:solid;border-color:#dbb66c;background:#111927}
 .upload.has-photo .upload-preview{display:block;width:100%;height:100%;border:0;border-radius:16px;object-fit:cover}
+.hand-camera[hidden]{display:none}
+.hand-camera{margin:20px 0 14px;padding:10px;border:1px solid #d9b8798c;border-radius:17px;background:#0c1527}
+.hand-camera-view{position:relative;width:100%;aspect-ratio:1;overflow:hidden;border-radius:12px;background:#070c16}
+.hand-camera-view video{display:block;width:100%;height:100%;object-fit:cover}
+.hand-camera-mask{position:absolute;inset:5%;width:90%;height:90%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 0 4px #07101b) drop-shadow(0 0 12px #07101b)}
+.hand-camera p{margin:12px 4px;color:#cbd0d8;font-size:12px;text-align:center}
+.hand-camera-actions{display:flex;gap:10px}.hand-camera-actions .primary{flex:1}.hand-camera-actions .secondary{flex:none}
+.hand-camera-open{display:block;width:100%;margin:18px 0 0}
+@media(max-width:430px){.hand-camera-actions{flex-direction:column}.hand-camera-actions .secondary{width:100%}}
 .hand-scan{position:absolute;z-index:2;inset:0;overflow:hidden;border-radius:16px;pointer-events:none}
 .hand-scan::before,.hand-scan::after{content:'';position:absolute;right:0;left:0;pointer-events:none}
 .hand-scan::before{top:0;height:96px;background:linear-gradient(to bottom,transparent 0%,#55d8ff12 40%,#62dfff65 100%);filter:blur(10px);animation:handScanTrail 2.8s ease-in-out infinite}
