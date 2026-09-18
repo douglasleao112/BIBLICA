@@ -348,6 +348,7 @@
 @media(max-width:650px){.report-stack{gap:14px;height:400px;margin:27px 0 36px;padding:10px}.report-sheet{min-height:760px;padding:25px clamp(15px,5vw,24px)}.report-sheet h3{margin-top:24px}.report-editorial{grid-template-columns:minmax(88px,36%) minmax(0,1fr);min-height:165px;margin-top:15px}.report-editorial-image{min-height:165px}.report-editorial-copy{padding:12px}.report-editorial-kicker{font-size:8px;letter-spacing:.09em}.report-editorial-copy strong{font-size:17px}.report-sheet .report-editorial-copy p{font-size:10px;line-height:1.42}.report-editorial-index{margin-top:8px;font-size:8px}.report-editorial-muted{min-height:138px}.report-editorial-muted .report-editorial-image{min-height:138px}.report-editorial-muted .report-editorial-copy{padding:11px}.report-editorial-muted .report-editorial-copy strong{font-size:16px}.report-sheet-first .report-sheet-fog{top:31%}.report-lock{min-width:155px;padding:14px 17px}.report-cta h3{font-size:30px}}
 .vector-icon{display:inline-block;width:1em;height:1em;vertical-align:-.12em;flex:none}
 .choice-icon .vector-icon{width:25px;height:25px}
+.primary .vector-icon,.choice-arrow .vector-icon{width:15px;height:15px;vertical-align:middle}
 .intro-sigil .vector-icon{width:32px;height:32px}
 .intro-visual .orbit:before,.intro-visual .orbit:after,.card-back:before,.pyramid-result:after{content:'';display:block;width:1em;height:1em;background:currentColor;clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)}
 .card-back:before{width:clamp(28px,5vw,46px);height:clamp(28px,5vw,46px)}

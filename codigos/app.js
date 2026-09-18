@@ -27,7 +27,8 @@
       sparkle: '<path d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4Z"/>',
       play: '<path d="m8 4 12 8-12 8Z"/>',
       restart: '<path d="M20 11a8 8 0 1 1-2.3-5.6M20 4v7h-7"/>',
-      check: '<path d="m4 12 5 5L20 6"/>'
+      check: '<path d="m4 12 5 5L20 6"/>',
+      arrowUpRight: '<path d="M5 19 19 5M8 5h11v11"/>'
     };
     return `<svg class="vector-icon ${className}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths[name] || paths.geral}</svg>`;
   };
@@ -232,7 +233,7 @@
     return frame(`<div class="intro-sigil" aria-hidden="true">${icon('sparkle')}</div><p class="eyebrow">Hoje, dia ${today}</p>
       <h1>A Janela de Convergência está aberta <span class="gold" id="geo-phrase">${escapeHTML(geoPhrase)}</span>.</h1>
       <p class="lead hero-subtitle">Descubra o que o Código dos 4 Sinais revela sobre o momento que está a viver.</p>
-      <div class="actions intro-actions"><button class="primary" type="button" data-action="start">Iniciar a minha leitura personalizada <span aria-hidden="true">↗</span></button></div>
+      <div class="actions intro-actions"><button class="primary" type="button" data-action="start">Iniciar a minha leitura personalizada <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>
       <p class="intro-limit-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.8a2 2 0 0 1 3.4 0l8 13.5a2 2 0 0 1-1.7 3H4a2 2 0 0 1-1.7-3l8-13.5Z"/><path d="M12 9v5"/><path d="M12 17.2h.01"/></svg><span>Uma avaliação por pessoa</span></p>`);
   }
 
@@ -278,7 +279,7 @@
   function nameScreen() {
     return frame(`<p class="eyebrow">SINAL 1 · A LEITURA COMEÇA AGORA</p><h2>O seu primeiro e último nome nesta <em class="gold">leitura astral</em></h2>
       <p class="lead">Usaremos apenas estes dois nomes para construir a sua leitura personalizada.</p>
-      <form id="name-form"><label class="field-label" for="full-name">Primeiro e último nome</label><input class="text-input" id="full-name" name="fullName" maxlength="90" autocomplete="name" placeholder="Escreva o primeiro e o último nome" value="${escapeHTML(state.fullName)}" required><div class="form-error" id="name-error" role="alert"></div><div class="actions"><button class="primary" type="submit">Continuar <span aria-hidden="true">↗</span></button></div></form>`);
+      <form id="name-form"><label class="field-label" for="full-name">Primeiro e último nome</label><input class="text-input" id="full-name" name="fullName" maxlength="90" autocomplete="name" placeholder="Escreva o primeiro e o último nome" value="${escapeHTML(state.fullName)}" required><div class="form-error" id="name-error" role="alert"></div><div class="actions"><button class="primary" type="submit">Continuar <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div></form>`);
   }
 
   function pyramidScreen() {
@@ -319,7 +320,7 @@
         <div class="pyramid-result"><span class="pyramid-number">${pyramid.final}</span><div><p class="eyebrow">O NÚMERO FINAL · ${title.toUpperCase()}</p><p>${reading}</p></div></div>
         <div class="pyramid-runs"><h3>As trincas encontradas</h3><ul>${trincas}</ul></div>
         <p class="quote">${diagnosis}</p>
-        <div class="actions"><button class="primary" type="button" data-action="pyramid-next">Continuar a minha leitura <span aria-hidden="true">↗</span></button></div>
+        <div class="actions"><button class="primary" type="button" data-action="pyramid-next">Continuar a minha leitura <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>
       </div></div>`);
   }
 
@@ -356,7 +357,7 @@
   function areaScreen() {
     if (state.showPyramid) return pyramidScreen();
     return frame(`<p class="eyebrow">SINAL 1 · O QUE PROCURA</p><h2>${escapeHTML(state.name)}, <span class="gold">que área da sua vida</span> está buscando?</h2>
-      <div class="choices">${config.areas.map(area => `<button class="choice" type="button" data-area="${area.id}" aria-pressed="${state.area === area.id}"><span class="choice-icon" aria-hidden="true">${icon(area.id)}</span><span>${escapeHTML(area.label)}</span><span class="choice-arrow" aria-hidden="true">↗</span></button>`).join('')}</div>`);
+      <div class="choices">${config.areas.map(area => `<button class="choice" type="button" data-area="${area.id}" aria-pressed="${state.area === area.id}"><span class="choice-icon" aria-hidden="true">${icon(area.id)}</span><span>${escapeHTML(area.label)}</span><span class="choice-arrow" aria-hidden="true">${icon('arrowUpRight')}</span></button>`).join('')}</div>`);
   }
 
   function cardsScreen() {
@@ -370,7 +371,7 @@
     const orderedCards = [...config.cards].sort((a, b) => cardRitual.final.get(a.id) - cardRitual.final.get(b.id));
     return frame(`${state.cards.length === 3 ? '' : '<p class="eyebrow">SINAL 2 · ESCOLHAS INTUITIVAS</p><h2>Não pense demasiado. <span class="gold">Escolha 3 cartas.</span></h2>'}
       <div class="card-table"><div class="card-deck is-${cardPhase}" role="group" aria-label="Cinco cartas; escolha três">${orderedCards.map((card, index) => { const chosen = state.cards.includes(card.id); const float = cardFloats.get(card.id) || { x: 0, y: 8, duration: 4, delay: 0 }; const fanStyles = cardRitual.fans.map((fan, cycle) => { const slot = fan.get(card.id); return `--fan-x-${cycle + 1}:${slot * 88}px;--fan-x-${cycle + 1}-mobile:${slot * 42}px;--fan-rotate-${cycle + 1}:${slot * 17}deg`; }).join(';'); return `<button class="card ${chosen ? 'chosen' : ''} ${spinningCardId === card.id ? 'is-spinning' : ''}" style="--card-index:${index};--deal-x:${(index - 2) * 26}px;--deal-rotate:${(index - 2) * 4}deg;${fanStyles};--spread-offset:${cardRitual.final.get(card.id) * 20}%;--chosen-tilt:${cardTilts.get(card.id) ?? 0}deg;--float-x:${float.x}px;--float-y:${float.y}px;--float-duration:${float.duration}s;--float-delay:${float.delay}s" type="button" data-card="${card.id}" aria-label="${chosen ? `${card.title}, carta escolhida` : 'Carta virada para baixo'}" aria-pressed="${chosen}" ${!ready || chosen || state.cards.length >= 3 ? 'disabled' : ''}><span class="card-face card-face-back" aria-hidden="true"><img src="assets/cards/tras.png" alt="" width="1024" height="1536"></span><span class="card-face card-face-front" aria-hidden="true"><img src="${card.image}" alt="" width="1024" height="1536"></span></button>`; }).join('')}</div></div>
-      ${cardPhase === 'ready' ? `<p class="card-count" aria-live="polite">${state.cards.length} DE 3 CARTAS ESCOLHIDAS</p>` : ''}${cardPhase === 'reading' ? `${cardReading()}<div class="actions"><button class="primary" type="button" data-action="cards-next">Continuar a minha leitura <span aria-hidden="true">↗</span></button></div>` : ''}`);
+      ${cardPhase === 'ready' ? `<p class="card-count" aria-live="polite">${state.cards.length} DE 3 CARTAS ESCOLHIDAS</p>` : ''}${cardPhase === 'reading' ? `${cardReading()}<div class="actions"><button class="primary" type="button" data-action="cards-next">Continuar a minha leitura <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>` : ''}`);
   }
 
   function randomCardFloat() {
@@ -459,7 +460,7 @@
     return frame(`<p class="eyebrow">O SEGUNDO SINAL</p><h2>Encontrámos o seu <span class="gold">segundo sinal.</span></h2><p class="lead">As cartas que escolheu abrem três pistas simbólicas para esta leitura:</p>
       <div class="card-meanings">${cards.map(card => `<div class="card-meaning"><b>${escapeHTML(card.title)}</b><span>${escapeHTML(card.meaning)}</span></div>`).join('')}</div>
       <p class="quote micro-reveal-quote">O seu número simbólico <span class="gold">${symbolicNumber}</span> revela uma correspondência entre as suas escolhas. Este sinal está a convergir <span class="gold">${escapeHTML(geoPhrase)}</span> e merece ser cruzado com os restantes sinais.</p>
-      <div class="actions micro-reveal-actions"><button class="primary" type="button" data-action="micro-next">Continuar a minha leitura <span aria-hidden="true">↗</span></button></div>`);
+      <div class="actions micro-reveal-actions"><button class="primary" type="button" data-action="micro-next">Continuar a minha leitura <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>`);
   }
 
   function birthScreen() {
@@ -467,7 +468,7 @@
       <form id="birth-form"><label class="field-label" for="birth-date">Data de nascimento</label><input class="text-input" id="birth-date" type="text" inputmode="numeric" autocomplete="bday" placeholder="DD/MM/AAAA" maxlength="10" required value="${escapeHTML(displayBirthDate(state.birthDate))}" aria-describedby="birth-error">
       <label class="check-row birth-time-toggle"><input id="show-birth-time" type="checkbox" aria-controls="birth-time-field" aria-expanded="${state.showBirthTime}" ${state.showBirthTime ? 'checked' : ''}> Hora de nascimento</label>
       <div id="birth-time-field" ${state.showBirthTime ? '' : 'hidden'}><label class="field-label" for="birth-time">Digite a hora de nascimento</label><input class="text-input" id="birth-time" type="text" inputmode="numeric" placeholder="HH:MM" maxlength="5" value="${escapeHTML(state.birthTime)}" ${state.showBirthTime ? '' : 'disabled'}></div>
-      <div class="form-error" id="birth-error" role="alert"></div><div class="actions"><button class="primary" type="submit">Continuar <span aria-hidden="true">↗</span></button></div></form>`);
+      <div class="form-error" id="birth-error" role="alert"></div><div class="actions"><button class="primary" type="submit">Continuar <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div></form>`);
   }
 
   function handScreen() {
@@ -504,7 +505,7 @@
     return frame(`<p class="eyebrow">A CONVERGÊNCIA</p><h2>Os seus sinais estão a <span class="gold">encontrar-se.</span></h2>${state.handPhoto ? '' : '<p class="subtle">Estamos a organizar as suas respostas para apresentar uma leitura personalizada.</p>'}
       ${handProgress}
       <div class="video-box">${config.videoUrl ? `<div class="mini-vsl" data-state="ready" role="group" aria-label="Apresentação em vídeo"><video id="analysis-video" autoplay muted ${state.handPhoto ? '' : 'loop '}playsinline preload="auto" disablepictureinpicture src="${escapeHTML(config.videoUrl)}" aria-label="Mini apresentação da leitura"></video><button class="mini-vsl-gate" type="button" data-action="vsl-start" ${state.handPhoto ? 'hidden' : videoReady ? '' : 'disabled'}><strong>O seu vídeo está pronto</strong><span aria-hidden="true">▶</span><small>${videoReady ? 'Toque para escutar' : 'Disponível ao concluir a análise'}</small></button><button class="mini-vsl-sound" type="button" data-action="vsl-sound" hidden>Toque para escutar</button><div class="mini-vsl-overlay" hidden><strong>Continue a ver o vídeo.</strong><button type="button" data-action="vsl-resume">▶ Continuar a ver</button><button type="button" data-action="vsl-restart">↻ Ver desde o início</button></div><div class="mini-vsl-controls" hidden><button type="button" data-action="vsl-speed" aria-label="Alterar velocidade do vídeo">1.0x</button></div><div class="mini-vsl-progress" role="progressbar" aria-label="Progresso do vídeo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div></div>` : '<div class="video-placeholder"><strong>◈</strong>Vídeo indisponível. Pode avançar quando a análise terminar.</div>'}</div>
-      <div id="analysis-continue" class="actions" ${canContinue ? '' : 'hidden'}><button class="primary" type="button" data-action="analysis-next">Ver o meu resultado <span aria-hidden="true">↗</span></button></div>
+      <div id="analysis-continue" class="actions" ${canContinue ? '' : 'hidden'}><button class="primary" type="button" data-action="analysis-next">Ver o meu resultado <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>
       <p class="privacy-note analysis-privacy-note">As interpretações obtidas aqui são baseadas nas suas escolhas e respostas individuais.</p>`);
   }
 
@@ -582,10 +583,10 @@
             <div class="plan-grid" aria-label="Planos da análise">
               <article class="plan-card plan-card-simple"><h4>Plano Simples</h4><div class="plan-price"><span class="plan-price-current">7,90 €</span><span class="plan-price-anchor" aria-label="Valor de referência: 19 euros">19 €</span></div>
                 <ul class="plan-benefits"><li>Leitura personalizada dos 4 sinais de convergência</li><li>Acesso imediato<span class="plan-benefit-detail">Garantia de 15 dias</span></li></ul>
-                <button class="primary" type="button" data-action="checkout" data-plan="simple">Escolher Plano Simples <span aria-hidden="true">↗</span></button><div class="payment-methods"><img src="assets/pagamento.png" alt="Meios de pagamento aceites" width="2065" height="274" loading="lazy" decoding="async"></div></article>
+                <button class="primary" type="button" data-action="checkout" data-plan="simple">Escolher Plano Simples <span aria-hidden="true">${icon('arrowUpRight')}</span></button><div class="payment-methods"><img src="assets/pagamento.png" alt="Meios de pagamento aceites" width="2065" height="274" loading="lazy" decoding="async"></div></article>
               <article class="plan-card plan-card-complete"><div class="plan-card-ribbons"><span class="plan-popular">Mais escolhido</span><span class="plan-tag">Leitura ampliada</span></div><h4>Plano Completo</h4><div class="plan-price"><span class="plan-price-current">14,90 €</span><span class="plan-price-anchor" aria-label="Valor de referência: 35 euros">35 €</span></div>
                 <ul class="plan-benefits"><li>Leitura personalizada dos 4 sinais de convergência</li><li>Interpretação das três cartas escolhidas</li><li class="plan-bonus"><strong>Bónus 1</strong> Diário dos Sinais (7 Dias)</li><li class="plan-bonus"><strong>Bónus 2</strong> Guia Completo das Cartas</li><li class="plan-bonus"><strong>Bónus 3</strong> Calendário dos Ciclos</li></ul>
-                <button class="primary" type="button" data-action="checkout" data-plan="complete">Escolher Plano Completo <span aria-hidden="true">↗</span></button><div class="payment-methods"><img src="assets/pagamento.png" alt="Meios de pagamento aceites" width="2065" height="274" loading="lazy" decoding="async"></div></article>
+                <button class="primary" type="button" data-action="checkout" data-plan="complete">Escolher Plano Completo <span aria-hidden="true">${icon('arrowUpRight')}</span></button><div class="payment-methods"><img src="assets/pagamento.png" alt="Meios de pagamento aceites" width="2065" height="274" loading="lazy" decoding="async"></div></article>
             </div><div id="checkout-error" class="checkout-error" role="alert"></div><img class="guarantee-seal" src="assets/garantia-15-dias.png" alt="Selo de garantia de 15 dias" width="500" height="500" loading="lazy" decoding="async"><p class="purchase-guarantee"><strong>Acesso imediato e garantia de satisfação de 15 dias.</strong><br>Se não gostar, basta pedir o seu dinheiro de volta.</p><small>Todo este material é confidencial e damos a maior importância à privacidade dos nossos clientes.</small></div>`);
   }
 
