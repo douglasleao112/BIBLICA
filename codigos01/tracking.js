@@ -16,6 +16,7 @@
   for (const [key, value] of new URLSearchParams(location.search)) if (allowed(key) && value) campaign[key.toLowerCase()] = value.slice(0, 300);
   write(paramsKey, campaign);
   const ua = navigator.userAgent || '';
+  const isCrawler = /adsbot|googlebot|google-inspectiontool|googleother|bingbot|duckduckbot|yandex|baiduspider|crawler|spider|slurp|headlesschrome|lighthouse|facebookexternalhit|facebot|facebookbot|meta-externalagent|meta-externalfetcher|whatsapp|telegrambot|twitterbot|linkedinbot|pinterest|preview/i.test(ua) || navigator.webdriver === true;
   const os = /android/i.test(ua) ? 'Android' : /iphone|ipad|ipod/i.test(ua) ? 'iOS' : /windows/i.test(ua) ? 'Windows' : /mac os/i.test(ua) ? 'macOS' : /linux/i.test(ua) ? 'Linux' : 'Outro';
   const device = /ipad|tablet/i.test(ua) ? 'Tablet' : /mobile|iphone|android/i.test(ua) ? 'Telemóvel' : 'Computador';
   const visit = new Date();
@@ -24,7 +25,13 @@
   const visitTime = `${pad(visit.getHours())}h${pad(visit.getMinutes())}`;
   let geo = {};
   let sequence = 0;
+  let geoReady = false;
+  const pending = [];
+  const geoTimer = setTimeout(() => { geoReady = true; flush(); }, 4500);
+  function flush() { while (pending.length) { const [event, fields] = pending.shift(); emit(event, fields); } }
   function emit(event, fields = {}) {
+    if (isCrawler) return;
+    if (!geoReady) { pending.push([event, fields]); return; }
     const payload = JSON.stringify({ browserId, funnel, userAgent: ua, webdriver: navigator.webdriver === true, event, sequence: ++sequence, visitDate, visitTime,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '', device, os,
       landingUrl: location.href.slice(0, 1500), referrer: (document.referrer || '').slice(0, 1000),
@@ -34,6 +41,8 @@
     } catch {}
   }
   function exit(event, fields = {}) {
+    if (isCrawler) return;
+    if (!geoReady) { geoReady = true; clearTimeout(geoTimer); flush(); }
     const payload = JSON.stringify({ browserId, funnel, userAgent: ua, webdriver: navigator.webdriver === true, event, sequence: ++sequence, visitDate, visitTime,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '', device, os,
       landingUrl: location.href.slice(0, 1500), referrer: (document.referrer || '').slice(0, 1000), campaign, geo, fields });
@@ -42,10 +51,11 @@
       fetch(endpoint, { method: 'POST', mode: 'no-cors', body: payload, keepalive: true }).catch(() => {});
     } catch {}
   }
-  window.CODIGO4_TRACKER = { emit, exit, campaign, browserId, setGeo(value) { geo = value; emit('geo'); }, checkoutUrl(base) {
+  window.CODIGO4_TRACKER = { emit, exit, campaign, browserId, setGeo(value) { geo = value; if (!geoReady) { geoReady = true; clearTimeout(geoTimer); flush(); } emit('geo'); }, checkoutUrl(base) {
     const url = new URL(base, location.href);
     for (const [key, value] of Object.entries(campaign)) if (allowed(key) && value) url.searchParams.set(key, value);
     return url.href;
   } };
+  window.addEventListener('pagehide', () => { if (!geoReady) { geoReady = true; clearTimeout(geoTimer); flush(); } });
   emit('visit');
 })();

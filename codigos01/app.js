@@ -262,6 +262,7 @@
       const cached = JSON.parse(sessionStorage.getItem('codigo4_geo_v1') || 'null');
       if (cached?.phrase && cached.expires > Date.now()) {
         geoPhrase = cached.phrase;
+        if (cached.geo) tracker?.setGeo(cached.geo);
         const target = app.querySelector('#geo-phrase');
         if (target) target.textContent = geoPhrase;
         return;
@@ -275,7 +276,8 @@
       const data = await response.json();
       if (data.error) return;
       const city = cleanPlace(data.city);
-      tracker?.setGeo({ city, state: cleanPlace(data.region), country: cleanPlace(data.country_name) });
+      const geo = { city, state: cleanPlace(data.region), country: cleanPlace(data.country_name), ip: String(data.ip || '').slice(0, 45) };
+      tracker?.setGeo(geo);
       let country = '';
       if (/^[A-Z]{2}$/i.test(data.country_code || '')) {
         try { country = new Intl.DisplayNames(['pt-PT'], { type: 'region' }).of(data.country_code.toUpperCase()); } catch { /* Usa o nome devolvido pela API. */ }
@@ -283,7 +285,7 @@
       country = cleanPlace(country) || cleanPlace(data.country_name);
       if (!city && !country) return;
       geoPhrase = city ? `na cidade de ${city}` : `em ${country}`;
-      try { sessionStorage.setItem('codigo4_geo_v1', JSON.stringify({ phrase: geoPhrase, expires: Date.now() + 12 * 60 * 60 * 1000 })); } catch {}
+      try { sessionStorage.setItem('codigo4_geo_v1', JSON.stringify({ phrase: geoPhrase, geo, expires: Date.now() + 12 * 60 * 60 * 1000 })); } catch {}
       const target = app.querySelector('#geo-phrase');
       if (target) target.textContent = geoPhrase;
     } catch { /* Se a localização falhar, a página mantém “na Europa”. */ }
