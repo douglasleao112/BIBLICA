@@ -1,6 +1,7 @@
 (() => {
   'use strict';
   const endpoint = 'https://script.google.com/macros/s/AKfycbyhwNWEO86s5XFk8Um-hpZGvqo9wDZYU6mm6uFFYqOw5gVNci3Jj7mgDsSeNYk6ULiqQg/exec';
+  const funnel = 'codigos02';
   const idKey = 'codigo4_browser_id_v1';
   const paramsKey = 'codigo4_campaign_v1';
   const allowed = key => /^utm_[a-z0-9_]+$/i.test(key) || ['fbclid', 'gclid', 'ttclid', 'msclkid', 'sck', 'src'].includes(key.toLowerCase());
@@ -24,7 +25,7 @@
   let geo = {};
   let sequence = 0;
   function emit(event, fields = {}) {
-    const payload = JSON.stringify({ browserId, event, sequence: ++sequence, visitDate, visitTime,
+    const payload = JSON.stringify({ browserId, funnel, userAgent: ua, webdriver: navigator.webdriver === true, event, sequence: ++sequence, visitDate, visitTime,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '', device, os,
       landingUrl: location.href.slice(0, 1500), referrer: (document.referrer || '').slice(0, 1000),
       campaign, geo, fields });
@@ -33,7 +34,7 @@
     } catch {}
   }
   function exit(event, fields = {}) {
-    const payload = JSON.stringify({ browserId, event, sequence: ++sequence, visitDate, visitTime,
+    const payload = JSON.stringify({ browserId, funnel, userAgent: ua, webdriver: navigator.webdriver === true, event, sequence: ++sequence, visitDate, visitTime,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '', device, os,
       landingUrl: location.href.slice(0, 1500), referrer: (document.referrer || '').slice(0, 1000), campaign, geo, fields });
     try {
