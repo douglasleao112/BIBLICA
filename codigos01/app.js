@@ -872,6 +872,19 @@
     handTraceStep = 0;
     try {
       go(7); // O vídeo começa no próprio gesto de selecionar a foto, antes de descodificá-la.
+      // No iPhone, um vídeo fora do ecrã pode ficar suspenso mesmo com autoplay silencioso.
+      const video = app.querySelector('#analysis-video');
+      app.querySelector('.video-box')?.scrollIntoView?.({ block: 'center', behavior: 'auto' });
+      const retryVisiblePlayback = () => {
+        if (!video?.paused || state.step !== 7) return;
+        video.defaultMuted = true;
+        video.muted = true;
+        video.setAttribute?.('muted', '');
+        video.setAttribute?.('playsinline', '');
+        void Promise.resolve(video.play()).catch(() => {});
+      };
+      if (window.requestAnimationFrame) window.requestAnimationFrame(() => window.requestAnimationFrame(retryVisiblePlayback));
+      else setTimeout(retryVisiblePlayback, 0);
       const image = new Image();
       await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; image.src = objectUrl; });
       const scale = Math.min(1, 1100 / Math.max(image.naturalWidth, image.naturalHeight));
