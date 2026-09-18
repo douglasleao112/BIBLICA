@@ -46,6 +46,7 @@
   let handAnalyzing = false;
   let handPhotoProcessing = false;
   let pendingHandUrl = '';
+  let startVideoOnRender = false;
   let handScanActive = false;
   let handTraceStep = 0;
   let cardTimer = null;
@@ -118,7 +119,6 @@
   }
 
   // Sessões antigas que pararam depois do envio retomam diretamente no vídeo.
-  if (state.step === 6 && state.handPhoto) { state.step = 7; save(); }
 
   function startSoundtrack() {
     if (!soundtrack || !soundtrack.paused || soundtrackPending) return;
@@ -493,7 +493,8 @@
     return frame(`<p class="eyebrow">SINAL 4 · MARCAS</p><h2>${escapeHTML(headingStart)} <span class="gold">palma da sua mão</span> para a leitura.</h2>${state.handPhoto ? '' : '<p class="lead">Para incluir as marcas da sua palma no quarto sinal, tire ou envie uma fotografia nítida da mão.</p>'}
       <label class="upload ${state.handPhoto ? 'has-photo' : ''}" for="hand-input"><input id="hand-input" type="file" accept="image/jpeg,image/png,image/webp" aria-label="${state.handPhoto ? 'Substituir fotografia da mão' : 'Tirar ou enviar fotografia da mão'}" ${handAnalyzing ? 'disabled' : ''}>${state.handPhoto ? `<img class="upload-preview" src="${state.handPhoto}" alt="Fotografia da palma da mão escolhida">${handScanActive ? '<span class="hand-scan" aria-hidden="true"></span>' : ''}${state.handLines ? `<svg class="hand-traces ${handTraceStep === 4 ? 'complete' : ''}" viewBox="0 0 ${dimensions.width} ${dimensions.height}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${traceLabels.map(([id]) => `<path class="hand-trace hand-trace-${id}" data-trace="${id}" d="${tracePath(state.handLines[id])}"/>`).join('')}</svg>` : ''}` : `<svg class="upload-icon" viewBox="0 0 48 48" width="42" height="42" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 15h9l3-4h10l3 4h9a3 3 0 0 1 3 3v20a3 3 0 0 1 3-3V18a3 3 0 0 1 3-3Z"/><circle cx="24" cy="27" r="8"/><path d="M36 21h2"/></svg><strong>Tirar ou enviar fotografia da mão</strong><small>JPG, PNG ou WebP · até 5 MB</small>`}</label>
       ${state.handLines ? `<div class="hand-checks" role="status" aria-live="polite" ${handTraceStep === 0 ? 'hidden' : ''}>${traceLabels.map(([id, label], index) => `<div class="hand-check ${handTraceStep === 4 ? state.handLines[id]?.length >= 4 ? 'done' : 'unavailable' : ''}" data-check="${id}" ${handTraceStep <= index ? 'hidden' : ''}><span class="hand-check-icon" aria-hidden="true">${state.handLines[id]?.length >= 4 ? '✓' : '—'}</span><span>${label}</span></div>`).join('')}</div>` : ''}
-      <div class="form-error" id="hand-error" role="alert"></div>`);
+      <div class="form-error" id="hand-error" role="alert"></div>
+      ${state.handPhoto ? `<div class="actions"><button class="primary" type="button" data-action="hand-next">Avançar e iniciar vídeo <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>` : ''}`);
   }
 
   const handSuitShapes = {
@@ -516,7 +517,7 @@
     return frame(`<p class="eyebrow">A CONVERGÊNCIA</p><h2>Os seus sinais estão a <span class="gold">encontrar-se.</span></h2>${handImage ? '' : '<p class="subtle">Estamos a organizar as suas respostas para apresentar uma leitura personalizada.</p>'}
       ${handProgress}
       ${state.handLineSources?.head === 'reference' ? '<p class="hand-reference-note">As linhas da cabeça e do destino são traçados de referência, posicionados a partir das linhas visíveis da palma.</p>' : ''}
-      <div class="video-box">${config.videoUrl ? `<div class="mini-vsl" data-state="ready" role="group" aria-label="Apresentação em vídeo"><video id="analysis-video" autoplay muted ${handImage ? '' : 'loop '}playsinline webkit-playsinline preload="auto" disablepictureinpicture src="${escapeHTML(config.videoUrl)}" aria-label="Mini apresentação da leitura"></video><button class="mini-vsl-gate" type="button" data-action="vsl-start" ${handImage ? 'hidden' : videoReady ? '' : 'disabled'}><strong>O seu vídeo está pronto</strong><span aria-hidden="true">▶</span><small>${videoReady ? 'Toque para escutar' : 'Disponível ao concluir a análise'}</small></button><div class="mini-vsl-overlay" hidden><strong>Continue a ver o vídeo.</strong><button type="button" data-action="vsl-resume">▶ Continuar a ver</button><button type="button" data-action="vsl-restart">↻ Ver desde o início</button></div><div class="mini-vsl-controls" hidden><button type="button" data-action="vsl-speed" aria-label="Alterar velocidade do vídeo">1.0x</button></div><div class="mini-vsl-progress" role="progressbar" aria-label="Progresso do vídeo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div></div>` : '<div class="video-placeholder"><strong>◈</strong>Vídeo indisponível. Pode avançar quando a análise terminar.</div>'}</div>
+      <div class="video-box">${config.videoUrl ? `<div class="mini-vsl" data-state="ready" role="group" aria-label="Apresentação em vídeo"><video id="analysis-video" autoplay muted loop playsinline webkit-playsinline preload="auto" disablepictureinpicture src="${escapeHTML(config.videoUrl)}" aria-label="Mini apresentação da leitura"></video><button class="mini-vsl-gate" type="button" data-action="vsl-start" ${videoReady ? '' : 'disabled'}><strong>O seu vídeo está pronto</strong><span aria-hidden="true">▶</span><small>${videoReady ? 'Toque para escutar' : 'Disponível ao concluir a análise'}</small></button><div class="mini-vsl-overlay" hidden><strong>Continue a ver o vídeo.</strong><button type="button" data-action="vsl-resume">▶ Continuar a ver</button><button type="button" data-action="vsl-restart">↻ Ver desde o início</button></div><div class="mini-vsl-controls" hidden><button type="button" data-action="vsl-speed" aria-label="Alterar velocidade do vídeo">1.0x</button></div><div class="mini-vsl-progress" role="progressbar" aria-label="Progresso do vídeo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div></div>` : '<div class="video-placeholder"><strong>◈</strong>Vídeo indisponível. Pode avançar quando a análise terminar.</div>'}</div>
       <div id="analysis-continue" class="actions" ${canContinue ? '' : 'hidden'}><button class="primary" type="button" data-action="analysis-next">Ver o meu resultado <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>
       <p class="privacy-note analysis-privacy-note">As interpretações obtidas aqui são baseadas nas suas escolhas e respostas individuais.</p>`);
   }
@@ -728,35 +729,14 @@
       });
       vslObserver.observe(slot);
     }
-    if (state.handPhoto || pendingHandUrl) {
-      // Iniciamos ainda no evento de seleção da foto; o Safari conserva o gesto do utilizador.
-      // A reprodução automática deve começar silenciosa; o som pode ser ativado por toque.
-      video.loop = false;
-      try { video.currentTime = 0; } catch { /* O Safari pode ainda não ter carregado os metadados. */ }
-      video.defaultMuted = true;
-      video.muted = true;
-      video.setAttribute?.('muted', '');
-      video.setAttribute?.('playsinline', '');
-      const showManualStart = () => {
-        gate.hidden = false;
-        overlay.hidden = true;
-        controls.hidden = true;
-        player.dataset.state = 'ready';
-        setSoundtrackDucked(false);
-      };
-      const attemptAutoplay = () => {
-        let playback;
-        try { playback = video.play(); } catch { showManualStart(); return; }
-        void Promise.resolve(playback).then(sync).catch(showManualStart);
-      };
-      if (video.readyState === 0) {
-        video.addEventListener('loadedmetadata', () => { if (video.paused) attemptAutoplay(); }, { once: true });
-      }
-      attemptAutoplay();
-    } else {
-      video.play().catch(() => {}); // Prévia silenciosa nas etapas sem fotografia.
-      sync();
-    }
+    // Antes do clique, o próprio vídeo serve de prévia animada, sempre em silêncio e em loop.
+    video.loop = true;
+    video.defaultMuted = true;
+    video.muted = true;
+    video.setAttribute?.('muted', '');
+    video.setAttribute?.('playsinline', '');
+    if (!startVideoOnRender) void video.play().catch(() => {});
+    sync();
   }
 
   function controlVsl(action) {
@@ -770,7 +750,9 @@
         if (state.videoEnded) { state.videoEnded = false; save(); updateAnalysisContinue(); }
       }
       video.loop = false;
+      video.defaultMuted = false;
       video.muted = false;
+      video.removeAttribute?.('muted');
       // A prévia já pode estar a tocar em silêncio; nesse caso, play() não emite outro evento "play".
       player.querySelector('.mini-vsl-gate').hidden = true;
       player.querySelector('.mini-vsl-overlay').hidden = true;
@@ -852,20 +834,6 @@
     state.videoEnded = false;
     handTraceStep = 0;
     try {
-      go(7); // O vídeo começa no próprio gesto de selecionar a foto, antes de descodificá-la.
-      // No iPhone, um vídeo fora do ecrã pode ficar suspenso mesmo com autoplay silencioso.
-      const video = app.querySelector('#analysis-video');
-      app.querySelector('.video-box')?.scrollIntoView?.({ block: 'center', behavior: 'auto' });
-      const retryVisiblePlayback = () => {
-        if (!video?.paused || state.step !== 7) return;
-        video.defaultMuted = true;
-        video.muted = true;
-        video.setAttribute?.('muted', '');
-        video.setAttribute?.('playsinline', '');
-        void Promise.resolve(video.play()).catch(() => {});
-      };
-      if (window.requestAnimationFrame) window.requestAnimationFrame(() => window.requestAnimationFrame(retryVisiblePlayback));
-      else setTimeout(retryVisiblePlayback, 0);
       const image = new Image();
       await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; image.src = objectUrl; });
       const scale = Math.min(1, 1100 / Math.max(image.naturalWidth, image.naturalHeight));
@@ -882,16 +850,13 @@
       } while (state.handPhoto.length > 800_000 && quality >= .62);
       state.handPhotoWidth = canvas.width;
       state.handPhotoHeight = canvas.height;
-      const preview = app.querySelector('.hand-analysis-preview img');
-      if (preview) { preview.src = state.handPhoto; preview.width = canvas.width; preview.height = canvas.height; }
-      app.querySelector('.hand-analysis-preview svg')?.setAttribute('viewBox', `0 0 ${canvas.width} ${canvas.height}`);
       pendingHandUrl = '';
       handPhotoProcessing = false;
       state.handFileName = file.name;
       tracker?.emit('hand_upload', { handUploaded: true });
       save();
       track('HandUploaded');
-      void analyzeHand();
+      render();
     } catch {
       pendingHandUrl = '';
       handPhotoProcessing = false;
@@ -902,8 +867,10 @@
   }
 
   function continueToAnalysis() {
+    startVideoOnRender = true;
     go(7);
-    if (config.videoUrl && (config.vslTestOpen || state.analysisDone)) controlVsl('vsl-start');
+    startVideoOnRender = false;
+    if (config.videoUrl) controlVsl('vsl-start');
   }
 
   async function analyzeHandSecurely() {
@@ -1029,6 +996,7 @@
       case 'cards-next': if (state.cards.length === 3) go(4); break;
       case 'pyramid-next': if (state.area) go(3); break;
       case 'micro-next': go(5); break;
+      case 'hand-next': if (state.step === 6 && state.handPhoto && !handPhotoProcessing) continueToAnalysis(); break;
       case 'hand-retry':
         state.handLines = null;
         state.handLineSources = null;
