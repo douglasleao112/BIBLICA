@@ -33,7 +33,8 @@
     return `<svg class="vector-icon ${className}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths[name] || paths.geral}</svg>`;
   };
   const analyticsEvents = new Set(['QuizStarted', 'AreaSelected', 'CardsCompleted', 'PartialDiagnosisViewed', 'HandUploaded', 'AnalysisStarted', 'ResultViewed', 'CheckoutClicked']);
-  const freshState = () => ({ flowVersion: 5, step: 0, name: '', fullName: '', showPyramid: false, area: '', cards: [], birthDate: '', birthTime: '', showBirthTime: false, handPhoto: '', handPhotoWidth: 0, handPhotoHeight: 0, handLines: null, handLineSources: null, handFileName: '', handAnalysisError: '', answers: {}, analysisStartedAt: 0, analysisDone: false, videoEnded: false, fired: [] });
+  const fixedCardIds = ['sol', 'lua', 'fogo'];
+  const freshState = () => ({ flowVersion: 5, step: 0, name: '', fullName: '', showPyramid: false, area: '', cards: [], cardSlots: [], birthDate: '', birthTime: '', showBirthTime: false, handPhoto: '', handPhotoWidth: 0, handPhotoHeight: 0, handLines: null, handLineSources: null, handFileName: '', handAnalysisError: '', answers: {}, analysisStartedAt: 0, analysisDone: false, videoEnded: false, fired: [] });
   // Sem uma localização visual fiável, não desenhamos linhas inventadas sobre a fotografia.
   function reliablePalmLines(lines) {
     return { life: lines.life, head: [], fate: [], heart: lines.heart };
@@ -89,6 +90,9 @@
       const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || 'null');
       if (saved && typeof saved === 'object') {
         state = { ...freshState(), ...saved, answers: { ...saved.answers }, cards: Array.isArray(saved.cards) ? saved.cards.slice(0, 3) : [], fired: Array.isArray(saved.fired) ? saved.fired : [] };
+        state.cardSlots = (Array.isArray(saved.cardSlots) ? saved.cardSlots : state.cards)
+          .filter((id, index, slots) => config.cards.some(card => card.id === id) && slots.indexOf(id) === index).slice(0, 3);
+        state.cards = fixedCardIds.slice(0, state.cardSlots.length);
         if (saved.flowVersion !== 5) {
           if (saved.flowVersion === 4 || saved.flowVersion === 3) {
             // As duas telas após o resultado deixam de existir; o limite abaixo leva ao resultado.
@@ -372,16 +376,16 @@
 
   function cardsScreen() {
     if (state.cards.length === 3) {
-      for (const id of state.cards) {
+      for (const id of state.cardSlots) {
         if (!cardTilts.has(id)) cardTilts.set(id, Math.round(Math.random() * 14) - 7);
         if (!cardFloats.has(id)) cardFloats.set(id, randomCardFloat());
       }
     }
     const ready = cardPhase === 'ready' || cardPhase === 'reading';
     const orderedCards = [...config.cards].sort((a, b) => cardRitual.final.get(a.id) - cardRitual.final.get(b.id));
-    return frame(`${state.cards.length === 3 ? '' : '<p class="eyebrow">SINAL 2 · ESCOLHAS INTUITIVAS</p><h2>Não pense demasiado. <span class="gold">Escolha 3 cartas.</span></h2>'}
-      <div class="card-table"><div class="card-deck is-${cardPhase}" role="group" aria-label="Cinco cartas; escolha três">${orderedCards.map((card, index) => { const chosen = state.cards.includes(card.id); const float = cardFloats.get(card.id) || { x: 0, y: 8, duration: 4, delay: 0 }; const fanStyles = cardRitual.fans.map((fan, cycle) => { const slot = fan.get(card.id); return `--fan-x-${cycle + 1}:${slot * 88}px;--fan-x-${cycle + 1}-mobile:${slot * 42}px;--fan-rotate-${cycle + 1}:${slot * 17}deg`; }).join(';'); return `<button class="card ${chosen ? 'chosen' : ''} ${spinningCardId === card.id ? 'is-spinning' : ''}" style="--card-index:${index};--deal-x:${(index - 2) * 26}px;--deal-rotate:${(index - 2) * 4}deg;${fanStyles};--spread-offset:${cardRitual.final.get(card.id) * 20}%;--chosen-tilt:${cardTilts.get(card.id) ?? 0}deg;--float-x:${float.x}px;--float-y:${float.y}px;--float-duration:${float.duration}s;--float-delay:${float.delay}s" type="button" data-card="${card.id}" aria-label="${chosen ? `${card.title}, carta escolhida` : 'Carta virada para baixo'}" aria-pressed="${chosen}" ${!ready || chosen || state.cards.length >= 3 ? 'disabled' : ''}><span class="card-face card-face-back" aria-hidden="true"><img src="assets/cards/tras.png" alt="" width="1024" height="1536"></span><span class="card-face card-face-front" aria-hidden="true"><img src="${card.image}" alt="" width="1024" height="1536"></span></button>`; }).join('')}</div></div>
-      ${cardPhase === 'ready' ? `<p class="card-count" aria-live="polite">${state.cards.length} DE 3 CARTAS ESCOLHIDAS</p>` : ''}${cardPhase === 'reading' ? `${cardReading()}<div class="actions"><button class="primary" type="button" data-action="cards-next">Continuar a minha leitura <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>` : ''}`);
+    return frame(`${state.cards.length === 3 ? '' : '<p class="eyebrow">SINAL 2 · CARTAS</p><h2>Não pense demasiado. <span class="gold">Revele 3 cartas.</span></h2>'}
+      <div class="card-table"><div class="card-deck is-${cardPhase}" role="group" aria-label="Cinco cartas; revele três">${orderedCards.map((card, index) => { const chosenIndex = state.cardSlots.indexOf(card.id); const chosen = chosenIndex >= 0; const revealedCard = chosen ? config.cards.find(item => item.id === fixedCardIds[chosenIndex]) : card; const float = cardFloats.get(card.id) || { x: 0, y: 8, duration: 4, delay: 0 }; const fanStyles = cardRitual.fans.map((fan, cycle) => { const slot = fan.get(card.id); return `--fan-x-${cycle + 1}:${slot * 88}px;--fan-x-${cycle + 1}-mobile:${slot * 42}px;--fan-rotate-${cycle + 1}:${slot * 17}deg`; }).join(';'); return `<button class="card ${chosen ? 'chosen' : ''} ${spinningCardId === card.id ? 'is-spinning' : ''}" style="--card-index:${index};--deal-x:${(index - 2) * 26}px;--deal-rotate:${(index - 2) * 4}deg;${fanStyles};--spread-offset:${cardRitual.final.get(card.id) * 20}%;--chosen-tilt:${cardTilts.get(card.id) ?? 0}deg;--float-x:${float.x}px;--float-y:${float.y}px;--float-duration:${float.duration}s;--float-delay:${float.delay}s" type="button" data-card="${card.id}" aria-label="${chosen ? `${revealedCard.title}, carta revelada` : 'Carta virada para baixo'}" aria-pressed="${chosen}" ${!ready || chosen || state.cards.length >= 3 ? 'disabled' : ''}><span class="card-face card-face-back" aria-hidden="true"><img src="assets/cards/tras.png" alt="" width="1024" height="1536"></span><span class="card-face card-face-front" aria-hidden="true"><img src="${revealedCard.image}" alt="" width="1024" height="1536"></span></button>`; }).join('')}</div></div>
+      ${cardPhase === 'ready' ? `<p class="card-count" aria-live="polite">${state.cards.length} DE 3 CARTAS REVELADAS</p>` : ''}${cardPhase === 'reading' ? `${cardReading()}<div class="actions"><button class="primary" type="button" data-action="cards-next">Continuar a minha leitura <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>` : ''}`);
   }
 
   function randomCardFloat() {
@@ -467,7 +471,7 @@
     const nameParts = (state.fullName || state.name).trim().split(/\s+/u);
     const countLetters = word => [...(word || '').normalize('NFC')].filter(character => /\p{L}/u.test(character)).length;
     const symbolicNumber = `${countLetters(nameParts[0])}${countLetters(nameParts.at(-1))}`;
-    return frame(`<p class="eyebrow">O SEGUNDO SINAL</p><h2>Encontrámos o seu <span class="gold">segundo sinal.</span></h2><p class="lead">As cartas que escolheu abrem três pistas simbólicas para esta leitura:</p>
+    return frame(`<p class="eyebrow">O SEGUNDO SINAL</p><h2>Encontrámos o seu <span class="gold">segundo sinal.</span></h2><p class="lead">As cartas reveladas abrem três pistas simbólicas para esta leitura:</p>
       <div class="card-meanings">${cards.map(card => `<div class="card-meaning"><b>${escapeHTML(card.title)}</b><span>${escapeHTML(card.meaning)}</span></div>`).join('')}</div>
       <p class="quote micro-reveal-quote">O seu número simbólico <span class="gold">${symbolicNumber}</span> revela uma correspondência entre as suas escolhas. Este sinal está a convergir <span class="gold">${escapeHTML(geoPhrase)}</span> e merece ser cruzado com os restantes sinais.</p>
       <div class="actions micro-reveal-actions"><button class="primary" type="button" data-action="micro-next">Continuar a minha leitura <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>`);
@@ -964,9 +968,10 @@
     if (button.dataset.card) {
       if (cardPhase !== 'ready' || spinningCardId || state.cards.length >= 3) return;
       const id = button.dataset.card;
-      if (state.cards.includes(id)) return;
+      if (state.cardSlots.includes(id)) return;
       spinningCardId = id;
-      state.cards.push(id);
+      state.cardSlots.push(id);
+      state.cards = fixedCardIds.slice(0, state.cardSlots.length);
       tracker?.emit('answer_cards', { cards: state.cards.join(', ') });
       cardTilts.set(id, Math.round(Math.random() * 14) - 7);
       cardFloats.set(id, randomCardFloat());
