@@ -276,9 +276,9 @@
   }
 
   function nameScreen() {
-    return frame(`<p class="eyebrow">SINAL 1 · A LEITURA COMEÇA AGORA</p><h2>O seu nome nesta <em class="gold">leitura astral</em></h2>
-      <p class="lead">Não medimos um campo magnético físico sem esta informação.</p>
-      <form id="name-form"><label class="field-label" for="full-name">O seu nome completo</label><input class="text-input" id="full-name" name="fullName" maxlength="90" autocomplete="name" placeholder="Escreva o seu nome completo" value="${escapeHTML(state.fullName)}" required><div class="form-error" id="name-error" role="alert"></div><div class="actions"><button class="primary" type="submit">Continuar <span aria-hidden="true">↗</span></button></div></form>`);
+    return frame(`<p class="eyebrow">SINAL 1 · A LEITURA COMEÇA AGORA</p><h2>O seu primeiro e último nome nesta <em class="gold">leitura astral</em></h2>
+      <p class="lead">Usaremos apenas estes dois nomes para construir a sua leitura personalizada.</p>
+      <form id="name-form"><label class="field-label" for="full-name">Primeiro e último nome</label><input class="text-input" id="full-name" name="fullName" maxlength="90" autocomplete="name" placeholder="Escreva o primeiro e o último nome" value="${escapeHTML(state.fullName)}" required><div class="form-error" id="name-error" role="alert"></div><div class="actions"><button class="primary" type="submit">Continuar <span aria-hidden="true">↗</span></button></div></form>`);
   }
 
   function pyramidScreen() {
@@ -992,8 +992,8 @@
       event.preventDefault();
       const value = app.querySelector('#full-name').value.trim().replace(/\s+/gu, ' ');
       const parts = value.split(' ');
-      if (value.length > 90 || parts.length < 2 || !parts.every(part => /\p{L}/u.test(part))) {
-        app.querySelector('#name-error').textContent = 'Escreva o seu nome e apelido para continuar.';
+      if (value.length > 90 || parts.length !== 2 || !parts.every(part => /^\p{L}[\p{L}\p{M}]*(?:[-'][\p{L}\p{M}]+)*$/u.test(part))) {
+        app.querySelector('#name-error').textContent = 'Escreva apenas o primeiro e o último nome.';
         return;
       }
       state.fullName = value;
@@ -1019,6 +1019,11 @@
   });
 
   app.addEventListener('input', event => {
+    if (event.target.id === 'full-name') {
+      const value = event.target.value.normalize('NFC').replace(/[^\p{L}\p{M}\s'-]/gu, '').replace(/\s+/gu, ' ').replace(/^\s/u, '');
+      event.target.value = value.split(' ').slice(0, 2).join(' ');
+      app.querySelector('#name-error').textContent = '';
+    }
     if (event.target.id === 'birth-date') {
       const digits = event.target.value.replace(/\D/g, '').slice(0, 8);
       event.target.value = [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4)].filter(Boolean).join('/');
