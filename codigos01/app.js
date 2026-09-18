@@ -34,22 +34,24 @@
   };
   const analyticsEvents = new Set(['QuizStarted', 'AreaSelected', 'CardsCompleted', 'PartialDiagnosisViewed', 'HandUploaded', 'AnalysisStarted', 'ResultViewed', 'CheckoutClicked']);
   const fixedCardIds = ['sol', 'lua', 'fogo'];
+  const handLineAssets = [
+    ['life', 'Linha da vida', 'assets/hand-lines/vida.png'],
+    ['head', 'Linha da cabeça', 'assets/hand-lines/cabeca.png'],
+    ['fate', 'Linha do destino', 'assets/hand-lines/destino.png'],
+    ['heart', 'Linha do coração', 'assets/hand-lines/coracao.png']
+  ];
+  const handLayerMarkup = (visibleCount, className = '') => handLineAssets.map(([id, , src], index) =>
+    `<img class="hand-line-layer hand-line-${id} ${index < visibleCount ? 'is-visible' : ''} ${className}" data-trace="${id}" src="${src}" alt="" aria-hidden="true" width="1254" height="1254">`).join('');
   const freshState = () => ({ flowVersion: 5, step: 0, name: '', fullName: '', showPyramid: false, area: '', cards: [], cardSlots: [], birthDate: '', birthTime: '', showBirthTime: false, handPhoto: '', handPhotoWidth: 0, handPhotoHeight: 0, handLines: null, handLineSources: null, handFileName: '', handAnalysisError: '', answers: {}, analysisStartedAt: 0, analysisDone: false, videoEnded: false, fired: [] });
-  // Sem uma localização visual fiável, não desenhamos linhas inventadas sobre a fotografia.
-  function reliablePalmLines(lines) {
-    return { life: lines.life, head: [], fate: [], heart: lines.heart };
-  }
   let state = freshState();
   let analysisTimer = null;
   let pyramidRevealTimer = null;
   let pyramidScrollTimer = null;
   let vslObserver = null;
-  let handAnalyzing = false;
   let handPhotoProcessing = false;
   let pendingHandUrl = '';
   let handCameraStream = null;
   let startVideoOnRender = false;
-  let handScanActive = false;
   let handTraceStep = 0;
   let cardTimer = null;
   let cardPhase = 'idle';
@@ -66,7 +68,7 @@
   function trackStep() {
     tracker?.emit('step', { step: state.step + 1, name: state.fullName, area: state.area,
       cards: state.cards.join(', '), birthDate: state.birthDate, birthTime: state.birthTime,
-      handUploaded: !!state.handPhoto, handLines: !!state.handLines, resultViewed: state.step === 8 });
+      handUploaded: !!state.handPhoto, handLines: !!state.handPhoto && state.analysisDone, resultViewed: state.step === 8 });
   }
   function trackVideo(event) {
     const video = app.querySelector('#analysis-video');
@@ -112,12 +114,10 @@
       }
     }
   } catch { /* A experiência continua sem armazenamento se o navegador o bloquear. */ }
-  if (state.handLines && !['life', 'head', 'fate', 'heart'].every(id => Array.isArray(state.handLines[id]))) state.handLines = null;
-  if (state.handLines) {
-    state.handLines = reliablePalmLines(state.handLines);
-    state.handLineSources = null;
-  }
-  if ((state.step === 6 || state.step === 7) && state.handLines) handTraceStep = 4;
+  // Traçados antigos não são reutilizados: os PNGs seguem a máscara da câmara.
+  state.handLines = null;
+  state.handLineSources = null;
+  if ((state.step === 6 || state.step === 7) && state.handPhoto && state.analysisDone) handTraceStep = 4;
 
   function save() {
     try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* Sem espaço: mantém os dados em memória nesta página. */ }
@@ -214,9 +214,7 @@
     vslObserver?.disconnect();
     vslObserver = null;
     app.querySelector('#analysis-video')?.pause();
-    handAnalyzing = false;
-    handScanActive = false;
-    handTraceStep = step === 6 && state.handLines ? 4 : 0;
+    handTraceStep = state.handPhoto && state.analysisDone ? 4 : 0;
     if (cardTimer) { clearTimeout(cardTimer); cardTimer = null; }
     spinningCardId = null;
     app.querySelector('#diagnosis-audio')?.pause();
@@ -490,17 +488,10 @@
   function handScreen() {
     const zodiac = zodiacForBirthDate(state.birthDate);
     const headingStart = zodiac ? `${zodiac.address}, mostre-me a` : 'Mostre-me a';
-    const traceLabels = [['life', 'Linha da vida'], ['head', 'Linha da cabeça'], ['fate', 'Linha do destino'], ['heart', 'Linha do coração']];
-    const dimensions = { width: state.handPhotoWidth || 800, height: state.handPhotoHeight || 800 };
-    const tracePath = points => {
-      const scaled = points.map(point => ({ x: Math.round(point.x * dimensions.width / 1000), y: Math.round(point.y * dimensions.height / 1000) }));
-      return `M ${scaled.map(point => `${point.x} ${point.y}`).join(' L ')}`;
-    };
     return frame(`<p class="eyebrow">SINAL 4 · MARCAS</p><h2>${escapeHTML(headingStart)} <span class="gold">palma da sua mão</span> para a leitura.</h2>${state.handPhoto ? '' : '<p class="lead">Para incluir as marcas da sua palma no quarto sinal, tire ou envie uma fotografia nítida da mão.</p>'}
       <div class="hand-camera" id="hand-camera" hidden><div class="hand-camera-view"><video id="hand-camera-video" autoplay muted playsinline webkit-playsinline aria-label="Imagem ao vivo da câmara para posicionar a mão"></video><img class="hand-camera-mask" src="hand-camera-mask.png" alt="" aria-hidden="true" width="1254" height="1254"></div><p>Coloque a palma aberta dentro do contorno e procure boa luz.</p><div class="hand-camera-actions"><button class="primary" type="button" data-action="hand-camera-capture">Fotografar a mão <span aria-hidden="true">${icon('arrowUpRight')}</span></button><button class="secondary" type="button" data-action="hand-camera-close">Cancelar</button></div></div>
       <button class="secondary hand-camera-open" type="button" data-action="hand-camera-open">${state.handPhoto ? 'Fotografar novamente com a câmara' : 'Abrir câmara com guia da mão'}</button>
-      <label class="upload ${state.handPhoto ? 'has-photo' : ''}" for="hand-input"><input id="hand-input" type="file" accept="image/jpeg,image/png,image/webp" aria-label="${state.handPhoto ? 'Substituir fotografia da mão' : 'Tirar ou enviar fotografia da mão'}" ${handAnalyzing ? 'disabled' : ''}>${state.handPhoto ? `<img class="upload-preview" src="${state.handPhoto}" alt="Fotografia da palma da mão escolhida">${handScanActive ? '<span class="hand-scan" aria-hidden="true"></span>' : ''}${state.handLines ? `<svg class="hand-traces ${handTraceStep === 4 ? 'complete' : ''}" viewBox="0 0 ${dimensions.width} ${dimensions.height}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${traceLabels.map(([id]) => `<path class="hand-trace hand-trace-${id}" data-trace="${id}" d="${tracePath(state.handLines[id])}"/>`).join('')}</svg>` : ''}` : `<svg class="upload-icon" viewBox="0 0 48 48" width="42" height="42" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 15h9l3-4h10l3 4h9a3 3 0 0 1 3 3v20a3 3 0 0 1 3-3V18a3 3 0 0 1 3-3Z"/><circle cx="24" cy="27" r="8"/><path d="M36 21h2"/></svg><strong>Tirar ou enviar fotografia da mão</strong><small>JPG, PNG ou WebP · até 5 MB</small>`}</label>
-      ${state.handLines ? `<div class="hand-checks" role="status" aria-live="polite" ${handTraceStep === 0 ? 'hidden' : ''}>${traceLabels.map(([id, label], index) => `<div class="hand-check ${handTraceStep === 4 ? state.handLines[id]?.length >= 4 ? 'done' : 'unavailable' : ''}" data-check="${id}" ${handTraceStep <= index ? 'hidden' : ''}><span class="hand-check-icon" aria-hidden="true">${state.handLines[id]?.length >= 4 ? '✓' : '—'}</span><span>${label}</span></div>`).join('')}</div>` : ''}
+      <label class="upload ${state.handPhoto ? 'has-photo' : ''}" for="hand-input"><input id="hand-input" type="file" accept="image/jpeg,image/png,image/webp" aria-label="${state.handPhoto ? 'Substituir fotografia da mão' : 'Tirar ou enviar fotografia da mão'}">${state.handPhoto ? `<img class="upload-preview" src="${state.handPhoto}" alt="Fotografia da palma da mão escolhida">${state.analysisDone ? handLayerMarkup(4) : ''}` : `<svg class="upload-icon" viewBox="0 0 48 48" width="42" height="42" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 15h9l3-4h10l3 4h9a3 3 0 0 1 3-3V18a3 3 0 0 1 3-3Z"/><circle cx="24" cy="27" r="8"/><path d="M36 21h2"/></svg><strong>Tirar ou enviar fotografia da mão</strong><small>JPG, PNG ou WebP · até 5 MB</small>`}</label>
       <div class="form-error" id="hand-error" role="alert"></div>
       ${state.handPhoto ? `<div class="actions"><button class="primary" type="button" data-action="hand-next">Avançar e iniciar vídeo <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>` : ''}`);
   }
@@ -515,16 +506,13 @@
 
   function analysisScreen() {
     const labels = ['A interpretar as suas escolhas', 'A analisar o seu nascimento', 'A cruzar os seus sinais', 'A identificar correspondências', 'A procurar o seu Ponto de Convergência'];
-    const handLabels = [['life', 'Linha da vida'], ['head', 'Linha da cabeça'], ['fate', 'Linha do destino'], ['heart', 'Linha do coração']];
     const dimensions = { width: state.handPhotoWidth || 800, height: state.handPhotoHeight || 800 };
-    const tracePath = points => points?.length >= 4 ? `M ${points.map(point => `${Math.round(point.x * dimensions.width / 1000)} ${Math.round(point.y * dimensions.height / 1000)}`).join(' L ')}` : '';
     const handImage = state.handPhoto || pendingHandUrl;
-    const handProgress = handImage ? `<div class="hand-analysis-overview"><div class="analysis-list hand-analysis-list" role="status" aria-live="polite">${handLabels.map(([id, label], index) => `<div class="analysis-item hand-analysis-item ${state.analysisDone ? state.handLines?.[id]?.length >= 4 ? 'done' : 'unavailable' : index === handTraceStep ? 'active' : ''}" data-check="${id}"><span class="analysis-tick">${state.analysisDone && !(state.handLines?.[id]?.length >= 4) ? '—' : handSuitIcon(id)}</span><span>${label}</span></div>`).join('')}</div><div class="hand-analysis-preview" aria-label="Fotografia da mão durante a leitura"><img src="${escapeHTML(handImage)}" alt="Palma da mão enviada" width="${dimensions.width}" height="${dimensions.height}">${!state.analysisDone ? '<span class="hand-scan" aria-hidden="true"></span>' : ''}<svg class="hand-traces ${state.handLines ? 'complete' : ''}" viewBox="0 0 ${dimensions.width} ${dimensions.height}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${handLabels.map(([id]) => `<path class="hand-trace hand-trace-${id}" data-trace="${id}" d="${tracePath(state.handLines?.[id])}"/>`).join('')}</svg></div></div><p id="hand-analysis-error" class="hand-analysis-error" role="alert" ${state.handAnalysisError ? '' : 'hidden'}><span>${escapeHTML(state.handAnalysisError)}</span> <button type="button" data-action="hand-retry">Tentar novamente</button><button type="button" data-action="hand-replace">Outra fotografia</button></p>` : `<div class="analysis-list">${labels.map((label, index) => `<div class="analysis-item ${state.analysisDone ? 'done' : ''}" data-analysis="${index}"><span class="analysis-tick">✓</span><span>${label}</span></div>`).join('')}</div>`;
+    const handProgress = handImage ? `<div class="hand-analysis-overview"><div class="analysis-list hand-analysis-list" role="status" aria-live="polite">${handLineAssets.map(([id, label], index) => `<div class="analysis-item hand-analysis-item ${index < handTraceStep ? 'done' : index === handTraceStep && !state.analysisDone ? 'active' : ''}" data-check="${id}"><span class="analysis-tick">${handSuitIcon(id)}</span><span>${label}</span></div>`).join('')}</div><div class="hand-analysis-preview" aria-label="Fotografia da mão durante a leitura"><img src="${escapeHTML(handImage)}" alt="Palma da mão enviada" width="${dimensions.width}" height="${dimensions.height}">${!state.analysisDone ? '<span class="hand-scan" aria-hidden="true"></span>' : ''}${handLayerMarkup(handTraceStep)}</div></div>` : `<div class="analysis-list">${labels.map((label, index) => `<div class="analysis-item ${state.analysisDone ? 'done' : ''}" data-analysis="${index}"><span class="analysis-tick">✓</span><span>${label}</span></div>`).join('')}</div>`;
     const videoReady = config.vslTestOpen || state.analysisDone || Boolean(handImage);
     const canContinue = state.analysisDone && (state.videoEnded || !config.videoUrl);
     return frame(`<p class="eyebrow">A CONVERGÊNCIA</p><h2>Os seus sinais estão a <span class="gold">encontrar-se.</span></h2>${handImage ? '' : '<p class="subtle">Estamos a organizar as suas respostas para apresentar uma leitura personalizada.</p>'}
       ${handProgress}
-      ${state.handLineSources?.head === 'reference' ? '<p class="hand-reference-note">As linhas da cabeça e do destino são traçados de referência, posicionados a partir das linhas visíveis da palma.</p>' : ''}
       <div class="video-box">${config.videoUrl ? `<div class="mini-vsl" data-state="ready" role="group" aria-label="Apresentação em vídeo"><video id="analysis-video" autoplay muted loop playsinline webkit-playsinline preload="auto" disablepictureinpicture src="${escapeHTML(config.videoUrl)}" aria-label="Mini apresentação da leitura"></video><button class="mini-vsl-gate" type="button" data-action="vsl-start" ${videoReady ? '' : 'disabled'}><strong>O seu vídeo está pronto</strong><span aria-hidden="true">▶</span><small>${videoReady ? 'Toque para escutar' : 'Disponível ao concluir a análise'}</small></button><div class="mini-vsl-overlay" hidden><strong>Continue a ver o vídeo.</strong><button type="button" data-action="vsl-resume">▶ Continuar a ver</button><button type="button" data-action="vsl-restart">↻ Ver desde o início</button></div><div class="mini-vsl-controls" hidden><button type="button" data-action="vsl-speed" aria-label="Alterar velocidade do vídeo">1.0x</button></div><div class="mini-vsl-progress" role="progressbar" aria-label="Progresso do vídeo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div></div>` : '<div class="video-placeholder"><strong>◈</strong>Vídeo indisponível. Pode avançar quando a análise terminar.</div>'}</div>
       <div id="analysis-continue" class="actions" ${canContinue ? '' : 'hidden'}><button class="primary" type="button" data-action="analysis-next">Ver o meu resultado <span aria-hidden="true">${icon('arrowUpRight')}</span></button></div>
       <p class="privacy-note analysis-privacy-note">As interpretações obtidas aqui são baseadas nas suas escolhas e respostas individuais.</p>`);
@@ -568,24 +556,13 @@
       const title = card?.title || 'Sinal';
       return `<figure class="report-editorial-image"><img src="${escapeHTML(card?.image || 'assets/cards/tras.png')}" alt="Ilustração simbólica: ${escapeHTML(title)}" width="120" height="180" loading="lazy" decoding="async"><figcaption>${escapeHTML(title)}</figcaption></figure>`;
     };
-    const handLabels = { life: 'vida', head: 'cabeça', fate: 'destino', heart: 'coração' };
-    const foundLines = Object.entries(handLabels).filter(([id]) => state.handLines?.[id]?.length >= 4 && state.handLineSources?.[id] !== 'reference').map(([, label]) => label);
-    const handNote = foundLines.length
-      ? `A fotografia permitiu assinalar ${foundLines.length} ${foundLines.length === 1 ? 'linha' : 'linhas'}: ${foundLines.join(', ')}. ${state.handLineSources?.head === 'reference' ? 'Cabeça e destino usam traçados de referência.' : ''} São referências visuais para a leitura simbólica, não indicadores de saúde nem previsões.`
-      : 'A etapa da mão não forneceu linhas suficientemente nítidas para esta prévia. Nenhuma marca foi inventada para preencher a leitura.';
-    const handLineArticles = { life: 'da vida', head: 'da cabeça', fate: 'do destino', heart: 'do coração' };
-    const namedLines = Object.keys(handLineArticles).filter(id => state.handLines?.[id]?.length >= 4 && state.handLineSources?.[id] !== 'reference').map(id => handLineArticles[id]);
-    const lineList = namedLines.join(', ').replace(/, ([^,]*)$/, ' e $1');
-    const handSummary = namedLines.length
-      ? `Identificámos ${namedLines.length === 1 ? 'a linha' : 'as linhas'} ${lineList} na fotografia. ${namedLines.length === 1 ? 'Esta marca completa' : 'Estas marcas completam'} o quarto sinal da leitura.`
-      : 'Não foi possível distinguir as linhas da palma com nitidez. A leitura segue com os restantes sinais disponíveis.';
+    const handSummary = state.handPhoto
+      ? 'As linhas da vida, da cabeça, do destino e do coração foram sobrepostas como referências visuais para acompanhar o quarto sinal da leitura.'
+      : 'A leitura segue com os restantes sinais disponíveis.';
     const handWidth = state.handPhotoWidth || 800;
     const handHeight = state.handPhotoHeight || 800;
-    const handTracePath = points => points?.length >= 4
-      ? `M ${points.map(point => `${Math.round(point.x * handWidth / 1000)} ${Math.round(point.y * handHeight / 1000)}`).join(' L ')}`
-      : '';
     const handArt = state.handPhoto
-      ? `<figure class="report-editorial-image report-editorial-hand"><img src="${escapeHTML(state.handPhoto)}" alt="Fotografia da palma enviada para a leitura" width="${handWidth}" height="${handHeight}" loading="lazy" decoding="async"><svg class="hand-traces complete" viewBox="0 0 ${handWidth} ${handHeight}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${Object.keys(handLineArticles).map(id => `<path class="hand-trace hand-trace-${id}" d="${handTracePath(state.handLines?.[id])}"/>`).join('')}</svg><figcaption>PALMA DA MÃO</figcaption></figure>`
+      ? `<figure class="report-editorial-image report-editorial-hand"><img src="${escapeHTML(state.handPhoto)}" alt="Fotografia da palma enviada para a leitura" width="${handWidth}" height="${handHeight}" loading="lazy" decoding="async">${handLayerMarkup(4)}<figcaption>PALMA DA MÃO</figcaption></figure>`
       : '<figure class="report-editorial-image report-editorial-hand"><div class="report-hand-placeholder">Fotografia da mão indisponível</div><figcaption>PALMA DA MÃO</figcaption></figure>';
     const lock = '<span class="report-lock" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="14" width="18" height="14" rx="3"/><path d="M11 14V9a5 5 0 0 1 10 0v5"/><circle cx="16" cy="21" r="1"/></svg><span>Conteúdo bloqueado</span></span>';
     return frame(`<p class="eyebrow">RESULTADO DA SUA LEITURA</p><h2>O seu diagnóstico <span class="gold">convergente está pronto.</span></h2>
@@ -619,7 +596,6 @@
 
   function render() {
     app.innerHTML = screens[state.step]();
-    if (state.handLineSources?.head === 'reference') app.querySelectorAll?.('.hand-trace-head, .hand-trace-fate').forEach(path => path.classList.add('reference'));
     progress();
     if (state.step === 2 && state.showPyramid) setupPyramidReveal();
     if (state.step === 3 && cardPhase === 'reading') setupDiagnosisAudio();
@@ -636,22 +612,27 @@
 
   function startAnalysis() {
     if (state.handPhoto || pendingHandUrl) {
-      if (state.handLines && !state.analysisDone) {
-        state.analysisDone = true;
-        handTraceStep = 4;
-        save();
-        app.querySelector('.hand-analysis-preview .hand-scan')?.remove();
-        for (const id of ['life', 'head', 'fate', 'heart']) {
+      const interval = 4_000;
+      if (!state.analysisStartedAt) { state.analysisStartedAt = Date.now(); save(); }
+      const revealLines = () => {
+        const completed = state.analysisDone ? 4 : Math.min(4, Math.floor((Date.now() - state.analysisStartedAt) / interval));
+        handTraceStep = completed;
+        for (const [index, [id]] of handLineAssets.entries()) {
+          app.querySelector(`.hand-line-${id}`)?.classList.toggle('is-visible', index < completed);
           const item = app.querySelector(`[data-check="${id}"]`);
-          item?.classList.remove('active');
-          item?.classList.add(state.handLines[id]?.length >= 4 ? 'done' : 'unavailable');
-          if (!(state.handLines[id]?.length >= 4)) {
-            const icon = item?.querySelector('.analysis-tick');
-            if (icon) icon.textContent = '—';
-          }
+          item?.classList.toggle('done', index < completed);
+          item?.classList.toggle('active', index === completed);
         }
-        updateAnalysisContinue();
-      }
+        if (completed === 4) {
+          analysisTimer = null;
+          if (!state.analysisDone) { state.analysisDone = true; save(); }
+          app.querySelector('.hand-analysis-preview .hand-scan')?.remove();
+          updateAnalysisContinue();
+          return;
+        }
+        analysisTimer = setTimeout(revealLines, Math.max(0, state.analysisStartedAt + (completed + 1) * interval - Date.now()));
+      };
+      revealLines();
     } else {
       const totalChecks = 5;
       const checkInterval = 15_000;
@@ -689,7 +670,6 @@
         updateAnalysisContinue();
       });
     }
-    if (state.handPhoto && !handPhotoProcessing && !state.handLines && !state.analysisDone && !handAnalyzing) void analyzeHand();
   }
 
   function updateAnalysisContinue() {
@@ -896,12 +876,13 @@
     try {
       const image = new Image();
       await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; image.src = objectUrl; });
-      const scale = Math.min(1, 1100 / Math.max(image.naturalWidth, image.naturalHeight));
+      const sourceSide = Math.min(image.naturalWidth, image.naturalHeight);
+      const scale = Math.min(1, 1100 / sourceSide);
       const canvas = document.createElement('canvas');
-      canvas.width = Math.round(image.naturalWidth * scale);
-      canvas.height = Math.round(image.naturalHeight * scale);
+      canvas.width = Math.round(sourceSide * scale);
+      canvas.height = canvas.width;
       const context = canvas.getContext('2d');
-      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      context.drawImage(image, (image.naturalWidth - sourceSide) / 2, (image.naturalHeight - sourceSide) / 2, sourceSide, sourceSide, 0, 0, canvas.width, canvas.height);
       enhancePalmImage(context, canvas.width, canvas.height);
       let quality = .86;
       do {
@@ -933,80 +914,6 @@
     if (config.videoUrl) controlVsl('vsl-start');
   }
 
-  async function analyzeHandSecurely() {
-    if (!state.handPhoto || handAnalyzing) return;
-    handAnalyzing = true;
-    handScanActive = true;
-    try {
-      const response = await fetch(config.palmAnalysisUrl, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', apikey: config.supabaseAnonKey, authorization: `Bearer ${config.supabaseAnonKey}` },
-        body: JSON.stringify({ image: state.handPhoto }),
-      });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || 'Não foi possível identificar as linhas da mão.');
-      const ids = ['life', 'head', 'fate', 'heart'];
-      const valid = points => Array.isArray(points) && (points.length === 0 || points.length >= 4 && points.length <= 15) && points.every(point => Number.isFinite(point?.x) && Number.isFinite(point?.y) && point.x >= 0 && point.x <= 1000 && point.y >= 0 && point.y <= 1000);
-      if (!ids.every(id => valid(payload.lines?.[id])) || !ids.some(id => payload.lines[id].length >= 4)) throw new Error('Não conseguimos distinguir as linhas da palma. Tire outra fotografia com boa luz e a palma aberta.');
-      if (state.step !== 6 && state.step !== 7) return;
-      const detected = Object.fromEntries(ids.map(id => [id, payload.lines[id].map(point => ({ x: Math.round(point.x), y: Math.round(point.y) }))]));
-      state.handLines = reliablePalmLines(detected);
-      state.handLineSources = null;
-      save();
-      handScanActive = false;
-      app.querySelector('.hand-analysis-preview .hand-scan')?.remove();
-      const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-      for (const [index, id] of ids.entries()) {
-        if (state.step !== 6 && state.step !== 7) return;
-        const check = app.querySelector(`[data-check="${id}"]`);
-        const path = app.querySelector(`[data-trace="${id}"]`);
-        if (state.handLineSources?.[id] === 'reference') path?.classList?.add('reference');
-        const lineVisible = state.handLines[id].length >= 4;
-        if (lineVisible) check?.classList.add('active');
-        if (path && lineVisible) {
-          path.setAttribute('d', `M ${state.handLines[id].map(point => `${Math.round(point.x * (state.handPhotoWidth || 800) / 1000)} ${Math.round(point.y * (state.handPhotoHeight || 800) / 1000)}`).join(' L ')}`);
-          const length = path.getTotalLength();
-          path.style.strokeDasharray = String(length);
-          path.style.strokeDashoffset = String(length);
-          path.getBoundingClientRect();
-          path.style.transition = reducedMotion ? 'none' : 'stroke-dashoffset .72s ease-in-out';
-          path.style.strokeDashoffset = '0';
-        }
-        await new Promise(resolve => setTimeout(resolve, reducedMotion || !lineVisible ? 0 : 760));
-        check?.classList.remove('active');
-        check?.classList.add(lineVisible ? 'done' : 'unavailable');
-        if (!lineVisible) {
-          const icon = check?.querySelector('.analysis-tick');
-          if (icon) icon.textContent = '—';
-        }
-        handTraceStep = index + 1;
-      }
-      handAnalyzing = false;
-      state.analysisDone = true;
-      save();
-      app.querySelector('.hand-analysis-preview .hand-traces')?.classList.add('complete');
-      updateAnalysisContinue();
-    } catch (error) {
-      handAnalyzing = false;
-      handScanActive = false;
-      state.handLines = null;
-      state.handLineSources = null;
-      state.handAnalysisError = error instanceof TypeError
-        ? 'O serviço de análise da mão não está acessível neste momento. Tente novamente mais tarde.'
-        : error.message || 'Não foi possível concluir a análise.';
-      state.analysisDone = true;
-      handTraceStep = 4;
-      save();
-      app.querySelector('.hand-analysis-preview .hand-scan')?.remove();
-      const notice = app.querySelector('#hand-analysis-error');
-      if (notice) { notice.hidden = false; notice.querySelector('span').textContent = state.handAnalysisError; }
-      updateAnalysisContinue();
-    }
-  }
-
-  function analyzeHand() {
-    return analyzeHandSecurely();
-  }
   app.addEventListener('click', event => {
     const button = event.target.closest('button');
     if (!button || !app.contains(button)) return;

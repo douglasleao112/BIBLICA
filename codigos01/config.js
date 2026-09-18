@@ -6,10 +6,6 @@ window.CODIGO4_CONFIG = {
   },
   videoUrl: 'assets/video/mini-vsl.mp4',
   vslTestOpen: true, // Durante os testes, permite iniciar o vídeo antes dos cinco checks.
-  palmAnalysisUrl: 'https://zpupfwlufzbafwwebrgb.supabase.co/functions/v1/analyze-palm',
-  // A leitura da mão usa a Edge Function; nenhum segredo privado é enviado ao navegador.
-  // Esta chave anon é pública; GEMINI_API_KEY fica exclusivamente no Supabase.
-  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpwdXBmd2x1ZnpiYWZ3d2VicmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1OTYyNTMsImV4cCI6MjEwNTE3MjI1M30.YHgjIfU1nhFW4Ggkzr6WLg3wIkk5WOIWdJlQIe2wfl0',
   price: 'Preço a anunciar',
   guarantee: 'Condições e garantia a anunciar',
   diagnostics: {
