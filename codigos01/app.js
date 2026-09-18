@@ -34,32 +34,9 @@
   };
   const analyticsEvents = new Set(['QuizStarted', 'AreaSelected', 'CardsCompleted', 'PartialDiagnosisViewed', 'HandUploaded', 'AnalysisStarted', 'ResultViewed', 'CheckoutClicked']);
   const freshState = () => ({ flowVersion: 5, step: 0, name: '', fullName: '', showPyramid: false, area: '', cards: [], birthDate: '', birthTime: '', showBirthTime: false, handPhoto: '', handPhotoWidth: 0, handPhotoHeight: 0, handLines: null, handLineSources: null, handFileName: '', handAnalysisError: '', answers: {}, analysisStartedAt: 0, analysisDone: false, videoEnded: false, fired: [] });
-  function standardPalmLines(lines) {
-    const life = lines.life;
-    const heart = lines.heart;
-    if (life.length < 4 || heart.length < 4) return { lines, sources: null };
-    const xs = heart.map(point => point.x);
-    const left = Math.min(...xs);
-    const right = Math.max(...xs);
-    if (right - left < 140) return { lines, sources: null };
-    const clamp = (value, low, high) => Math.round(Math.max(low, Math.min(high, value)));
-    const heartY = heart.reduce((sum, point) => sum + point.y, 0) / heart.length;
-    const lifeTop = life.reduce((top, point) => point.y < top.y ? point : top);
-    const thumbLeft = life.reduce((sum, point) => sum + point.x, 0) / life.length < (left + right) / 2;
-    const startX = clamp(lifeTop.x, left + 20, right - 20);
-    const endX = thumbLeft ? right - 18 : left + 18;
-    const headY = clamp(Math.max(heartY + 90, lifeTop.y + 70), 160, 740);
-    const head = Array.from({ length: 5 }, (_, index) => {
-      const part = index / 4;
-      return { x: clamp(startX + (endX - startX) * part, 0, 1000), y: clamp(headY + Math.sin(part * Math.PI) * 20 + part * 26, 0, 1000) };
-    });
-    const centerX = clamp((left + right) / 2, 0, 1000);
-    const bottomY = clamp(headY + 280, headY + 120, 900);
-    const fate = Array.from({ length: 5 }, (_, index) => {
-      const part = index / 4;
-      return { x: clamp(centerX + Math.sin(part * Math.PI) * (thumbLeft ? -16 : 16), 0, 1000), y: clamp(bottomY - (bottomY - headY - 12) * part, 0, 1000) };
-    });
-    return { lines: { ...lines, head, fate }, sources: { head: 'reference', fate: 'reference' } };
+  // Sem uma localização visual fiável, não desenhamos linhas inventadas sobre a fotografia.
+  function reliablePalmLines(lines) {
+    return { life: lines.life, head: [], fate: [], heart: lines.heart };
   }
   let state = freshState();
   let analysisTimer = null;
@@ -130,6 +107,10 @@
     }
   } catch { /* A experiência continua sem armazenamento se o navegador o bloquear. */ }
   if (state.handLines && !['life', 'head', 'fate', 'heart'].every(id => Array.isArray(state.handLines[id]))) state.handLines = null;
+  if (state.handLines) {
+    state.handLines = reliablePalmLines(state.handLines);
+    state.handLineSources = null;
+  }
   if ((state.step === 6 || state.step === 7) && state.handLines) handTraceStep = 4;
 
   function save() {
@@ -587,7 +568,7 @@
     const namedLines = Object.keys(handLineArticles).filter(id => state.handLines?.[id]?.length >= 4 && state.handLineSources?.[id] !== 'reference').map(id => handLineArticles[id]);
     const lineList = namedLines.join(', ').replace(/, ([^,]*)$/, ' e $1');
     const handSummary = namedLines.length
-      ? `Identificámos ${namedLines.length === 1 ? 'a linha' : 'as linhas'} ${lineList} na fotografia. ${state.handLineSources?.head === 'reference' ? 'Cabeça e destino seguem traçados de referência, não deteções confirmadas.' : 'Estas marcas completam o quarto sinal da leitura.'}`
+      ? `Identificámos ${namedLines.length === 1 ? 'a linha' : 'as linhas'} ${lineList} na fotografia. ${namedLines.length === 1 ? 'Esta marca completa' : 'Estas marcas completam'} o quarto sinal da leitura.`
       : 'Não foi possível distinguir as linhas da palma com nitidez. A leitura segue com os restantes sinais disponíveis.';
     const handWidth = state.handPhotoWidth || 800;
     const handHeight = state.handPhotoHeight || 800;
@@ -942,9 +923,8 @@
       if (!ids.every(id => valid(payload.lines?.[id])) || !ids.some(id => payload.lines[id].length >= 4)) throw new Error('Não conseguimos distinguir as linhas da palma. Tire outra fotografia com boa luz e a palma aberta.');
       if (state.step !== 6 && state.step !== 7) return;
       const detected = Object.fromEntries(ids.map(id => [id, payload.lines[id].map(point => ({ x: Math.round(point.x), y: Math.round(point.y) }))]));
-      const standardized = standardPalmLines(detected);
-      state.handLines = standardized.lines;
-      state.handLineSources = standardized.sources;
+      state.handLines = reliablePalmLines(detected);
+      state.handLineSources = null;
       save();
       handScanActive = false;
       app.querySelector('.hand-analysis-preview .hand-scan')?.remove();
