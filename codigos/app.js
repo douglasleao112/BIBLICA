@@ -710,23 +710,31 @@
       vslObserver.observe(slot);
     }
     if (state.handPhoto) {
-      // A foto abre a etapa do vídeo imediatamente; tentar com som e continuar sem som se o navegador bloquear.
+      // Após a descodificação assíncrona da foto, o gesto do utilizador já expirou no iOS.
+      // A reprodução automática deve começar silenciosa; o som pode ser ativado por toque.
       video.loop = false;
       video.currentTime = 0;
-      video.muted = false;
-      void video.play().then(sync).catch(() => {
-        video.muted = true;
-        void video.play().then(() => { setSoundtrackDucked(false); sync(); }).catch(() => {
-          // Se nem a reprodução silenciosa for permitida, o toque no vídeo continua disponível.
-          video.loop = true;
-          gate.hidden = false;
-          overlay.hidden = true;
-          controls.hidden = true;
-          sound.hidden = true;
-          player.dataset.state = 'ready';
-          setSoundtrackDucked(false);
-        });
-      });
+      video.defaultMuted = true;
+      video.muted = true;
+      video.setAttribute?.('muted', '');
+      video.setAttribute?.('playsinline', '');
+      const showManualStart = () => {
+        gate.hidden = false;
+        overlay.hidden = true;
+        controls.hidden = true;
+        sound.hidden = true;
+        player.dataset.state = 'ready';
+        setSoundtrackDucked(false);
+      };
+      const attemptAutoplay = () => {
+        let playback;
+        try { playback = video.play(); } catch { showManualStart(); return; }
+        void Promise.resolve(playback).then(sync).catch(showManualStart);
+      };
+      if (video.readyState === 0) {
+        video.addEventListener('loadedmetadata', () => { if (video.paused) attemptAutoplay(); }, { once: true });
+      }
+      attemptAutoplay();
     } else {
       video.play().catch(() => {}); // Prévia silenciosa nas etapas sem fotografia.
       sync();
