@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <script>
+    const pagina01 = "https://vivalavidas.com/codigos01/";
+    const pagina02 = "https://vivalavidas.com/codigos02/";
+
+    // Split aleatório 50% / 50%
+    const destino = Math.random() < 0.5 ? pagina01 : pagina02;
+
+    // Mantém UTMs e demais parâmetros
+    const parametros = window.location.search;
+
+    // Redireciona imediatamente
+    window.location.replace(destino + parametros);
+  </script>
+</head>
+
+<body>
+</body>
+</html>
