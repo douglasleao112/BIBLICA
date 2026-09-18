@@ -16,6 +16,21 @@
     { from: 923, name: 'Libra', symbol: '♎', address: 'Libriano' }, { from: 1023, name: 'Escorpião', symbol: '♏', address: 'Escorpiano' },
     { from: 1122, name: 'Sagitário', symbol: '♐', address: 'Sagitariano' }, { from: 1222, name: 'Capricórnio', symbol: '♑', address: 'Capricorniano' }
   ];
+  // Draw icons as paths: Unicode pictographs can be replaced by colour emoji on mobile.
+  const icon = (name, className = '') => {
+    const paths = {
+      amor: '<path d="M12 20.5 3.8 12.7C-1 8.1 5.1 1.8 10 5.7L12 7.4l2-1.7c4.9-3.9 11 2.4 6.2 7Z"/>',
+      'trabalho-dinheiro': '<path d="m12 2 9 10-9 10-9-10Z"/><path d="M3 12h18M12 2v20"/>',
+      'familia-pessoal': '<circle cx="8" cy="7" r="2.5"/><circle cx="16" cy="7" r="2.5"/><path d="M3 20v-3a5 5 0 0 1 10 0v3H3Zm8 0v-3a5 5 0 0 1 10 0v3h-8"/>',
+      'bem-estar': '<circle cx="12" cy="12" r="3"/><path d="M12 2v5m0 10v5M2 12h5m10 0h5M4.9 4.9l3.5 3.5m7.2 7.2 3.5 3.5m0-14.2-3.5 3.5m-7.2 7.2-3.5 3.5"/>',
+      geral: '<circle cx="12" cy="12" r="9"/><path d="m12 5 2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>',
+      sparkle: '<path d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4Z"/>',
+      play: '<path d="m8 4 12 8-12 8Z"/>',
+      restart: '<path d="M20 11a8 8 0 1 1-2.3-5.6M20 4v7h-7"/>',
+      check: '<path d="m4 12 5 5L20 6"/>'
+    };
+    return `<svg class="vector-icon ${className}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths[name] || paths.geral}</svg>`;
+  };
   const analyticsEvents = new Set(['QuizStarted', 'AreaSelected', 'CardsCompleted', 'PartialDiagnosisViewed', 'HandUploaded', 'AnalysisStarted', 'ResultViewed', 'CheckoutClicked']);
   const freshState = () => ({ flowVersion: 5, step: 0, name: '', fullName: '', showPyramid: false, area: '', cards: [], birthDate: '', birthTime: '', showBirthTime: false, handPhoto: '', handPhotoWidth: 0, handPhotoHeight: 0, handLines: null, handFileName: '', handAnalysisError: '', answers: {}, analysisStartedAt: 0, analysisDone: false, videoEnded: false, fired: [] });
   let state = freshState();
@@ -196,7 +211,7 @@
 
   function intro() {
     const today = new Intl.DateTimeFormat('pt-PT', { day: 'numeric', month: 'long' }).format(new Date());
-    return frame(`<div class="intro-sigil" aria-hidden="true">✧</div><p class="eyebrow">Hoje, dia ${today}</p>
+    return frame(`<div class="intro-sigil" aria-hidden="true">${icon('sparkle')}</div><p class="eyebrow">Hoje, dia ${today}</p>
       <h1>A Janela de Convergência está aberta <span class="gold" id="geo-phrase">${escapeHTML(geoPhrase)}</span>.</h1>
       <p class="lead hero-subtitle">Descubra o que o Código dos 4 Sinais revela sobre o momento que está a viver.</p>
       <div class="actions intro-actions"><button class="primary" type="button" data-action="start">Iniciar a minha leitura personalizada <span aria-hidden="true">↗</span></button></div>
@@ -323,7 +338,7 @@
   function areaScreen() {
     if (state.showPyramid) return pyramidScreen();
     return frame(`<p class="eyebrow">SINAL 1 · O QUE PROCURA</p><h2>${escapeHTML(state.name)}, <span class="gold">que área da sua vida</span> está buscando?</h2>
-      <div class="choices">${config.areas.map(area => `<button class="choice" type="button" data-area="${area.id}" aria-pressed="${state.area === area.id}"><span class="choice-icon" aria-hidden="true">${area.icon}</span><span>${escapeHTML(area.label)}</span><span class="choice-arrow" aria-hidden="true">↗</span></button>`).join('')}</div>`);
+      <div class="choices">${config.areas.map(area => `<button class="choice" type="button" data-area="${area.id}" aria-pressed="${state.area === area.id}"><span class="choice-icon" aria-hidden="true">${icon(area.id)}</span><span>${escapeHTML(area.label)}</span><span class="choice-arrow" aria-hidden="true">↗</span></button>`).join('')}</div>`);
   }
 
   function cardsScreen() {
