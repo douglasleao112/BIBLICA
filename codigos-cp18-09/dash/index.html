@@ -1,0 +1,2437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#07100b">
+  <link rel="icon" type="image/jpeg" href="./filter-icon.jpg">
+  <link rel="apple-touch-icon" href="./filter-icon.jpg">
+  <title>Dashboard — Código dos 4 Sinais</title>
+  <style>
+    :root {
+      --bg: #07100b;
+      --surface: #0d1811;
+      --surface-2: #111f16;
+      --line: rgba(255, 255, 255, 0.09);
+      --line-strong: rgba(255, 255, 255, 0.15);
+      --text: #f3f7f4;
+      --muted: #93a399;
+      --green: #48d47f;
+      --green-2: #22b865;
+      --lime: #b8f36b;
+      --blue: #68a6ff;
+      --amber: #f5b942;
+      --red: #f06565;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.26);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      background: var(--bg);
+      color-scheme: dark;
+    }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      background:
+        radial-gradient(circle at 75% -10%, rgba(72, 116, 212, 0.14), transparent 31rem),
+        radial-gradient(circle at -5% 25%, rgba(104, 166, 255, 0.08), transparent 28rem),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    button, input { font: inherit; }
+
+    [hidden] { display: none !important; }
+
+    .login-view {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .login-card {
+      width: min(100%, 430px);
+      padding: 34px;
+      border: 1px solid var(--line-strong);
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(17, 24, 31, 0.98), rgba(9, 12, 18, 0.98));
+      box-shadow: var(--shadow);
+    }
+
+    .login-card h1 {
+      margin-bottom: 10px;
+      font-size: clamp(30px, 8vw, 42px);
+    }
+
+    .login-description {
+      margin-bottom: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .login-field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 15px;
+      color: #dce7df;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .login-field input {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      outline: 0;
+      background: rgba(4, 10, 6, 0.7);
+      color: var(--text);
+      transition: 160ms ease;
+    }
+
+    .login-field input:focus {
+      border-color: rgba(72, 212, 127, 0.7);
+      box-shadow: 0 0 0 4px rgba(72, 79, 212, 0.1);
+    }
+
+    .login-submit {
+      width: 100%;
+      min-height: 49px;
+      margin-top: 5px;
+      border: 0;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--green), var(--green-2));
+      color: #040b12;
+      cursor: pointer;
+      font-weight: 900;
+      transition: 160ms ease;
+    }
+
+    .login-submit:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .login-submit:disabled { cursor: wait; filter: saturate(0.45); transform: none; }
+
+    .login-error {
+      min-height: 20px;
+      margin: 13px 0 0;
+      color: #ffadad;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .shell {
+      width: min(1480px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 70px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 26px;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 9px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 0 5px rgba(72, 102, 212, 0.12);
+      content: "";
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 7px;
+      font-size: clamp(29px, 4vw, 48px);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      max-width: 720px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      min-width: 340px;
+    }
+
+    .date-filter { position: relative; }
+
+    .date-trigger {
+      display: inline-flex;
+      min-height: 43px;
+      align-items: center;
+      gap: 9px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: rgba(13, 24, 17, 0.86);
+      color: var(--text);
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      font-weight: 850;
+      transition: 160ms ease;
+    }
+
+    .date-trigger:hover, .date-trigger[aria-expanded="true"] {
+      border-color: rgba(72, 212, 127, 0.5);
+      background: rgba(72, 212, 127, 0.1);
+    }
+
+    .date-trigger-icon {
+      display: block;
+      width: 22px;
+      height: 22px;
+      flex: 0 0 22px;
+      border-radius: 5px;
+      object-fit: cover;
+    }
+    .date-trigger-caret { color: var(--muted); font-size: 10px; }
+
+    .date-popover {
+      position: absolute;
+      z-index: 80;
+      top: calc(100% + 9px);
+      right: 0;
+      width: min(820px, calc(100vw - 28px));
+      overflow: hidden;
+      border: 1px solid var(--line-strong);
+      border-radius: 18px;
+      background: #0b1510;
+      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.55);
+    }
+
+    .date-popover-body {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      min-height: 330px;
+    }
+
+    .date-presets {
+      display: grid;
+      align-content: start;
+      gap: 4px;
+      padding: 15px 11px;
+      border-right: 1px solid var(--line);
+      background: rgba(4, 10, 6, 0.45);
+    }
+
+    .date-preset {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      width: 100%;
+      padding: 9px 10px;
+      border: 0;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 750;
+      text-align: left;
+    }
+
+    .date-preset::before {
+      width: 9px;
+      height: 9px;
+      border: 1px solid var(--line-strong);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .date-preset:hover, .date-preset.active {
+      background: rgba(72, 212, 127, 0.1);
+      color: var(--text);
+    }
+
+    .date-preset.active::before {
+      border-color: var(--green);
+      background: var(--green);
+      box-shadow: 0 0 0 3px rgba(72, 212, 127, 0.12);
+    }
+
+    .date-calendar-area { min-width: 0; padding: 17px 18px 13px; }
+
+    .calendar-navigation {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .calendar-nav-button {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .calendar-nav-button:hover { border-color: rgba(72, 212, 127, 0.5); color: var(--green); }
+    .calendar-selection-hint { color: var(--muted); font-size: 11px; font-weight: 700; text-align: center; }
+
+    .calendar-months {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .calendar-month-title {
+      margin-bottom: 10px;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 850;
+      text-align: center;
+      text-transform: capitalize;
+    }
+
+    .calendar-weekdays, .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      column-gap: 0;
+      row-gap: 3px;
+    }
+
+    .calendar-weekday {
+      padding: 4px 0 7px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 800;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .calendar-day {
+      position: relative;
+      display: grid;
+      min-width: 0;
+      height: 31px;
+      place-items: center;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #c6d2ca;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .calendar-day:hover:not(:disabled) { background: rgba(72, 212, 127, 0.13); color: #fff; }
+    .calendar-day.in-range { border-radius: 0; background: rgba(72, 212, 127, 0.09); }
+    .calendar-day.range-start, .calendar-day.range-end {
+      border-radius: 8px;
+      background: var(--green);
+      color: #041209;
+      font-weight: 900;
+    }
+    .calendar-day.today:not(.range-start):not(.range-end) { box-shadow: inset 0 0 0 1px rgba(72, 212, 127, 0.75); }
+    .calendar-day:disabled { color: #39453e; cursor: not-allowed; }
+    .calendar-day.blank { pointer-events: none; visibility: hidden; }
+
+    .date-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 15px;
+    }
+
+    .date-input-field { display: grid; gap: 5px; color: var(--muted); font-size: 10px; font-weight: 800; }
+    .date-input-field input {
+      min-width: 0;
+      height: 38px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      outline: 0;
+      background: rgba(4, 10, 6, 0.7);
+      color: var(--text);
+      color-scheme: dark;
+      font-size: 11px;
+    }
+
+    .date-popover-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--line);
+      background: rgba(4, 10, 6, 0.35);
+    }
+
+    .date-timezone { color: var(--muted); font-size: 10px; }
+    .date-actions { display: flex; gap: 8px; }
+    .date-action {
+      min-height: 36px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .date-action.primary { border-color: var(--green); background: var(--green); color: #041209; }
+
+    .refresh-button, .series-button {
+      border: 0;
+      color: var(--muted);
+      cursor: pointer;
+      transition: 160ms ease;
+    }
+
+    .refresh-button {
+      display: inline-flex;
+      width: 43px;
+      min-height: 43px;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+    }
+
+    .refresh-button:hover { border-color: rgba(72, 93, 212, 0.44); }
+    .refresh-icon { display: block; width: 19px; height: 19px; }
+    .refresh-button.loading .refresh-icon { animation: spin 800ms linear infinite; }
+    @keyframes spin { to { transform: rotate(-360deg); } }
+
+    .logout-button {
+      min-height: 43px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .logout-button:hover { border-color: rgba(240, 101, 101, 0.45); color: #ffadad; }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 16px;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .eyebrow .status {
+      margin-left: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 0 4px rgba(245, 185, 66, 0.11);
+    }
+
+    .status.ready .status-dot {
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(72, 107, 212, 0.11);
+    }
+
+    .status.error .status-dot {
+      background: var(--red);
+      box-shadow: 0 0 0 4px rgba(240, 101, 101, 0.11);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 13px;
+      margin-bottom: 16px;
+    }
+
+    .card, .panel {
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, rgba(17, 19, 31, 0.97), rgba(11, 14, 21, 0.96));
+      box-shadow: var(--shadow);
+    }
+
+    .card {
+      position: relative;
+      min-height: 153px;
+      overflow: hidden;
+      padding: 20px;
+      border-radius: 18px;
+    }
+
+    .card::after {
+      position: absolute;
+      right: -34px;
+      bottom: -45px;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: rgba(72, 100, 212, 0.05);
+      content: "";
+    }
+
+    .card-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: 0.035em;
+      text-transform: uppercase;
+    }
+
+    .card-value {
+      margin: 12px 0 10px;
+      font-size: clamp(31px, 3.4vw, 45px);
+      font-weight: 850;
+      line-height: 1;
+      letter-spacing: -0.045em;
+    }
+
+    .card-detail {
+      position: relative;
+      z-index: 1;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .purchase-card .card-value {
+      color: var(--green);
+    }
+
+    .metric-status {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .metric-status.good { background: rgba(72, 128, 212, 0.13); color: var(--green); }
+    .metric-status.warn { background: rgba(245, 185, 66, 0.13); color: var(--amber); }
+    .metric-status.bad { background: rgba(240, 101, 101, 0.13); color: #ff8a8a; }
+
+    .panel {
+      padding: 22px;
+      border-radius: 22px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel-title {
+      margin-bottom: 5px;
+      font-size: 18px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-description {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .retention-panel { margin-bottom: 16px; }
+
+    .series-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .series-button {
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .series-button.active {
+      border-color: rgba(72, 212, 127, 0.4);
+      background: rgba(72, 98, 212, 0.12);
+      color: var(--green);
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 430px;
+      min-height: 330px;
+      border: 1px solid rgba(255, 255, 255, 0.055);
+      border-radius: 16px;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.014), rgba(255, 255, 255, 0.006)),
+        #09120d;
+    }
+
+    #retentionCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+    }
+
+    .chart-tooltip {
+      position: absolute;
+      z-index: 4;
+      display: none;
+      min-width: 120px;
+      padding: 9px 11px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: rgba(5, 10, 7, 0.94);
+      color: var(--text);
+      font-size: 11px;
+      pointer-events: none;
+      transform: translate(10px, -50%);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.38);
+    }
+
+    .chart-tooltip strong { color: var(--green); font-size: 13px; }
+
+    .two-column {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(310px, 0.75fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .insight-panel {
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .insight-nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin: 2px 0 22px;
+      padding: 2px 0 7px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--line-strong) transparent;
+    }
+
+    .insight-tab {
+      flex: 0 0 auto;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.025);
+      color: var(--muted);
+      cursor: pointer;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+    }
+
+    .insight-tab:hover {
+      border-color: var(--line-strong);
+      color: var(--text);
+    }
+
+    .insight-tab.active {
+      border-color: rgba(72, 212, 127, 0.52);
+      background: rgba(72, 86, 212, 0.12);
+      color: var(--green);
+    }
+
+    .insight-tab:focus-visible,
+    .insight-page-button:focus-visible {
+      outline: 2px solid var(--green);
+      outline-offset: 2px;
+    }
+
+    .insight-page {
+      min-height: 330px;
+      animation: insight-in 220ms ease both;
+    }
+
+    .insight-page[hidden] { display: none; }
+
+    @keyframes insight-in {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .insight-page-head {
+      margin-bottom: 18px;
+    }
+
+    .insight-page-title {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.025em;
+    }
+
+    .insight-page-description {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .insight-page .table-scroll {
+      margin-bottom: 0;
+    }
+
+    .insight-page .device-layout {
+      width: min(100%, 760px);
+      margin: 0 auto;
+    }
+
+    .insight-chart-single {
+      width: min(100%, 920px);
+      margin: 0 auto;
+    }
+
+    .insight-pagination {
+      display: grid;
+      grid-template-columns: minmax(112px, 1fr) auto minmax(112px, 1fr);
+      align-items: center;
+      gap: 12px;
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .insight-page-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: fit-content;
+      min-height: 38px;
+      padding: 8px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.025);
+      color: var(--text);
+      cursor: pointer;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .insight-page-button:last-child { justify-self: end; }
+    .insight-page-button:hover:not(:disabled) { border-color: var(--line-strong); background: rgba(255, 255, 255, 0.05); }
+    .insight-page-button:disabled { opacity: 0.35; cursor: default; }
+
+    .insight-page-count {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .table-panel { overflow: hidden; }
+
+    .table-scroll {
+      overflow-x: auto;
+      margin: 0 -22px -22px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th, td {
+      padding: 13px 14px;
+      border-top: 1px solid var(--line);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.045em;
+      text-transform: uppercase;
+    }
+
+    .sort-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      min-height: 28px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      letter-spacing: inherit;
+      text-transform: inherit;
+      cursor: pointer;
+    }
+
+    .sort-button:hover,
+    .sort-button:focus-visible,
+    th[aria-sort="ascending"] .sort-button,
+    th[aria-sort="descending"] .sort-button {
+      color: var(--text);
+    }
+
+    .sort-button:focus-visible {
+      outline: 2px solid var(--green);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+
+    .sort-indicator {
+      width: 11px;
+      color: var(--green);
+      font-size: 11px;
+      line-height: 1;
+      text-align: center;
+      opacity: 0.5;
+    }
+
+    th[aria-sort="ascending"] .sort-indicator,
+    th[aria-sort="descending"] .sort-indicator {
+      opacity: 1;
+    }
+
+    th:first-child, td:first-child {
+      width: 46%;
+      padding-left: 22px;
+      text-align: left;
+      white-space: normal;
+    }
+
+    th:last-child, td:last-child { padding-right: 22px; }
+    tbody tr:hover { background: rgba(255, 255, 255, 0.018); }
+
+    .rank-name {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .rank-number {
+      display: inline-flex;
+      flex: 0 0 24px;
+      width: 24px;
+      height: 24px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 7px;
+      background: rgba(72, 212, 127, 0.1);
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .creative-name {
+      cursor: help;
+      border-bottom: 1px dotted rgba(225, 236, 229, 0.55);
+      text-underline-offset: 3px;
+    }
+
+    .rate-good { color: var(--green); font-weight: 800; }
+    .rate-warn { color: var(--amber); font-weight: 800; }
+    .rate-bad { color: #ff8a8a; font-weight: 800; }
+
+    .device-layout {
+      display: grid;
+      grid-template-columns: minmax(150px, 0.9fr) minmax(160px, 1.1fr);
+      align-items: center;
+      gap: 20px;
+      min-height: 250px;
+    }
+
+    .donut {
+      position: relative;
+      width: min(210px, 100%);
+      aspect-ratio: 1;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: conic-gradient(var(--line) 0 100%);
+      box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.25);
+    }
+
+    .donut::after {
+      position: absolute;
+      inset: 25%;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--surface);
+      color: var(--muted);
+      content: "Dispositivos";
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .legend { display: grid; gap: 12px; }
+
+    .legend-item {
+      display: grid;
+      grid-template-columns: 9px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+
+    .legend-label { color: var(--muted); font-size: 12px; }
+    .legend-value { font-size: 13px; font-weight: 800; }
+
+    .traffic-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.35fr);
+      gap: 22px;
+    }
+
+    .subsection-title {
+      margin-bottom: 13px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .day-column-chart {
+      --day-plot-height: 220px;
+      display: grid;
+      grid-template-columns: repeat(7, minmax(34px, 1fr));
+      align-items: end;
+      gap: clamp(7px, 1.5vw, 20px);
+      padding: 12px 6px 0;
+    }
+
+    .day-column {
+      min-width: 0;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .day-column-plot {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      height: var(--day-plot-height);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .day-column-bar {
+      width: min(64px, 72%);
+      min-width: 16px;
+      height: var(--bar-height);
+      min-height: 3px;
+      border-radius: 8px 8px 2px 2px;
+      background: linear-gradient(180deg, var(--lime), var(--green-2));
+      box-shadow: 0 8px 24px rgba(71, 99, 212, 0.08);
+      transform-origin: bottom;
+      animation: rise 520ms ease both;
+    }
+
+    .day-column:hover .day-column-bar { filter: brightness(1.2); }
+
+    .day-column-value {
+      position: absolute;
+      bottom: calc(var(--bar-height) + 7px);
+      left: 50%;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 800;
+      transform: translateX(-50%);
+    }
+
+    .day-column-label {
+      display: block;
+      min-height: 28px;
+      padding-top: 8px;
+      font-size: 11px;
+      line-height: 1.2;
+    }
+
+    .hour-chart {
+      display: grid;
+      grid-template-columns: repeat(24, minmax(7px, 1fr));
+      align-items: end;
+      gap: 4px;
+      height: 218px;
+      padding-top: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hour-column {
+      position: relative;
+      min-height: 3px;
+      border-radius: 5px 5px 0 0;
+      background: linear-gradient(180deg, var(--lime), var(--green-2));
+      cursor: help;
+      transform-origin: bottom;
+      animation: rise 520ms ease both;
+    }
+
+    .hour-column:hover { filter: brightness(1.25); }
+    @keyframes rise { from { transform: scaleY(0); } }
+
+    .hour-axis {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .hour-axis span:last-child { text-align: right; }
+
+    .empty, .error-box {
+      padding: 34px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 14px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .error-box {
+      border-color: rgba(240, 101, 101, 0.32);
+      background: rgba(240, 101, 101, 0.055);
+      color: #ffadad;
+    }
+
+    .footnote {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    @media (max-width: 1120px) {
+      .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .kpi-grid .card:nth-child(4), .kpi-grid .card:nth-child(5) { grid-column: span 1; }
+      .two-column { grid-template-columns: 1fr; }
+      .device-layout { grid-template-columns: minmax(180px, 0.7fr) minmax(250px, 1.3fr); }
+    }
+
+    @media (max-width: 780px) {
+      .shell { width: min(100% - 20px, 1480px); padding-top: 23px; }
+      .topbar { flex-direction: column; }
+      .toolbar { width: 100%; min-width: 0; justify-content: space-between; }
+      .date-filter { flex: 1; }
+      .date-trigger { width: 100%; justify-content: space-between; }
+      .date-popover { right: auto; left: 0; }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .card { min-height: 143px; padding: 17px; }
+      .panel { padding: 17px; }
+      .panel-head { flex-direction: column; gap: 12px; }
+      .chart-wrap { height: 365px; }
+      .table-scroll { margin: 0 -17px -17px; }
+      th:first-child, td:first-child { padding-left: 17px; }
+      th:last-child, td:last-child { padding-right: 17px; }
+      .insight-panel { padding-bottom: 15px; }
+      .insight-nav { margin-right: -17px; padding-right: 17px; }
+      .insight-page { min-height: 280px; }
+      .insight-pagination { grid-template-columns: 1fr auto 1fr; gap: 8px; }
+      .insight-page-button { min-width: 42px; padding: 8px 10px; }
+      .insight-page-button .button-label { display: none; }
+      .traffic-grid, .device-layout { grid-template-columns: 1fr; }
+      .day-column-chart { --day-plot-height: 170px; gap: 4px; padding-inline: 0; }
+      .day-column-bar { width: min(48px, 76%); min-width: 12px; }
+      .day-column-value { font-size: 10px; }
+      .day-column-label { font-size: 9px; }
+      .hour-chart { gap: 2px; height: 170px; }
+    }
+
+    @media (max-width: 470px) {
+      .login-view { padding: 14px; }
+      .login-card { padding: 25px 20px; }
+      .toolbar { align-items: stretch; }
+      .date-popover {
+        position: fixed;
+        inset: 12px 12px auto;
+        width: auto;
+        max-height: calc(100dvh - 24px);
+        overflow-y: auto;
+      }
+      .date-popover-body { grid-template-columns: 1fr; }
+      .date-presets { grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 10px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .date-preset { justify-content: center; padding: 8px 4px; font-size: 10px; text-align: center; }
+      .date-preset::before { display: none; }
+      .date-calendar-area { padding: 13px 12px 10px; }
+      .calendar-months { grid-template-columns: 1fr; }
+      .calendar-month:nth-child(2) { display: none; }
+      .date-popover-footer { position: sticky; bottom: 0; }
+      .date-timezone { display: none; }
+      .refresh-button { width: 43px; justify-content: center; padding: 0; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; gap: 9px; }
+      .card { min-height: 132px; }
+      .card-value { font-size: 31px; }
+      .status-row { align-items: flex-start; flex-direction: column; }
+      .chart-wrap { height: 320px; }
+      .device-layout { gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <section id="loginView" class="login-view" hidden>
+    <div class="login-card">
+      <div class="eyebrow">Inteligência de conversão</div>
+      <h1>Acesso restrito</h1>
+      <p class="login-description"> </p>
+
+      <form id="loginForm">
+        <label class="login-field">
+          <span>Login</span>
+          <input id="loginInput" name="username" type="text" autocomplete="username" maxlength="120" required autofocus>
+        </label>
+        <label class="login-field">
+          <span>Senha</span>
+          <input id="passwordInput" name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button id="loginButton" class="login-submit" type="submit">Entrar na dashboard</button>
+        <p id="loginError" class="login-error" role="alert" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+  <main id="dashboardView" class="shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">
+          <span>Código dos 4 Sinais</span>
+          <span id="status" class="status"><span class="status-dot"></span><span id="statusText">Conectando à planilha…</span></span>
+        </div>
+        <h1>Dashboard dos funis</h1>
+        <p class="subtitle">Comparativo de codigos01 e codigos02</p>
+      </div>
+
+      <div class="toolbar" aria-label="Filtros do dashboard">
+        <div id="dateFilter" class="date-filter">
+          <button id="dateTrigger" class="date-trigger" type="button" aria-haspopup="dialog" aria-expanded="false">
+            <img class="date-trigger-icon" src="./filter-icon.jpg" alt="" aria-hidden="true">
+            <span id="dateTriggerLabel">Últimos 7 dias</span>
+            <span class="date-trigger-caret" aria-hidden="true">▼</span>
+          </button>
+
+          <div id="datePopover" class="date-popover" role="dialog" aria-label="Selecionar período" hidden>
+            <div class="date-popover-body">
+              <nav id="datePresets" class="date-presets" aria-label="Períodos rápidos">
+                <button class="date-preset" type="button" data-days="1">Hoje</button>
+                <button class="date-preset active" type="button" data-days="7">7 dias</button>
+                <button class="date-preset" type="button" data-days="14">14 dias</button>
+                <button class="date-preset" type="button" data-days="30">30 dias</button>
+                <button class="date-preset" type="button" data-days="all">Tudo</button>
+              </nav>
+
+              <section class="date-calendar-area">
+                <div class="calendar-navigation">
+                  <button id="calendarPrevious" class="calendar-nav-button" type="button" aria-label="Meses anteriores">‹</button>
+                  <div id="calendarHint" class="calendar-selection-hint">1 clique: um dia · 2 cliques: intervalo</div>
+                  <button id="calendarNext" class="calendar-nav-button" type="button" aria-label="Próximos meses">›</button>
+                </div>
+                <div id="calendarMonths" class="calendar-months"></div>
+                <div class="date-inputs">
+                  <label class="date-input-field">Data inicial<input id="startDateInput" type="date"></label>
+                  <label class="date-input-field">Data final<input id="endDateInput" type="date"></label>
+                </div>
+              </section>
+            </div>
+
+            <footer class="date-popover-footer">
+              <span class="date-timezone">Fuso horário: São Paulo</span>
+              <div class="date-actions">
+                <button id="dateCancel" class="date-action" type="button">Cancelar</button>
+                <button id="dateApply" class="date-action primary" type="button">Atualizar</button>
+              </div>
+            </footer>
+          </div>
+        </div>
+        <button id="refreshButton" class="refresh-button" type="button" aria-label="Atualizar dados" title="Atualizar dados">
+          <svg class="refresh-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" aria-hidden="true">
+            <defs>
+              <path id="refreshHalf" d="M 749.5 485 L 899.7 485 A 400 400 0 0 0 153.6 300 L 70 300 L 250 485 L 430 300 L 350 300 A 250 250 0 0 1 749.5 485 Z" fill="currentColor"></path>
+            </defs>
+            <use href="#refreshHalf"></use>
+            <use href="#refreshHalf" transform="rotate(180 500 500)"></use>
+          </svg>
+        </button>
+        <button id="logoutButton" class="logout-button" type="button" hidden>Sair</button>
+      </div>
+    </header>
+
+    <div class="status-row">
+      <div id="periodLabel">—</div>
+    </div>
+
+    <section id="errorArea" hidden></section>
+
+    <section class="kpi-grid" aria-label="Indicadores principais">
+      <article class="card">
+        <div class="card-label"><span>Visitas</span><span class="metric-status">Sessões</span></div>
+        <div id="pageViewsValue" class="card-value">—</div>
+        <div id="pageViewsDetail" class="card-detail">— visitantes únicos</div>
+      </article>
+      <article class="card">
+        <div class="card-label"><span>Início da leitura</span><span id="playStatus" class="metric-status">Conversão</span></div>
+        <div id="playRateValue" class="card-value">—</div>
+        <div id="playRateDetail" class="card-detail">% das visitas</div>
+      </article>
+      <article class="card">
+        <div class="card-label"><span>Foto da mão</span><span id="leadStatus" class="metric-status">Conversão</span></div>
+        <div id="leadRateValue" class="card-value">—</div>
+        <div id="leadRateDetail" class="card-detail">Percentual dos Plays</div>
+      </article>
+      <article class="card">
+        <div class="card-label"><span>Vídeo iniciado</span><span id="pitchStatus" class="metric-status">Conversão</span></div>
+        <div id="pitchRateValue" class="card-value">—</div>
+        <div id="pitchRateDetail" class="card-detail">Percentual dos Plays</div>
+      </article>
+      <article class="card">
+        <div class="card-label"><span>Resultado</span><span class="metric-status">Etapa final</span></div>
+        <div id="ctaValue" class="card-value">—</div>
+        <div id="ctaDetail" class="card-detail">Cliques em plano</div>
+      </article>
+      <article class="card purchase-card">
+        <div class="card-label"><span>Plano escolhido</span><span class="metric-status">Simples/Completo</span></div>
+        <div id="purchaseValue" class="card-value">—</div>
+        <div id="purchaseDetail" class="card-detail">% das visitas</div>
+      </article>
+    </section>
+
+    <section class="panel retention-panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">Retenção do vídeo</h2>
+          <p class="panel-description">A curva mostra quantas pessoas permanecem no vídeo a cada 10 segundos, separadas por funil.</p>
+        </div>
+        <div id="seriesPicker" class="series-picker" aria-label="Funil"></div>
+      </div>
+
+      <div class="chart-wrap">
+        <canvas id="retentionCanvas" aria-label="Gráfico de retenção do vídeo"></canvas>
+        <div id="chartTooltip" class="chart-tooltip"></div>
+      </div>
+
+    </section>
+
+    <section class="panel insight-panel" aria-labelledby="insightPanelTitle">
+      <div class="panel-head">
+        <div>
+          <h2 id="insightPanelTitle" class="panel-title">Análises detalhadas</h2>
+          <p class="panel-description"> </p>
+        </div>
+      </div>
+
+      <div id="insightNav" class="insight-nav" role="tablist" aria-label="Menu das análises detalhadas">
+        <button id="insightTabCreative" class="insight-tab active" type="button" role="tab" aria-selected="true" aria-controls="insightCreative" data-insight="creative">Criativos</button>
+        <button id="insightTabPages" class="insight-tab" type="button" role="tab" aria-selected="false" aria-controls="insightPages" tabindex="-1" data-insight="pages">Funis</button>
+        <button id="insightTabLocation" class="insight-tab" type="button" role="tab" aria-selected="false" aria-controls="insightLocation" tabindex="-1" data-insight="location">Localizações</button>
+        <button id="insightTabPlacements" class="insight-tab" type="button" role="tab" aria-selected="false" aria-controls="insightPlacements" tabindex="-1" data-insight="placements">Posicionamentos</button>
+        <button id="insightTabDays" class="insight-tab" type="button" role="tab" aria-selected="false" aria-controls="insightDays" tabindex="-1" data-insight="days">Fluxo por dia</button>
+        <button id="insightTabHours" class="insight-tab" type="button" role="tab" aria-selected="false" aria-controls="insightHours" tabindex="-1" data-insight="hours">Horários do dia</button>
+        <button id="insightTabDevices" class="insight-tab" type="button" role="tab" aria-selected="false" aria-controls="insightDevices" tabindex="-1" data-insight="devices">Dispositivos</button>
+      </div>
+
+      <div class="insight-pages">
+        <section id="insightCreative" class="insight-page" role="tabpanel" aria-labelledby="insightTabCreative" data-insight-page="creative">
+          <div class="insight-page-head">
+            <h3 class="insight-page-title">Performance por criativo</h3>
+            <p class="insight-page-description">Ordenado por avanço no funil, não somente por volume. Passe o mouse sobre o nome para ver campanha e conjunto.</p>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Criativo</th><th data-sort-table="creative" data-sort-key="pageViews" aria-sort="none"><button class="sort-button" type="button">Visitas<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="creative" data-sort-key="playRate" aria-sort="none"><button class="sort-button" type="button">Início<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="creative" data-sort-key="leadRate" aria-sort="none"><button class="sort-button" type="button">Mão<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="creative" data-sort-key="pitchRate" aria-sort="none"><button class="sort-button" type="button">Vídeo<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="creative" data-sort-key="ctaClicks" aria-sort="none"><button class="sort-button" type="button">Resultado<span class="sort-indicator" aria-hidden="true">↕</span></button></th></tr></thead>
+              <tbody id="creativeRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="insightPages" class="insight-page" role="tabpanel" aria-labelledby="insightTabPages" data-insight-page="pages" hidden>
+          <div class="insight-page-head">
+            <h3 class="insight-page-title">Performance por página</h3>
+            <p class="insight-page-description">Comparação entre codigos01 e codigos02, com a conversão de cada etapa.</p>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Funil</th><th data-sort-table="page" data-sort-key="pageViews" aria-sort="none"><button class="sort-button" type="button">Visitas<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="page" data-sort-key="playRate" aria-sort="none"><button class="sort-button" type="button">Início<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="page" data-sort-key="leadRate" aria-sort="none"><button class="sort-button" type="button">Mão<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="page" data-sort-key="pitchRate" aria-sort="none"><button class="sort-button" type="button">Vídeo<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="page" data-sort-key="ctaClicks" aria-sort="none"><button class="sort-button" type="button">Resultado<span class="sort-indicator" aria-hidden="true">↕</span></button></th></tr></thead>
+              <tbody id="pageRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="insightLocation" class="insight-page" role="tabpanel" aria-labelledby="insightTabLocation" data-insight-page="location" hidden>
+          <div class="insight-page-head">
+            <h3 class="insight-page-title">Localizações</h3>
+            <p class="insight-page-description">Distribuição agrupada pela coluna E — Location. Os acessos técnicos de Altoona continuam excluídos.</p>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Localização</th><th data-sort-table="location" data-sort-key="pageViews" aria-sort="none"><button class="sort-button" type="button">PV<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="location" data-sort-key="playRate" aria-sort="none"><button class="sort-button" type="button">Play<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="location" data-sort-key="leadRate" aria-sort="none"><button class="sort-button" type="button">Lead<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="location" data-sort-key="pitchRate" aria-sort="none"><button class="sort-button" type="button">Pitch<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="location" data-sort-key="ctaClicks" aria-sort="none"><button class="sort-button" type="button">CTA<span class="sort-indicator" aria-hidden="true">↕</span></button></th></tr></thead>
+              <tbody id="locationRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="insightPlacements" class="insight-page" role="tabpanel" aria-labelledby="insightTabPlacements" data-insight-page="placements" hidden>
+          <div class="insight-page-head">
+            <h3 class="insight-page-title">Posicionamentos</h3>
+            <p class="insight-page-description">Distribuição pela coluna J, ordenada pelos posicionamentos que mais geraram Page Views.</p>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Posicionamento</th><th data-sort-table="placement" data-sort-key="pageViews" aria-sort="none"><button class="sort-button" type="button">PV<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="placement" data-sort-key="playRate" aria-sort="none"><button class="sort-button" type="button">Play<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="placement" data-sort-key="leadRate" aria-sort="none"><button class="sort-button" type="button">Lead<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="placement" data-sort-key="pitchRate" aria-sort="none"><button class="sort-button" type="button">Pitch<span class="sort-indicator" aria-hidden="true">↕</span></button></th><th data-sort-table="placement" data-sort-key="ctaClicks" aria-sort="none"><button class="sort-button" type="button">CTA<span class="sort-indicator" aria-hidden="true">↕</span></button></th></tr></thead>
+              <tbody id="placementRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="insightDays" class="insight-page" role="tabpanel" aria-labelledby="insightTabDays" data-insight-page="days" hidden>
+          <div class="insight-page-head">
+            <h3 class="insight-page-title">Fluxo por dia da semana</h3>
+            <p class="insight-page-description">Dias com maior volume de entrada, no horário de Brasília.</p>
+          </div>
+          <div class="insight-chart-single">
+            <div id="dayChart" class="day-column-chart" aria-label="Fluxo por dia da semana"></div>
+          </div>
+        </section>
+
+        <section id="insightHours" class="insight-page" role="tabpanel" aria-labelledby="insightTabHours" data-insight-page="hours" hidden>
+          <div class="insight-page-head">
+            <h3 class="insight-page-title">Distribuição por hora do dia</h3>
+            <p class="insight-page-description">Horários em que as pessoas mais entram na página, considerando o horário de Brasília.</p>
+          </div>
+          <div class="insight-chart-single">
+            <div id="hourChart" class="hour-chart"></div>
+            <div class="hour-axis"><span>00h</span><span>04h</span><span>08h</span><span>12h</span><span>16h</span><span>23h</span></div>
+          </div>
+        </section>
+
+        <section id="insightDevices" class="insight-page" role="tabpanel" aria-labelledby="insightTabDevices" data-insight-page="devices" hidden>
+          <div class="insight-page-head">
+            <h3 class="insight-page-title">Dispositivos</h3>
+            <p class="insight-page-description">Participação de iPhone, Android e computador sobre as sessões do período.</p>
+          </div> 
+          <div class="device-layout">
+            <div id="deviceDonut" class="donut"></div>
+            <div id="deviceLegend" class="legend"></div>
+          </div>
+        </section>
+      </div>
+ 
+    </section>
+
+    <footer class="footnote">
+      <span> </span>
+      <span id="dataSource"> </span>
+    </footer>
+  </main>
+
+  <script>
+    const DASHBOARD_ENDPOINT =
+      "https://script.google.com/macros/s/AKfycbyhwNWEO86s5XFk8Um-hpZGvqo9wDZYU6mm6uFFYqOw5gVNci3Jj7mgDsSeNYk6ULiqQg/exec";
+
+    const COLORS = ["#48d47f", "#68a6ff", "#b8f36b", "#f5b942", "#ab8cff"];
+    const SESSION_STORAGE_KEY = "vsl_dashboard_session";
+    const LOCAL_SESSION_KEY = "vsl_dashboard_auth_v1";
+    const LOCAL_PERIOD_KEY = "vsl_dashboard_period_v1";
+    const DEFAULT_SESSION_SECONDS = 2592000;
+    const INSIGHT_ORDER = ["creative", "pages", "location", "placements", "days", "hours", "devices"];
+    const persistedAuth = readPersistedAuth();
+    const state = {
+      data: null,
+      period: readPersistedPeriod(),
+      draftPeriod: null,
+      calendarViewMonth: null,
+      awaitingRangeEnd: false,
+      activeSeries: "total",
+      activeInsight: "creative",
+      groupSort: {
+        creative: { key: null, direction: "desc" },
+        page: { key: null, direction: "desc" },
+        location: { key: null, direction: "desc" },
+        placement: { key: null, direction: "desc" }
+      },
+      loadingScript: null,
+      timeout: null,
+      session: "public",
+      login: "Dashboard"
+    };
+
+    const $ = selector => document.querySelector(selector);
+    const $$ = selector => Array.from(document.querySelectorAll(selector));
+    const numberFormat = new Intl.NumberFormat("pt-BR");
+    const percentFormat = new Intl.NumberFormat("pt-BR", { style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+    function formatNumber(value) { return numberFormat.format(Number(value || 0)); }
+    function formatPercent(value) { return percentFormat.format(Number(value || 0)); }
+
+    function formatTime(seconds) {
+      const total = Math.max(0, Math.floor(Number(seconds || 0)));
+      const minutes = Math.floor(total / 60);
+      const remainder = total % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
+    }
+
+    function todayIsoInSaoPaulo() {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit"
+      }).formatToParts(new Date()).reduce((result, item) => {
+        if (item.type !== "literal") result[item.type] = item.value;
+        return result;
+      }, {});
+      return `${parts.year}-${parts.month}-${parts.day}`;
+    }
+
+    function isoToUtcDate(value) {
+      const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      return match ? new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]))) : null;
+    }
+
+    function utcDateToIso(date) {
+      return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}`;
+    }
+
+    function addIsoDays(value, amount) {
+      const date = isoToUtcDate(value);
+      if (!date) return "";
+      date.setUTCDate(date.getUTCDate() + Number(amount || 0));
+      return utcDateToIso(date);
+    }
+
+    function createPresetPeriod(days) {
+      const value = String(days || "7");
+      if (value === "all") return { mode: "all", days: "all", start: "", end: "" };
+      const numericDays = Math.max(1, Number(value) || 7);
+      const end = todayIsoInSaoPaulo();
+      return {
+        mode: "preset",
+        days: String(numericDays),
+        start: addIsoDays(end, -(numericDays - 1)),
+        end
+      };
+    }
+
+    function readPersistedPeriod() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(LOCAL_PERIOD_KEY) || "null");
+        if (!saved || typeof saved !== "object") return createPresetPeriod("7");
+        if (saved.mode === "all") return createPresetPeriod("all");
+        if (saved.mode === "preset" && ["1", "7", "14", "30"].includes(String(saved.days))) {
+          return createPresetPeriod(String(saved.days));
+        }
+        if (saved.mode === "custom") {
+          const today = todayIsoInSaoPaulo();
+          const start = String(saved.start || "");
+          const end = String(saved.end || "");
+          if (isoToUtcDate(start) && isoToUtcDate(end) && start <= today && end <= today) {
+            return { mode: "custom", days: null, start: start <= end ? start : end, end: start <= end ? end : start };
+          }
+        }
+      } catch (error) { /* preferência local indisponível ou inválida */ }
+      return createPresetPeriod("7");
+    }
+
+    function persistPeriod(period) {
+      try { localStorage.setItem(LOCAL_PERIOD_KEY, JSON.stringify(clonePeriod(period))); }
+      catch (error) { /* armazenamento local indisponível */ }
+    }
+
+    function clonePeriod(period) {
+      return { mode: period.mode, days: period.days, start: period.start || "", end: period.end || "" };
+    }
+
+    function monthStartFromIso(value) {
+      const date = isoToUtcDate(value) || isoToUtcDate(todayIsoInSaoPaulo());
+      return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1));
+    }
+
+    function shiftUtcMonth(date, amount) {
+      return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + amount, 1));
+    }
+
+    function formatCalendarDate(value, options = {}) {
+      const date = isoToUtcDate(value);
+      if (!date) return "";
+      return date.toLocaleDateString("pt-BR", { timeZone: "UTC", ...options });
+    }
+
+    function formatPeriodLabel(period) {
+      if (!period || period.mode === "all") return "Todo o período";
+      if (period.mode === "preset") {
+        if (period.days === "1") return `Hoje: ${formatCalendarDate(period.end, { day: "2-digit", month: "short", year: "numeric" })}`;
+        return `Últimos ${period.days} dias`;
+      }
+      if (!period.start || !period.end) return "Selecionar período";
+      if (period.start === period.end) {
+        return formatCalendarDate(period.start, { day: "2-digit", month: "short", year: "numeric" });
+      }
+      const startDate = isoToUtcDate(period.start);
+      const endDate = isoToUtcDate(period.end);
+      const sameMonth = startDate.getUTCFullYear() === endDate.getUTCFullYear() && startDate.getUTCMonth() === endDate.getUTCMonth();
+      return sameMonth
+        ? `${startDate.getUTCDate()}–${formatCalendarDate(period.end, { day: "2-digit", month: "short", year: "numeric" })}`
+        : `${formatCalendarDate(period.start, { day: "2-digit", month: "short" })} – ${formatCalendarDate(period.end, { day: "2-digit", month: "short", year: "numeric" })}`;
+    }
+
+    function syncDateTrigger() {
+      $("#dateTriggerLabel").textContent = formatPeriodLabel(state.period);
+    }
+
+    function openDatePicker() {
+      state.draftPeriod = clonePeriod(state.period);
+      state.awaitingRangeEnd = false;
+      state.calendarViewMonth = monthStartFromIso(state.draftPeriod.start || state.draftPeriod.end || todayIsoInSaoPaulo());
+      $("#datePopover").hidden = false;
+      $("#dateTrigger").setAttribute("aria-expanded", "true");
+      renderDatePicker();
+    }
+
+    function closeDatePicker() {
+      $("#datePopover").hidden = true;
+      $("#dateTrigger").setAttribute("aria-expanded", "false");
+      state.draftPeriod = null;
+      state.awaitingRangeEnd = false;
+    }
+
+    function renderDatePicker() {
+      const draft = state.draftPeriod || clonePeriod(state.period);
+      $$(".date-preset").forEach(button => {
+        const isActive = button.dataset.days === "all"
+          ? draft.mode === "all"
+          : draft.mode === "preset" && draft.days === button.dataset.days;
+        button.classList.toggle("active", isActive);
+      });
+
+      $("#startDateInput").value = draft.start || "";
+      $("#endDateInput").value = draft.end || "";
+      $("#startDateInput").max = todayIsoInSaoPaulo();
+      $("#endDateInput").max = todayIsoInSaoPaulo();
+      $("#calendarHint").textContent = state.awaitingRangeEnd
+        ? `${formatCalendarDate(draft.start, { day: "2-digit", month: "short", year: "numeric" })} selecionado · clique em outra data para criar um intervalo ou em Atualizar para usar só este dia`
+        : formatPeriodLabel(draft);
+
+      $("#calendarMonths").innerHTML = [0, 1]
+        .map(offset => renderCalendarMonth(shiftUtcMonth(state.calendarViewMonth, offset), draft))
+        .join("");
+    }
+
+    function renderCalendarMonth(monthDate, draft) {
+      const month = monthDate.getUTCMonth();
+      const year = monthDate.getUTCFullYear();
+      const monthTitle = monthDate.toLocaleDateString("pt-BR", { timeZone: "UTC", month: "long", year: "numeric" });
+      const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+      const firstWeekday = (new Date(Date.UTC(year, month, 1)).getUTCDay() + 6) % 7;
+      const today = todayIsoInSaoPaulo();
+      const cells = [];
+
+      for (let index = 0; index < firstWeekday; index++) {
+        cells.push('<span class="calendar-day blank" aria-hidden="true"></span>');
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const iso = utcDateToIso(new Date(Date.UTC(year, month, day)));
+        const disabled = iso > today;
+        const inRange = draft.start && draft.end && iso > draft.start && iso < draft.end;
+        const classes = ["calendar-day"];
+        if (iso === today) classes.push("today");
+        if (inRange) classes.push("in-range");
+        if (iso === draft.start) classes.push("range-start");
+        if (iso === draft.end) classes.push("range-end");
+        cells.push(`<button class="${classes.join(" ")}" type="button" data-date="${iso}"${disabled ? " disabled" : ""} aria-label="${formatCalendarDate(iso, { dateStyle: "long" })}">${day}</button>`);
+      }
+
+      return `<section class="calendar-month"><h3 class="calendar-month-title">${monthTitle}</h3><div class="calendar-weekdays">${["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"].map(day => `<span class="calendar-weekday">${day}</span>`).join("")}</div><div class="calendar-days">${cells.join("")}</div></section>`;
+    }
+
+    function chooseCalendarDate(value) {
+      if (!isoToUtcDate(value) || value > todayIsoInSaoPaulo()) return;
+      if (!state.draftPeriod || state.draftPeriod.mode !== "custom" || !state.awaitingRangeEnd) {
+        state.draftPeriod = { mode: "custom", days: null, start: value, end: value };
+        state.awaitingRangeEnd = true;
+      } else {
+        const first = state.draftPeriod.start;
+        state.draftPeriod.start = value < first ? value : first;
+        state.draftPeriod.end = value < first ? first : value;
+        state.awaitingRangeEnd = false;
+      }
+      renderDatePicker();
+    }
+
+    function updateDraftFromInputs() {
+      const start = $("#startDateInput").value;
+      const end = $("#endDateInput").value || start;
+      if (!start) return;
+      state.draftPeriod = {
+        mode: "custom",
+        days: null,
+        start: start <= end ? start : end,
+        end: start <= end ? end : start
+      };
+      state.awaitingRangeEnd = false;
+      state.calendarViewMonth = monthStartFromIso(state.draftPeriod.start);
+      renderDatePicker();
+    }
+
+    function applyDraftPeriod() {
+      if (!state.draftPeriod) return;
+      if (state.draftPeriod.mode === "custom" && (!state.draftPeriod.start || !state.draftPeriod.end)) return;
+      state.period = clonePeriod(state.draftPeriod);
+      persistPeriod(state.period);
+      syncDateTrigger();
+      closeDatePicker();
+      loadDashboard();
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function setStatus(type, text) {
+      const status = $("#status");
+      status.className = `status ${type || ""}`.trim();
+      $("#statusText").textContent = text;
+    }
+
+    function targetState(rate, target) {
+      if (!target) return { className: "", label: "Sem meta" };
+      if (rate >= target.min) return { className: "good", label: rate > target.max ? "Acima" : "Na meta" };
+      if (rate >= target.min * 0.72) return { className: "warn", label: "Próximo" };
+      return { className: "bad", label: "Abaixo" };
+    }
+
+    function applyMetricStatus(elementId, rate, target) {
+      const element = $(elementId);
+      const result = targetState(rate, target);
+      element.className = `metric-status ${result.className}`;
+      const targetRange = target
+        ? `${Math.round(target.min * 100)}–${Math.round(target.max * 100)}%`
+        : "";
+      element.textContent = targetRange ? `${result.label} (${targetRange})` : result.label;
+    }
+
+    function rateClass(rate, kind) {
+      const target = state.data && state.data.targets ? state.data.targets[kind] : null;
+      return targetState(rate, target).className === "good" ? "rate-good" :
+        targetState(rate, target).className === "warn" ? "rate-warn" : "rate-bad";
+    }
+
+    function jsonpRequest(params, timeoutMs = 16000) {
+      return new Promise((resolve, reject) => {
+        const callbackName = `__vslDashboard_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+        const script = document.createElement("script");
+        let timer;
+
+        const cleanup = () => {
+          clearTimeout(timer);
+          delete window[callbackName];
+          script.remove();
+        };
+
+        window[callbackName] = payload => {
+          cleanup();
+          resolve(payload);
+        };
+
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("Não foi possível conectar ao servidor."));
+        };
+
+        const url = new URL(DASHBOARD_ENDPOINT);
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== "") url.searchParams.set(key, value);
+        });
+        url.searchParams.set("callback", callbackName);
+        url.searchParams.set("_", Date.now());
+        script.src = url.href;
+        document.head.appendChild(script);
+
+        timer = setTimeout(() => script.onerror(), timeoutMs);
+      });
+    }
+
+    async function sha256Hex(value) {
+      if (!window.crypto || !window.crypto.subtle) throw new Error("Seu navegador não oferece criptografia segura para o login.");
+      const bytes = new TextEncoder().encode(String(value));
+      const digest = await crypto.subtle.digest("SHA-256", bytes);
+      return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
+    }
+
+    function readPersistedAuth() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(LOCAL_SESSION_KEY) || "null");
+        if (saved && saved.session && Number(saved.expiresAt) > Date.now()) {
+          return {
+            session: String(saved.session),
+            login: String(saved.login || "Usuário")
+          };
+        }
+        localStorage.removeItem(LOCAL_SESSION_KEY);
+      } catch (error) { /* armazenamento local indisponível ou inválido */ }
+
+      let legacySession = "";
+      try { legacySession = sessionStorage.getItem(SESSION_STORAGE_KEY) || ""; } catch (error) { /* sem armazenamento */ }
+      return { session: legacySession, login: legacySession ? "Usuário" : "" };
+    }
+
+    function persistDashboardSession(expiresIn = DEFAULT_SESSION_SECONDS) {
+      if (!state.session) return;
+      const duration = Math.max(60, Number(expiresIn) || DEFAULT_SESSION_SECONDS);
+      const serialized = JSON.stringify({
+        session: state.session,
+        login: state.login || "Usuário",
+        expiresAt: Date.now() + duration * 1000
+      });
+
+      try {
+        localStorage.setItem(LOCAL_SESSION_KEY, serialized);
+        sessionStorage.removeItem(SESSION_STORAGE_KEY);
+      } catch (error) {
+        try { sessionStorage.setItem(SESSION_STORAGE_KEY, state.session); } catch (storageError) { /* sem armazenamento */ }
+      }
+    }
+
+    function clearDashboardSession() {
+      state.session = "";
+      state.login = "";
+      try { localStorage.removeItem(LOCAL_SESSION_KEY); } catch (error) { /* sem armazenamento */ }
+      try { sessionStorage.removeItem(SESSION_STORAGE_KEY); } catch (error) { /* sem armazenamento */ }
+    }
+
+    function showLogin(message = "") {
+      clearDashboardSession();
+      $("#dashboardView").hidden = true;
+      $("#loginView").hidden = false;
+      $("#loginError").textContent = message;
+      $("#passwordInput").value = "";
+      setTimeout(() => $("#loginInput").focus(), 50);
+    }
+
+    function showDashboard(login) {
+      state.login = login || state.login || "Usuário";
+      $("#loginView").hidden = true;
+      $("#dashboardView").hidden = false;
+    }
+
+    async function handleLogin(event) {
+      event.preventDefault();
+      const button = $("#loginButton");
+      const login = $("#loginInput").value.trim().toLowerCase();
+      const password = $("#passwordInput").value;
+
+      if (!login || !password) return;
+      button.disabled = true;
+      button.textContent = "Verificando…";
+      $("#loginError").textContent = "";
+
+      try {
+        const challenge = await jsonpRequest({ action: "dashboard_challenge", login });
+        if (!challenge || challenge.success !== true || !challenge.nonce) {
+          throw new Error(challenge && challenge.message ? challenge.message : "Login ou senha inválidos.");
+        }
+
+        const passwordHash = await sha256Hex(password);
+        const proof = await sha256Hex(`${login}|${passwordHash}|${challenge.nonce}`);
+        const result = await jsonpRequest({
+          action: "dashboard_login",
+          login,
+          nonce: challenge.nonce,
+          proof
+        });
+
+        if (!result || result.success !== true || !result.session) {
+          throw new Error(result && result.message ? result.message : "Login ou senha inválidos.");
+        }
+
+        state.session = result.session;
+        state.login = result.login || login;
+        persistDashboardSession(result.expiresIn);
+        $("#passwordInput").value = "";
+        showDashboard(state.login);
+        loadDashboard();
+      } catch (error) {
+        $("#loginError").textContent = error.message || "Não foi possível entrar.";
+        $("#passwordInput").select();
+      } finally {
+        button.disabled = false;
+        button.textContent = "Entrar na dashboard";
+      }
+    }
+
+    async function logoutDashboard() {
+      const session = state.session;
+      clearDashboardSession();
+      showLogin("");
+      if (session) {
+        try { await jsonpRequest({ action: "dashboard_logout", session }, 6000); } catch (error) { /* sessão local já removida */ }
+      }
+    }
+
+    function loadDashboard() {
+      if (!state.session) {
+        showLogin("");
+        return;
+      }
+
+      $("#refreshButton").classList.add("loading");
+      setStatus("", "Lendo dados da planilha…");
+      $("#errorArea").hidden = true;
+
+      if (state.loadingScript) state.loadingScript.remove();
+      if (state.timeout) clearTimeout(state.timeout);
+
+      const callbackName = `__receiveVslDashboard_${Date.now()}`;
+      const script = document.createElement("script");
+      state.loadingScript = script;
+
+      window[callbackName] = payload => {
+        clearTimeout(state.timeout);
+        delete window[callbackName];
+        script.remove();
+        state.loadingScript = null;
+        $("#refreshButton").classList.remove("loading");
+
+        if (payload && payload.error === "auth_required") {
+          showLogin("Sua sessão expirou. Entre novamente.");
+          return;
+        }
+
+        if (!payload || payload.success !== true || !payload.summary) {
+          showError(payload && payload.error ? payload.error : "A versão publicada do Apps Script ainda não possui a API do dashboard.");
+          return;
+        }
+
+        state.data = payload;
+        showDashboard(payload.auth && payload.auth.login ? payload.auth.login : state.login);
+        persistDashboardSession();
+        state.activeSeries = payload.retention && payload.retention.series.some(item => item.key === state.activeSeries)
+          ? state.activeSeries : "total";
+        renderDashboard(payload);
+      };
+
+      script.onerror = () => {
+        clearTimeout(state.timeout);
+        delete window[callbackName];
+        script.remove();
+        state.loadingScript = null;
+        $("#refreshButton").classList.remove("loading");
+        showError("Não foi possível carregar os dados. Confira se o Apps Script foi implantado com acesso público.");
+      };
+
+      const url = new URL(DASHBOARD_ENDPOINT);
+      url.searchParams.set("action", "dashboard");
+      if (state.period.mode === "custom") {
+        url.searchParams.set("startDate", state.period.start);
+        url.searchParams.set("endDate", state.period.end);
+      } else {
+        url.searchParams.set("days", state.period.mode === "all" ? "all" : state.period.days);
+      }
+      url.searchParams.set("session", state.session);
+      url.searchParams.set("callback", callbackName);
+      url.searchParams.set("_", Date.now());
+      script.src = url.href;
+      document.head.appendChild(script);
+
+      state.timeout = setTimeout(() => {
+        if (state.loadingScript === script) script.onerror();
+      }, 16000);
+    }
+
+    function showError(message) {
+      setStatus("error", "Dashboard sem conexão");
+      $("#errorArea").hidden = false;
+      $("#errorArea").innerHTML = `<div class="error-box"><strong>Não foi possível atualizar.</strong><br>${escapeHtml(message)}</div>`;
+    }
+
+    function normalizedPageName(value) {
+      const cleaned = String(value || "").toLowerCase().split(/[?#]/)[0].replace(/\/+$/, "");
+      return cleaned ? `${cleaned}/` : "";
+    }
+
+    function pageForSeries(data, seriesKey) {
+      if (seriesKey !== "vsl1" && seriesKey !== "vsl2") return null;
+      const expected = seriesKey === "vsl1" ? "codigos01" : "codigos02";
+      return (data.pages || []).find(page => String(page.name || "").toLowerCase() === expected) || null;
+    }
+
+    function purchaseCountForSeries(data, seriesKey) {
+      if (seriesKey === "total") return Number((data.summary && data.summary.purchases) || 0);
+
+      const byVsl = data.purchasesByVsl || data.purchaseByVsl || data.summaryByVsl || null;
+      if (!byVsl || byVsl[seriesKey] == null) return null;
+      const entry = byVsl[seriesKey];
+      const value = typeof entry === "object" ? entry.purchases : entry;
+      const count = Number(value);
+      return Number.isFinite(count) ? count : null;
+    }
+
+    function summaryForSeries(data, seriesKey = state.activeSeries) {
+      const base = data.summary || {};
+      if (seriesKey === "total") {
+        const pageViews = Number(base.pageViews || 0);
+        const purchasePlays = Number(base.plays || 0);
+        const purchasePageViews = pageViews;
+        const purchases = purchaseCountForSeries(data, "total");
+        return {
+          ...base,
+          pageViews,
+          purchases,
+          purchaseRate: purchasePlays ? purchases / purchasePlays : 0,
+          purchasePageViewRate: purchasePageViews ? purchases / purchasePageViews : 0,
+          purchaseAttributionAvailable: true,
+          purchasePlays,
+          purchasePageViews,
+          seriesLabel: "Total"
+        };
+      }
+
+      const retentionSeries = (data.retention && data.retention.series || []).find(item => item.key === seriesKey) || null;
+      const page = pageForSeries(data, seriesKey) || {};
+      const provided = data.summaryByVsl && data.summaryByVsl[seriesKey] || {};
+      const pageViews = Number(provided.pageViews != null ? provided.pageViews : page.pageViews || 0);
+      const plays = Number(provided.plays != null ? provided.plays : page.plays != null ? page.plays : retentionSeries && retentionSeries.plays || 0);
+      const leads = Number(provided.leads != null ? provided.leads : page.leads || 0);
+      const pitches = Number(provided.pitches != null ? provided.pitches : page.pitches || 0);
+      const ctaClicks = Number(provided.ctaClicks != null ? provided.ctaClicks : page.ctaClicks || 0);
+      const attributedPurchases = purchaseCountForSeries(data, seriesKey);
+      const purchases = attributedPurchases == null ? Number(base.purchases || 0) : attributedPurchases;
+      const purchasePlays = attributedPurchases == null ? Number(base.plays || 0) : plays;
+      const purchasePageViews = attributedPurchases == null ? Number(base.pageViews || 0) : pageViews;
+
+      return {
+        pageViews,
+        uniqueVisitors: provided.uniqueVisitors != null ? Number(provided.uniqueVisitors) : null,
+        plays,
+        leads,
+        pitches,
+        ctaClicks,
+        purchases,
+        playRate: pageViews ? plays / pageViews : 0,
+        leadRate: plays ? leads / plays : 0,
+        pitchRate: plays ? pitches / plays : 0,
+        ctaRate: pitches ? ctaClicks / pitches : 0,
+        purchaseRate: purchasePlays ? purchases / purchasePlays : 0,
+        purchasePageViewRate: purchasePageViews ? purchases / purchasePageViews : 0,
+        purchaseAttributionAvailable: attributedPurchases != null,
+        purchaseUsesTotal: attributedPurchases == null,
+        purchasePlays,
+        purchasePageViews,
+        seriesLabel: retentionSeries && retentionSeries.label || seriesKey.toUpperCase()
+      };
+    }
+
+    function renderSummaryCards(data) {
+      const summary = summaryForSeries(data);
+
+      $("#pageViewsValue").textContent = formatNumber(summary.pageViews);
+      $("#pageViewsDetail").textContent = summary.uniqueVisitors == null
+        ? `${summary.seriesLabel} selecionada`
+        : `${formatNumber(summary.uniqueVisitors)} visitantes únicos`;
+      $("#playRateValue").textContent = formatPercent(summary.playRate);
+      $("#playRateDetail").textContent = `${formatNumber(summary.plays)} iniciaram`;
+      $("#leadRateValue").textContent = formatPercent(summary.leadRate);
+      $("#leadRateDetail").textContent = `${formatNumber(summary.leads)} enviaram a mão`;
+      $("#pitchRateValue").textContent = formatPercent(summary.pitchRate);
+      $("#pitchRateDetail").textContent = `${formatNumber(summary.pitches)} chegaram ao vídeo`;
+      $("#ctaValue").textContent = formatNumber(summary.ctaClicks);
+      $("#ctaDetail").textContent = summary.pitches
+        ? `${formatPercent(summary.ctaRate)} de quem viu o vídeo`
+        : "Ainda sem resultados no período";
+
+      $("#purchaseValue").textContent = formatNumber(summary.purchases);
+      $("#purchaseDetail").textContent = summary.pageViews
+        ? `${formatPercent(summary.purchases / summary.pageViews)} das visitas`
+        : "Sem visitas no período";
+
+      applyMetricStatus("#playStatus", summary.playRate, data.targets.playRate);
+      applyMetricStatus("#leadStatus", summary.leadRate, data.targets.leadRate);
+      applyMetricStatus("#pitchStatus", summary.pitchRate, data.targets.pitchRate);
+    }
+
+    function renderDashboard(data) {
+      setStatus("ready", "Dados atualizados");
+
+      const generated = new Date(data.generatedAt);
+      const periodText = data.period && data.period.type === "custom"
+        ? formatPeriodLabel({ mode: "custom", start: data.period.startDate, end: data.period.endDate })
+        : data.period.days == null
+          ? "Todo o histórico"
+          : data.period.days === 1
+            ? `Hoje: ${formatCalendarDate(todayIsoInSaoPaulo(), { day: "2-digit", month: "short", year: "numeric" })}`
+            : `Últimos ${data.period.days} dias`;
+      $("#periodLabel").textContent = `${periodText} · atualizado ${generated.toLocaleString("pt-BR", { timeZone: data.timezone || "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" })}`;
+      $("#dataSource").textContent = `Fonte: ${data.sheet || "Página1"} · ${data.timezone || "America/Sao_Paulo"}`;
+
+      renderSummaryCards(data);
+
+      renderSeriesPicker(data.retention);
+      renderRetentionChart();
+      renderGroupRows("#creativeRows", data.creatives, "creative");
+      renderGroupRows("#pageRows", data.pages, "page");
+      renderGroupRows("#locationRows", data.locations, "location");
+      renderGroupRows("#placementRows", data.placements, "placement");
+      renderDevices(data.devices);
+      renderTraffic(data.traffic);
+      switchInsightPanel(state.activeInsight);
+    }
+
+    function renderSeriesPicker(retention) {
+      const picker = $("#seriesPicker");
+      picker.innerHTML = retention.series.map(series =>
+        `<button type="button" class="series-button ${series.key === state.activeSeries ? "active" : ""}" data-series="${escapeHtml(series.key)}">${escapeHtml(series.label)} · ${formatNumber(series.plays)} Plays</button>`
+      ).join("");
+    }
+
+    function groupRowsForDisplay(rows, type) {
+      const sort = state.groupSort[type];
+      const ordered = [...(rows || [])];
+      if (!sort || !sort.key) return ordered;
+
+      const direction = sort.direction === "asc" ? 1 : -1;
+      return ordered.sort((a, b) => {
+        const aValue = Number(a[sort.key] || 0);
+        const bValue = Number(b[sort.key] || 0);
+        if (aValue !== bValue) return (aValue - bValue) * direction;
+        return b.pitches - a.pitches || b.leads - a.leads || b.plays - a.plays ||
+          b.pageViews - a.pageViews || b.ctaClicks - a.ctaClicks ||
+          String(a.name || "").localeCompare(String(b.name || ""), "pt-BR");
+      });
+    }
+
+    function syncGroupSortHeaders(type) {
+      const sort = state.groupSort[type] || { key: null, direction: "desc" };
+      $$(`[data-sort-table="${type}"]`).forEach(header => {
+        const isActive = header.dataset.sortKey === sort.key;
+        const button = header.querySelector(".sort-button");
+        const indicator = header.querySelector(".sort-indicator");
+        const label = button ? button.textContent.replace(/[↕↑↓]/g, "").trim() : "coluna";
+        header.setAttribute("aria-sort", isActive ? (sort.direction === "asc" ? "ascending" : "descending") : "none");
+        if (indicator) indicator.textContent = isActive ? (sort.direction === "asc" ? "↑" : "↓") : "↕";
+        if (button) {
+          const nextDirection = isActive && sort.direction === "desc" ? "menor para o maior" : "maior para o menor";
+          button.setAttribute("aria-label", `Ordenar ${label} do ${nextDirection}`);
+          button.title = `Ordenar do ${nextDirection}`;
+        }
+      });
+    }
+
+    function toggleGroupSort(type, key) {
+      if (!state.groupSort[type]) return;
+      const current = state.groupSort[type];
+      state.groupSort[type] = current.key === key
+        ? { key, direction: current.direction === "desc" ? "asc" : "desc" }
+        : { key, direction: "desc" };
+
+      const sourceMap = {
+        creative: ["#creativeRows", state.data && state.data.creatives],
+        page: ["#pageRows", state.data && state.data.pages],
+        location: ["#locationRows", state.data && state.data.locations],
+        placement: ["#placementRows", state.data && state.data.placements]
+      };
+      const source = sourceMap[type];
+      if (source) renderGroupRows(source[0], source[1], type);
+    }
+
+    function renderGroupRows(selector, rows, type) {
+      const element = $(selector);
+      if (!rows || !rows.length) {
+        element.innerHTML = `<tr><td colspan="6"><div class="empty">Sem dados no período.</div></td></tr>`;
+        syncGroupSortHeaders(type);
+        return;
+      }
+
+      element.innerHTML = groupRowsForDisplay(rows, type).map((row, index) => {
+        const creativeTooltip = type === "creative"
+          ? `Campanha: ${(row.campaigns || ["Sem identificação"]).join(", ")}\nConjunto: ${(row.adsets || ["Sem identificação"]).join(", ")}`
+          : "";
+        const label = type === "creative"
+          ? `<span class="creative-name" title="${escapeHtml(creativeTooltip)}" aria-label="${escapeHtml(`${row.name}. ${creativeTooltip}`)}">${escapeHtml(row.name)}</span>`
+          : `<span>${escapeHtml(row.name)}</span>`;
+        const name = `<div class="rank-name"><span class="rank-number">${index + 1}</span>${label}</div>`;
+        return `<tr><td>${name}</td><td>${formatNumber(row.pageViews)}</td><td class="${rateClass(row.playRate, "playRate")}">${formatPercent(row.playRate)}</td><td class="${rateClass(row.leadRate, "leadRate")}">${formatPercent(row.leadRate)}</td><td class="${rateClass(row.pitchRate, "pitchRate")}">${formatPercent(row.pitchRate)}</td><td>${formatNumber(row.ctaClicks)}</td></tr>`;
+      }).join("");
+      syncGroupSortHeaders(type);
+    }
+
+    function renderDevices(devices) {
+      const total = devices.reduce((sum, item) => sum + item.count, 0);
+      let cursor = 0;
+      const stops = [];
+
+      devices.forEach((item, index) => {
+        const start = cursor;
+        cursor += total ? item.count / total * 100 : 0;
+        stops.push(`${COLORS[index % COLORS.length]} ${start.toFixed(2)}% ${cursor.toFixed(2)}%`);
+      });
+
+      $("#deviceDonut").style.background = devices.length
+        ? `conic-gradient(${stops.join(",")})`
+        : "conic-gradient(var(--line) 0 100%)";
+      $("#deviceLegend").innerHTML = devices.length ? devices.map((item, index) =>
+        `<div class="legend-item"><span class="legend-dot" style="background:${COLORS[index % COLORS.length]}"></span><span class="legend-label">${escapeHtml(item.name)}</span><span class="legend-value">${formatPercent(item.rate)}</span></div>`
+      ).join("") : `<div class="empty">Sem dados.</div>`;
+    }
+
+    function renderTraffic(traffic) {
+      const days = [...(traffic.byDay || [])].sort((a, b) => b.count - a.count);
+      const maxDay = Math.max(1, ...days.map(item => item.count));
+      $("#dayChart").innerHTML = days.map(item => {
+        const height = item.count ? Math.max(5, item.count / maxDay * 82) : 2;
+        const label = `${item.name}: ${formatNumber(item.count)} acessos`;
+        return `<div class="day-column" style="--bar-height:${height}%" role="img" title="${escapeHtml(label)}" aria-label="${escapeHtml(label)}"><div class="day-column-plot"><span class="day-column-value">${formatNumber(item.count)}</span><span class="day-column-bar"></span></div><span class="day-column-label">${escapeHtml(item.name)}</span></div>`;
+      }).join("");
+
+      const hours = traffic.byHour || [];
+      const maxHour = Math.max(1, ...hours.map(item => item.count));
+      $("#hourChart").innerHTML = hours.map(item => {
+        const height = item.count ? Math.max(3, item.count / maxHour * 100) : 1;
+        return `<div class="hour-column" style="height:${height}%" title="${escapeHtml(item.label)}: ${formatNumber(item.count)} acessos" aria-label="${escapeHtml(item.label)}: ${formatNumber(item.count)} acessos"></div>`;
+      }).join("");
+    }
+
+    function switchInsightPanel(target, focusTab = false) {
+      const next = INSIGHT_ORDER.includes(target) ? target : INSIGHT_ORDER[0];
+      const index = INSIGHT_ORDER.indexOf(next);
+      state.activeInsight = next;
+
+      $$("[data-insight]").forEach(button => {
+        const active = button.dataset.insight === next;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-selected", String(active));
+        button.tabIndex = active ? 0 : -1;
+        if (active && focusTab) {
+          button.focus();
+          button.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+        }
+      });
+
+      $$("[data-insight-page]").forEach(page => {
+        page.hidden = page.dataset.insightPage !== next;
+      });
+
+      const insightCounter = $("#insightCounter");
+      const insightPrevious = $("#insightPrevious");
+      const insightNext = $("#insightNext");
+
+      if (insightCounter) {
+        insightCounter.textContent = `${index + 1} de ${INSIGHT_ORDER.length}`;
+      }
+      if (insightPrevious) insightPrevious.disabled = index === 0;
+      if (insightNext) insightNext.disabled = index === INSIGHT_ORDER.length - 1;
+    }
+
+    function moveInsightPanel(direction, focusTab = false) {
+      const current = Math.max(0, INSIGHT_ORDER.indexOf(state.activeInsight));
+      const next = Math.max(0, Math.min(INSIGHT_ORDER.length - 1, current + direction));
+      switchInsightPanel(INSIGHT_ORDER[next], focusTab);
+    }
+
+    function currentRetentionSeries() {
+      if (!state.data || !state.data.retention) return null;
+      return state.data.retention.series.find(item => item.key === state.activeSeries) || state.data.retention.series[0];
+    }
+
+    function renderRetentionChart() {
+      const series = currentRetentionSeries();
+      const canvas = $("#retentionCanvas");
+      const wrap = canvas.parentElement;
+      const width = wrap.clientWidth;
+      const height = wrap.clientHeight;
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+
+      if (!series || !series.points || !series.points.length || !series.plays) {
+        ctx.fillStyle = "#93a399";
+        ctx.font = "13px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("Ainda não há Plays suficientes para formar a curva.", width / 2, height / 2);
+        canvas.__chart = null;
+        return;
+      }
+
+      const margin = { left: width < 600 ? 43 : 58, right: 22, top: 24, bottom: 42 };
+      const plotWidth = width - margin.left - margin.right;
+      const plotHeight = height - margin.top - margin.bottom;
+      const maxSecond = state.data.retention.durationSeconds;
+      const x = second => margin.left + second / maxSecond * plotWidth;
+      const y = rate => margin.top + (1 - rate) * plotHeight;
+
+      ctx.lineWidth = 1;
+      ctx.font = "10px sans-serif";
+      ctx.textBaseline = "middle";
+      for (let rate = 0; rate <= 1.0001; rate += 0.2) {
+        const py = y(rate);
+        ctx.strokeStyle = "rgba(255,255,255,.065)";
+        ctx.beginPath(); ctx.moveTo(margin.left, py); ctx.lineTo(width - margin.right, py); ctx.stroke();
+        ctx.fillStyle = "#74847a";
+        ctx.textAlign = "right";
+        ctx.fillText(`${Math.round(rate * 100)}%`, margin.left - 9, py);
+      }
+
+      const ticks = 5;
+      for (let i = 0; i <= ticks; i++) {
+        const second = maxSecond / ticks * i;
+        const px = x(second);
+        ctx.fillStyle = "#74847a";
+        ctx.textAlign = i === 0 ? "left" : i === ticks ? "right" : "center";
+        ctx.fillText(formatTime(second), px, height - 18);
+      }
+
+      const markers = [
+        { second: state.data.retention.leadSeconds, label: "Foto enviada", color: "#68a6ff" },
+        { second: state.data.retention.pitchSeconds, label: "Vídeo iniciado", color: "#f5b942" }
+      ];
+      markers.forEach(marker => {
+        const px = x(marker.second);
+        ctx.save();
+        ctx.strokeStyle = marker.color;
+        ctx.globalAlpha = 0.7;
+        ctx.setLineDash([5, 6]);
+        ctx.beginPath(); ctx.moveTo(px, margin.top); ctx.lineTo(px, margin.top + plotHeight); ctx.stroke();
+        ctx.restore();
+        ctx.fillStyle = marker.color;
+        ctx.textAlign = marker.second > maxSecond * 0.75 ? "right" : "left";
+        ctx.fillText(marker.label, px + (marker.second > maxSecond * 0.75 ? -6 : 6), margin.top + 9);
+      });
+
+      const pointCoords = series.points.map(point => ({ ...point, x: x(point.second), y: y(point.rate) }));
+      const gradient = ctx.createLinearGradient(0, margin.top, 0, margin.top + plotHeight);
+      gradient.addColorStop(0, "rgba(72,212,127,.42)");
+      gradient.addColorStop(0.7, "rgba(72,212,127,.09)");
+      gradient.addColorStop(1, "rgba(72,212,127,0)");
+
+      ctx.beginPath();
+      ctx.moveTo(pointCoords[0].x, margin.top + plotHeight);
+      pointCoords.forEach((point, index) => index ? ctx.lineTo(point.x, point.y) : ctx.lineTo(point.x, point.y));
+      ctx.lineTo(pointCoords[pointCoords.length - 1].x, margin.top + plotHeight);
+      ctx.closePath();
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      ctx.beginPath();
+      pointCoords.forEach((point, index) => index ? ctx.lineTo(point.x, point.y) : ctx.moveTo(point.x, point.y));
+      ctx.strokeStyle = "#48d47f";
+      ctx.lineWidth = 2.4;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.shadowColor = "rgba(72,212,127,.35)";
+      ctx.shadowBlur = 12;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      canvas.__chart = { pointCoords, margin, plotWidth, plotHeight, width, height, series };
+    }
+
+    function handleChartPointer(event) {
+      const canvas = $("#retentionCanvas");
+      const chart = canvas.__chart;
+      const tooltip = $("#chartTooltip");
+      if (!chart) return;
+      const rect = canvas.getBoundingClientRect();
+      const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+      const px = clientX - rect.left;
+      const point = chart.pointCoords.reduce((closest, candidate) =>
+        Math.abs(candidate.x - px) < Math.abs(closest.x - px) ? candidate : closest
+      );
+      tooltip.style.display = "block";
+      tooltip.style.left = `${Math.min(point.x, chart.width - 145)}px`;
+      tooltip.style.top = `${Math.max(35, point.y)}px`;
+      tooltip.innerHTML = `${formatTime(point.second)}<br><strong>${formatNumber(point.viewers)} pessoas</strong><br>${formatPercent(point.rate)} de retenção`;
+    }
+
+    $("#loginForm").addEventListener("submit", handleLogin);
+    $("#logoutButton").addEventListener("click", logoutDashboard);
+
+    $("#dateTrigger").addEventListener("click", () => {
+      if ($("#datePopover").hidden) openDatePicker();
+      else closeDatePicker();
+    });
+
+    $("#datePresets").addEventListener("click", event => {
+      const button = event.target.closest("[data-days]");
+      if (!button) return;
+      state.draftPeriod = createPresetPeriod(button.dataset.days);
+      state.awaitingRangeEnd = false;
+      state.calendarViewMonth = monthStartFromIso(state.draftPeriod.start || state.draftPeriod.end || todayIsoInSaoPaulo());
+      renderDatePicker();
+    });
+
+    $("#calendarMonths").addEventListener("click", event => {
+      const button = event.target.closest("[data-date]");
+      if (button) chooseCalendarDate(button.dataset.date);
+    });
+
+    $("#calendarPrevious").addEventListener("click", () => {
+      state.calendarViewMonth = shiftUtcMonth(state.calendarViewMonth, -1);
+      renderDatePicker();
+    });
+
+    $("#calendarNext").addEventListener("click", () => {
+      state.calendarViewMonth = shiftUtcMonth(state.calendarViewMonth, 1);
+      renderDatePicker();
+    });
+
+    $("#startDateInput").addEventListener("change", updateDraftFromInputs);
+    $("#endDateInput").addEventListener("change", updateDraftFromInputs);
+    $("#dateCancel").addEventListener("click", closeDatePicker);
+    $("#dateApply").addEventListener("click", applyDraftPeriod);
+
+    document.addEventListener("click", event => {
+      const dateFilter = $("#dateFilter");
+      const clickedInside = typeof event.composedPath === "function"
+        ? event.composedPath().includes(dateFilter)
+        : dateFilter.contains(event.target);
+      if (!$("#datePopover").hidden && !clickedInside) closeDatePicker();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && !$("#datePopover").hidden) closeDatePicker();
+    });
+
+    $("#refreshButton").addEventListener("click", () => loadDashboard());
+    $("#seriesPicker").addEventListener("click", event => {
+      const button = event.target.closest("[data-series]");
+      if (!button) return;
+      state.activeSeries = button.dataset.series;
+      $$(".series-button").forEach(item => item.classList.toggle("active", item.dataset.series === state.activeSeries));
+      renderSummaryCards(state.data);
+      renderRetentionChart();
+    });
+
+    $("#insightNav").addEventListener("click", event => {
+      const button = event.target.closest("[data-insight]");
+      if (button) switchInsightPanel(button.dataset.insight);
+    });
+
+    $(".insight-pages").addEventListener("click", event => {
+      const button = event.target.closest(".sort-button");
+      if (!button) return;
+      const header = button.closest("[data-sort-table][data-sort-key]");
+      if (header) toggleGroupSort(header.dataset.sortTable, header.dataset.sortKey);
+    });
+
+    $("#insightNav").addEventListener("keydown", event => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      event.preventDefault();
+      if (event.key === "Home") return switchInsightPanel(INSIGHT_ORDER[0], true);
+      if (event.key === "End") return switchInsightPanel(INSIGHT_ORDER[INSIGHT_ORDER.length - 1], true);
+      moveInsightPanel(event.key === "ArrowRight" ? 1 : -1, true);
+    });
+
+    const insightPrevious = $("#insightPrevious");
+    const insightNext = $("#insightNext");
+    if (insightPrevious) insightPrevious.addEventListener("click", () => moveInsightPanel(-1));
+    if (insightNext) insightNext.addEventListener("click", () => moveInsightPanel(1));
+
+    $("#retentionCanvas").addEventListener("mousemove", handleChartPointer);
+    $("#retentionCanvas").addEventListener("touchstart", handleChartPointer, { passive: true });
+    $("#retentionCanvas").addEventListener("mouseleave", () => $("#chartTooltip").style.display = "none");
+
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => state.data && renderRetentionChart(), 120);
+    });
+
+    switchInsightPanel(state.activeInsight);
+    syncDateTrigger();
+    showDashboard("Dashboard");
+    setStatus("", "Atualizando dados da planilha…");
+    loadDashboard();
+  </script>
+</body>
+</html>
